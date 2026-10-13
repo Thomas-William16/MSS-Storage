@@ -39,7 +39,8 @@ A leader sees only their own private records by default; no implicit group-wide 
 
 - `GET/POST /categories`, `GET/POST /locations`: create body `{name,description?}`.
 - `PATCH/DELETE /categories/:id`, `/locations/:id`: edits or delete unused records. References block deletion.
-- `GET/POST /equipment`: create `{name,category,description?,minimumStock?,imageUrl?}`. Images are HTTPS URLs; uploads are intentionally unsupported.
+- `GET/POST /equipment`: create `{name,category,description?,totalStock?,photo?:{data:base64},minimumStock?,imageUrl?}`. Total stock creates real available items in the same transaction (at most 500 added per operation). Photo data is a JPEG/PNG/WebP file, max 5 MB decoded and 16 million pixels; it is decoded and normalized to JPEG before MongoDB storage. Legacy imageUrl remains optional for compatibility.
+- `GET /equipment/:id/photo`: authenticated JPEG image response, never raw photo bytes in equipment JSON. PATCH accepts photo replacement or `photo:null` to remove; omitted photo keeps the current image. PATCH totalStock may increase actual item count, but cannot remove existing items/history.
 - `GET/PATCH/DELETE /equipment/:id`: DELETE archives, retires AVAILABLE items, preserves all items/history, rejects unresolved loans, maintenance or requests. No destructive equipment deletion.
 - `GET/POST /equipment/:equipmentId/items`: create one with `{itemCode?,serialNumber?,condition?,location?,notes?}`.
 - `POST /equipment/:equipmentId/items/bulk`: `{quantity:1..500,codes?:string[],condition?,location?,notes?}`. Transactional, all-or-nothing, custom codes unique and quantity-matched.

@@ -20,56 +20,59 @@ export async function activeEquipment(id, session) {
   return equipment;
 }
 export async function createItems(user, equipmentId, input) {
-  return transaction(async (session) => {
-    const equipment = await activeEquipment(equipmentId, session);
-    if (input.location) await reference(Location, input.location, session);
-    const quantity = input.quantity || 1;
-    const counter = await Counter.findOneAndUpdate(
-      { _id: String(equipmentId) },
-      { $inc: { value: quantity } },
-      { new: true, upsert: true, session },
-    );
-    const prefix =
-      equipment.name
-        .toUpperCase()
-        .replace(/[^A-Z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
-        .slice(0, 20) || "ITEM";
-    const items = Array.from({ length: quantity }, (_, i) => ({
-      equipmentId,
-      itemCode:
-        input.codes?.[i] ||
-        input.itemCode ||
-        `${prefix}-${String(equipmentId).slice(-6).toUpperCase()}-${String(counter.value - quantity + i + 1).padStart(3, "0")}`,
-      location: input.location,
-      condition: input.condition || "GOOD",
-      status: input.condition === "DAMAGED" ? "MAINTENANCE" : "AVAILABLE",
-      notes: input.notes || "",
-      serialNumber: input.serialNumber || "",
-    }));
-    const created = await EquipmentItem.create(items, {
-      session,
-      ordered: true,
-    });
-    if (input.condition === "DAMAGED")
-      await Maintenance.create(
-        created.map((item) => ({
-          equipmentItem: item._id,
-          reportedBy: user._id,
-          description: "Initial damaged condition",
-        })),
-        { session, ordered: true },
-      );
-    await audit(
-      user,
-      "ITEMS_CREATED",
-      "Equipment",
-      equipmentId,
-      { quantity, codes: created.map((x) => x.itemCode) },
-      session,
-    );
-    return created;
+  return transaction((session) =>
+    createItemsInSession(user, equipmentId, input, session),
+  );
+}
+export async function createItemsInSession(user, equipmentId, input, session) {
+  const equipment = await activeEquipment(equipmentId, session);
+  if (input.location) await reference(Location, input.location, session);
+  const quantity = input.quantity || 1;
+  const counter = await Counter.findOneAndUpdate(
+    { _id: String(equipmentId) },
+    { $inc: { value: quantity } },
+    { new: true, upsert: true, session },
+  );
+  const prefix =
+    equipment.name
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 20) || "ITEM";
+  const items = Array.from({ length: quantity }, (_, i) => ({
+    equipmentId,
+    itemCode:
+      input.codes?.[i] ||
+      input.itemCode ||
+      `${prefix}-${String(equipmentId).slice(-6).toUpperCase()}-${String(counter.value - quantity + i + 1).padStart(3, "0")}`,
+    location: input.location,
+    condition: input.condition || "GOOD",
+    status: input.condition === "DAMAGED" ? "MAINTENANCE" : "AVAILABLE",
+    notes: input.notes || "",
+    serialNumber: input.serialNumber || "",
+  }));
+  const created = await EquipmentItem.create(items, {
+    session,
+    ordered: true,
   });
+  if (input.condition === "DAMAGED")
+    await Maintenance.create(
+      created.map((item) => ({
+        equipmentItem: item._id,
+        reportedBy: user._id,
+        description: "Initial damaged condition",
+      })),
+      { session, ordered: true },
+    );
+  await audit(
+    user,
+    "ITEMS_CREATED",
+    "Equipment",
+    equipmentId,
+    { quantity, codes: created.map((x) => x.itemCode) },
+    session,
+  );
+  return created;
 }
 export async function inventoryStats(filter = {}) {
   const rows = await Equipment.find(filter).populate("category").lean();

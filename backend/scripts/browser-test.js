@@ -1,4 +1,5 @@
 import "./test-env.js";
+import sharp from "sharp";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import { spawn } from "node:child_process";
 import { chromium } from "@playwright/test";
@@ -48,13 +49,39 @@ try {
   await page.goto("http://localhost:3000/equipment.html");
   await page.getByRole("button", { name: "New equipment" }).click();
   await page.getByLabel("Equipment name").fill("Patrol Tent");
+  await page.getByLabel("Total stock", { exact: true }).fill("2");
+  await page.getByLabel("Equipment photo", { exact: true }).setInputFiles({
+    name: "tent.png",
+    mimeType: "image/png",
+    buffer: await sharp({
+      create: { width: 40, height: 40, channels: 3, background: "#71508b" },
+    })
+      .png()
+      .toBuffer(),
+  });
+  await page.getByRole("img", { name: "Equipment photo preview" }).waitFor();
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.getByRole("link", { name: "Patrol Tent" }).click();
+  await page
+    .locator('[data-count="available"] strong')
+    .filter({ hasText: /^2$/ })
+    .waitFor();
+  await page.getByRole("img", { name: "Patrol Tent photo" }).waitFor();
   await page.getByRole("button", { name: "Add items" }).click();
   await page.getByLabel("Quantity", { exact: true }).fill("2");
   await page.getByRole("button", { name: "Review batch", exact: true }).click();
   await page.getByRole("button", { name: "Confirm", exact: true }).click();
   await page.getByRole("link", { name: /PATROL-TENT-.*-001/ }).waitFor();
+  await page
+    .locator('[data-count="available"] strong')
+    .filter({ hasText: /^4$/ })
+    .waitFor();
+  await page.goto("http://localhost:3000/equipment.html");
+  await page.getByRole("button", { name: "New equipment" }).click();
+  await page.getByLabel("Equipment name").fill("Camp Stove");
+  await page.getByLabel("Total stock", { exact: true }).fill("1");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.getByRole("link", { name: "Camp Stove", exact: true }).waitFor();
   await page.goto("http://localhost:3000/users.html");
   await page.getByRole("button", { name: "New user" }).click();
   await page.getByLabel("Full name").fill("Patrol Scout");
@@ -72,17 +99,57 @@ try {
   await page
     .getByLabel("Purpose", { exact: true })
     .fill("Browser verified camp");
-  await page.locator(".item-picker input[type=checkbox]").first().check();
+  const tentCard = page.locator(".borrow-card").filter({
+    has: page.getByRole("heading", { name: "Patrol Tent", exact: true }),
+  });
+  await tentCard.getByLabel("Patrol Tent quantity to add").fill("2");
+  await tentCard.getByRole("button", { name: "Add to cart" }).click();
+  await page
+    .locator(".borrow-card")
+    .filter({
+      has: page.getByRole("heading", { name: "Camp Stove", exact: true }),
+    })
+    .getByRole("button", { name: "Add to cart" })
+    .click();
+  await page
+    .locator(".cart-summary")
+    .filter({ hasText: "2 equipment types · 3 physical items" })
+    .waitFor();
+  assert.equal(
+    await page
+      .locator(".borrow-card")
+      .filter({
+        has: page.getByRole("heading", { name: "Camp Stove", exact: true }),
+      })
+      .getByRole("button", { name: "Add to cart" })
+      .isDisabled(),
+    true,
+  );
+  await page.screenshot({
+    path: "/tmp/scout-storage-cart-desktop.png",
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Confirm issuance" }).click();
   await page.getByRole("cell", { name: "Browser verified camp" }).waitFor();
   await page.getByRole("link", { name: /BR-/ }).first().click();
   await page.getByRole("button", { name: "Record returns" }).click();
-  await page.getByRole("checkbox", { name: /Return PATROL/ }).check();
+  for (const check of await page
+    .getByRole("checkbox", { name: /^Return / })
+    .all())
+    await check.check();
   await page
     .getByRole("button", { name: "Record returns", exact: true })
     .last()
     .click();
   await page.locator(".detail-line .badge.returned").waitFor();
+  const loanDetail = await page.evaluate(async () => {
+    const id = new URLSearchParams(location.search).get("id");
+    return (await (await fetch(`/api/v1/borrowings/${id}`)).json()).data;
+  });
+  assert.ok(
+    loanDetail.items.every((item) => item.resolution === "RETURNED"),
+    "Cart items must be returned, not marked lost",
+  );
   await page.goto("http://localhost:3000/requests.html");
   await page.getByRole("button", { name: "New request" }).click();
   await page.getByLabel("Purpose", { exact: true }).fill("Scout day hike");
@@ -141,6 +208,22 @@ try {
     fullPage: true,
   });
   assert.deepEqual(errors, []);
+  await page.goto("http://localhost:3000/borrowings.html");
+  await page.getByRole("button", { name: "Issue equipment" }).click();
+  await page
+    .getByRole("heading", { name: "Borrowing cart", exact: true })
+    .waitFor();
+  assert.ok(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+    "Mobile cart must not overflow",
+  );
+  await page.screenshot({
+    path: "/tmp/scout-storage-cart-mobile.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL("**/login.html");
   await page.getByLabel("Email address").fill("scout@browser.test");
@@ -175,7 +258,7 @@ try {
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL("**/login.html");
   console.log(
-    "Browser integration passed: login, taxonomy, equipment/bulk items, user, issue/return, request/approval, damage/repair, QR, reports/audit/settings, mobile navigation, scout request/cancellation and logout.",
+    "Browser integration passed: login, taxonomy, equipment/photo/initial stock/bulk items, user, multi-type borrowing cart/return, request/approval, damage/repair, QR, reports/audit/settings, mobile navigation, scout request/cancellation and logout.",
   );
 } catch (error) {
   await page?.screenshot({

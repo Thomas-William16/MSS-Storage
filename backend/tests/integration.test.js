@@ -717,3 +717,146 @@ describe("Additional state and HTTP invariants", () => {
     expect(response.body.error.message).toContain("Too many login attempts");
   });
 });
+
+describe("Equipment photos and total stock", () => {
+  it("creates real available items with total stock and updates dashboard counts immediately", async () => {
+    const res = await send("ADMIN", "post", "/equipment", {
+      name: "Rope",
+      category: String(category._id),
+      totalStock: 3,
+    });
+    expect(res.status, res.text).toBe(201);
+    const detail = await clients.ADMIN.get(
+      `/api/v1/equipment/${res.body.data._id}`,
+    );
+    expect(detail.body.data.counts.total).toBe(3);
+    expect(detail.body.data.counts.available).toBe(3);
+    const selectable = await clients.ADMIN.get(
+      `/api/v1/equipment/${res.body.data._id}/items?status=AVAILABLE`,
+    );
+    expect(selectable.body.data).toHaveLength(3);
+    expect(
+      (await clients.ADMIN.get("/api/v1/reports/dashboard")).body.data.counts
+        .AVAILABLE,
+    ).toBe(3);
+  });
+  it("grows stock atomically and rejects reductions without destroying borrowing history", async () => {
+    const existing = await items(2);
+    await loan([existing[0]._id]);
+    const grown = await send("ADMIN", "patch", `/equipment/${equipment._id}`, {
+      totalStock: 5,
+    });
+    expect(grown.status, grown.text).toBe(200);
+    expect(
+      await EquipmentItem.countDocuments({ equipmentId: equipment._id }),
+    ).toBe(5);
+    expect((await EquipmentItem.findById(existing[0]._id)).status).toBe(
+      "BORROWED",
+    );
+    const rejected = await send(
+      "ADMIN",
+      "patch",
+      `/equipment/${equipment._id}`,
+      { name: "Do not commit", totalStock: 1 },
+    );
+    expect(rejected.status).toBe(409);
+    expect((await Equipment.findById(equipment._id)).name).toBe("Tent");
+    expect(await BorrowingItem.countDocuments()).toBe(1);
+    expect(
+      (
+        await send("ADMIN", "post", "/equipment", {
+          name: "Huge batch",
+          category: String(category._id),
+          totalStock: 501,
+        })
+      ).status,
+    ).toBe(400);
+    expect(await Equipment.exists({ name: "Huge batch" })).toBeNull();
+  });
+  it("decodes and stores uploaded photos, limits exposure, and supports replacement/removal", async () => {
+    const { default: sharp } = await import("sharp");
+    const { randomBytes } = await import("node:crypto");
+    const raw = randomBytes(400 * 400 * 3);
+    const image = await sharp(raw, {
+      raw: { width: 400, height: 400, channels: 3 },
+    })
+      .png()
+      .toBuffer();
+    expect(image.length).toBeGreaterThan(64000);
+    const res = await send("ADMIN", "post", "/equipment", {
+      name: "Photo tent",
+      category: String(category._id),
+      totalStock: 2,
+      photo: { data: image.toString("base64") },
+    });
+    expect(res.status, res.text).toBe(201);
+    expect(res.body.data.hasPhoto).toBe(true);
+    expect(res.body.data.photo).toBeUndefined();
+    const photo = await clients.SCOUT.get(
+      `/api/v1/equipment/${res.body.data._id}/photo`,
+    );
+    expect(photo.status).toBe(200);
+    expect(photo.headers["content-type"]).toContain("image/jpeg");
+    expect((await sharp(photo.body).metadata()).format).toBe("jpeg");
+    expect(
+      (await request(app).get(`/api/v1/equipment/${res.body.data._id}/photo`))
+        .status,
+    ).toBe(401);
+    const detail = await clients.ADMIN.get(
+      `/api/v1/equipment/${res.body.data._id}`,
+    );
+    expect(detail.body.data.photo).toBeUndefined();
+    expect(JSON.stringify(await AuditLog.find())).not.toContain(
+      image.toString("base64").slice(0, 100),
+    );
+    const cleared = await send(
+      "ADMIN",
+      "patch",
+      `/equipment/${res.body.data._id}`,
+      { photo: null },
+    );
+    expect(cleared.status).toBe(200);
+    expect(cleared.body.data.hasPhoto).toBe(false);
+    expect(
+      (await clients.ADMIN.get(`/api/v1/equipment/${res.body.data._id}/photo`))
+        .status,
+    ).toBe(404);
+  });
+  it("rejects invalid or unsafe images without creating equipment or stock", async () => {
+    for (const value of [
+      "not base64",
+      Buffer.from("not an image").toString("base64"),
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>',
+      ).toString("base64"),
+    ]) {
+      const res = await send("ADMIN", "post", "/equipment", {
+        name: "Invalid photo",
+        category: String(category._id),
+        totalStock: 3,
+        photo: { data: value },
+      });
+      expect(res.status, res.text).toBe(400);
+    }
+    expect(await Equipment.exists({ name: "Invalid photo" })).toBeNull();
+    expect(await EquipmentItem.countDocuments()).toBe(0);
+  });
+  it("issues several equipment types together in one borrowing", async () => {
+    const tents = await items(2);
+    const other = await send("ADMIN", "post", "/equipment", {
+      name: "Stove",
+      category: String(category._id),
+      totalStock: 1,
+    });
+    const stove = await EquipmentItem.findOne({
+      equipmentId: other.body.data._id,
+    });
+    const issued = await loan([tents[0]._id, tents[1]._id, String(stove._id)]);
+    expect(issued.status, issued.text).toBe(201);
+    expect(await Borrowing.countDocuments()).toBe(1);
+    expect(
+      await BorrowingItem.countDocuments({ borrowing: issued.body.data._id }),
+    ).toBe(3);
+    expect(await EquipmentItem.countDocuments({ status: "BORROWED" })).toBe(3);
+  });
+});

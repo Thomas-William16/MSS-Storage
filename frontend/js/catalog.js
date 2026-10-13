@@ -15,6 +15,7 @@ import {
   toast,
 } from "./dom.js";
 import { pagedList } from "./lists.js";
+import { photoUrl, readPhoto } from "./photos.js";
 const conditions = ["NEW", "GOOD", "FAIR", "DAMAGED"].map((value) => ({
   value,
   label: value,
@@ -47,22 +48,28 @@ export async function equipmentView(root) {
           value: record.description,
         },
         {
-          name: "minimumStock",
-          label: "Minimum available stock",
+          name: "totalStock",
+          label: "Total stock",
           type: "number",
-          min: 0,
-          max: 100000,
-          value: record.minimumStock || 0,
+          min: record._id ? record.counts?.total || 0 : 1,
+          max: (record.counts?.total || 0) + 500,
+          value: record._id ? record.counts?.total || 0 : 1,
+          hint: record._id
+            ? "Increase to add physical items. Existing items and their history are kept."
+            : "Creates this many individually coded items, immediately available to borrow.",
         },
         {
-          name: "imageUrl",
-          label: "Image URL (HTTPS)",
-          type: "url",
+          name: "photo",
+          label: "Equipment photo",
+          type: "file",
           required: false,
-          value: record.imageUrl,
+          accept: "image/jpeg,image/png,image/webp",
+          previewUrl: record._id ? photoUrl(record) : undefined,
+          hint: "JPEG, PNG or WebP, up to 5 MB. Choose a file from your computer.",
         },
       ],
       async (data) => {
+        if (data.photo) data.photo = await readPhoto(data.photo);
         await api(record._id ? `/equipment/${record._id}` : "/equipment", {
           method: record._id ? "PATCH" : "POST",
           body: data,
@@ -97,9 +104,25 @@ export async function equipmentView(root) {
         render: (x) =>
           el(
             "div",
-            {},
-            link(x.name, `/equipment-details.html?id=${x._id}`),
-            el("small", { class: "subline" }, x.description),
+            { class: "equipment-cell" },
+            photoUrl(x)
+              ? el("img", {
+                  class: "equipment-thumb",
+                  src: photoUrl(x),
+                  crossOrigin: "use-credentials",
+                  alt: `${x.name} photo`,
+                })
+              : el(
+                  "span",
+                  { class: "equipment-thumb no-photo", "aria-hidden": "true" },
+                  "▦",
+                ),
+            el(
+              "div",
+              {},
+              link(x.name, `/equipment-details.html?id=${x._id}`),
+              el("small", { class: "subline" }, x.description),
+            ),
           ),
       },
       { label: "Category", render: (x) => x.category?.name },
@@ -207,22 +230,32 @@ export async function equipmentDetail(root, id) {
       ),
     ),
   );
-  root.append(
-    el(
-      "div",
-      { class: "stats" },
-      Object.entries(record.counts)
+  const stats = el("div", { class: "stats" });
+  function showCounts(counts) {
+    stats.replaceChildren(
+      ...Object.entries(counts)
         .filter(([key]) => key !== "_id")
         .map(([key, value]) =>
           el(
             "article",
-            { class: "stat compact" },
+            { class: "stat compact", "data-count": key },
             el("span", { class: "stat-label" }, key),
             el("strong", {}, value),
           ),
         ),
-    ),
-  );
+    );
+  }
+  showCounts(record.counts);
+  root.append(stats);
+  if (photoUrl(record))
+    root.append(
+      el("img", {
+        class: "equipment-cover",
+        src: photoUrl(record),
+        crossOrigin: "use-credentials",
+        alt: `${record.name} photo`,
+      }),
+    );
   root.append(
     el(
       "p",
@@ -232,7 +265,7 @@ export async function equipmentDetail(root, id) {
   );
   const container = panel("Individual items");
   root.append(container);
-  reload = pagedList(container, {
+  const reloadItems = pagedList(container, {
     path: `/equipment/${id}/items`,
     filters: [
       {
@@ -259,6 +292,11 @@ export async function equipmentDetail(root, id) {
       { label: "Notes", key: "notes" },
     ],
   });
+  reload = async () => {
+    await reloadItems();
+    const { data: fresh } = await api(`/equipment/${id}`);
+    showCounts(fresh.counts);
+  };
 }
 export async function printLabels(ids) {
   if (ids.length > 500) throw new Error("Print up to 500 labels at a time");

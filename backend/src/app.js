@@ -44,7 +44,14 @@ app.use(
     allowedHeaders: ["Content-Type", "X-CSRF-Token"],
   }),
 );
-app.use(express.json({ limit: "64kb" }));
+const standardJson = express.json({ limit: "64kb" }),
+  photoJson = express.json({ limit: "8mb" });
+app.use((req, res, next) => {
+  const acceptsPhoto =
+    ["POST", "PATCH"].includes(req.method) &&
+    /^\/api\/v1\/equipment(?:\/[a-f0-9]{24})?$/i.test(req.path);
+  (acceptsPhoto ? photoJson : standardJson)(req, res, next);
+});
 app.use(cookieParser());
 app.get("/health", async (req, res) => {
   let ready = mongoose.connection.readyState === 1;

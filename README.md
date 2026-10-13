@@ -6,12 +6,12 @@ A real MongoDB-backed inventory application for Scout groups. Vanilla HTML/CSS/E
 
 - Four roles: ADMIN, STORAGE_KEEPER, LEADER, SCOUT; backend permissions and private-record ownership checks.
 - Revocable HTTP-only cookie sessions, CSRF tokens, bcrypt passwords, rate limits, account deactivation, no self-registration.
-- Categories, locations, equipment catalog, archive workflow, per-item conditions and statuses, atomic bulk creation and provisional code previews.
-- Multi-item borrowing, concurrent reservation protection, partial returns, damaged/lost outcomes and overdue calculations.
+- Categories, locations, equipment catalog, uploaded photos, total stock that creates real items atomically, archive workflow, per-item conditions/statuses, bulk creation and code previews.
+- Multi-equipment borrowing cart with quantities, item-code review, concurrent reservation protection, partial returns, damaged/lost outcomes and overdue calculations.
 - Multi-equipment requests, approval/rejection/cancellation, separate confirmed issuance and status history.
 - Damage reporting, costs and repair workflows, authenticated QR lookup/download/individual and bulk printing.
 - Live dashboard, filtered/paginated operational reports, most-borrowed ranking, safe current-page CSV export and audit logs.
-- Responsive sidebar interface, accessible labeled forms, loading/error/empty states and safe DOM rendering.
+- Purple and café responsive sidebar interface, accessible labeled forms, loading/error/empty states and safe DOM rendering.
 
 ## Architecture and files
 
@@ -95,7 +95,7 @@ MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries npm test
 
 See [docs/API.md](docs/API.md) for routes, JSON request bodies and the full permission matrix. All lists paginate. CSV exports contain the selected **page**, so export each desired page or use the API for complete extraction. Inventory status counts partition items; DAMAGED is an overlapping condition metric and is not added to totals. Requests do not reserve inventory, even when approved; issuance rechecks stock. Availability is current physical stock rather than future-date scheduling/reservations. Dates are stored in UTC; the browser displays/converts local dates. Maintenance costs are numeric amounts in your organization's chosen currency; no currency conversion is performed.
 
-Physical items and borrowing history are never destructively deleted. Equipment is archived (remaining AVAILABLE items become RETIRED) and users deactivated. Image uploads are not supported; optional HTTPS image URLs are validated. QR codes require normal authentication and do not grant permissions.
+Physical items and borrowing history are never destructively deleted. Equipment is archived (remaining AVAILABLE items become RETIRED) and users deactivated. Equipment photos can be uploaded as JPEG, PNG or WebP (up to 5 MB, 16 million pixels). The backend decodes, strips metadata, resizes and re-encodes them as JPEG, stores them in MongoDB, and serves them only to authenticated inventory viewers. SVG, animated and invalid images are rejected. Photo bytes are excluded from JSON responses and audit logs. Legacy HTTPS image URLs remain supported by the API for compatibility. QR codes require normal authentication and do not grant permissions.
 
 ## Atlas, Vercel and backend deployment
 
@@ -116,7 +116,7 @@ Vercel static hosting does **not** run Express. The backend remains a persistent
 - Current IP login limits are process-local; multi-instance deployments should add a shared limiter store before horizontally scaling. Use a correctly configured trusted proxy to avoid spoofed client addresses.
 - Audit entries are append-only through application routes, but not cryptographically tamper-proof. Restrict direct DB credentials. Session expiration is absolute (8 hours), not sliding.
 - Session settings and public URL configuration should be reviewed for your own domains. Production cookie behavior must be validated in deployed browsers.
-- No email/password-reset flow, email verification, MFA, notifications, file uploads, future inventory reservations or multi-organization tenancy is implied. Accounts/password resets are administrator-managed.
+- No email/password-reset flow, email verification, MFA, notifications, arbitrary file uploads, future inventory reservations or multi-organization tenancy is implied. Accounts/password resets are administrator-managed.
 
 ## Backup and restore
 
@@ -131,3 +131,13 @@ Enable Atlas scheduled backups and retention, limit restore access, and perform 
 - Archive 409: resolve active maintenance, outstanding borrowing and pending/approved requests first.
 - Replica-set test download blocked: allow `fastdl.mongodb.org` and reuse the verified binary cache; do not disable TLS or checksum verification.
 - npm cache not writable: use `npm ci --cache /workspace/.npm-cache` in the cloud workspace.
+
+## Equipment stock, photos and borrowing cart
+
+New equipment asks for **Total stock**, not a minimum-stock threshold. Entering 3 creates three individually coded GOOD/AVAILABLE physical items together with the equipment record. Availability and dashboard totals come from these real records, and detail counts refresh immediately after adding a batch. Editing total stock upward adds the difference (up to 500 per operation). Reductions are rejected to preserve individual item and borrowing history; retire items through the item workflow. The legacy minimumStock API field remains for existing low-stock settings.
+
+Existing equipment created with no physical items stays at zero until you edit its total stock or add physical items. The cart clearly labels zero-stock equipment; it does not invent stock. Add quantities of several equipment types, adjust/remove cart lines, review the selected item codes, select the borrower and due date, and confirm a single issuance. The server revalidates and reserves all items atomically; up to 100 physical items per issue. Equipment requests still require exact approved quantities at issuance.
+
+### Updating a downloaded Windows copy
+
+Stop the running app with Ctrl+C before updating. Download the newest scout-storage-app branch ZIP and extract into a **new folder**. Copy your existing ignored `.env` file and `.local-db` directory into that new project folder to retain account and inventory data. Do not copy `node_modules`. Open PowerShell in the new folder, run `npm ci`, then `npm run dev:local`. Keep the old folder as a backup until your accounts and inventory are verified. Never copy a live MongoDB data directory while its server is running.

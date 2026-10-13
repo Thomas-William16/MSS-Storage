@@ -17,6 +17,7 @@ import {
   iso,
 } from "./dom.js";
 import { pagedList } from "./lists.js";
+import { photoUrl } from "./photos.js";
 const opts = (values) =>
   values.map((value) => ({ value, label: value.replaceAll("_", " ") }));
 function workflowDialog(title, content, submit, action) {
@@ -63,10 +64,10 @@ function field(label, input) {
   );
 }
 export async function issueDialog(refresh, request) {
-  const users = await all("/users"),
-    equipment = request
-      ? request.items.map((x) => x.equipment)
-      : await all("/equipment");
+  const users = await all("/users");
+  const equipment = request
+    ? request.items.map((x) => x.equipment)
+    : await all("/equipment");
   const user = el(
     "select",
     { required: true },
@@ -87,55 +88,211 @@ export async function issueDialog(refresh, request) {
       value: request?.purpose || "",
     }),
     notes = el("textarea", { maxLength: 2000 });
-  const itemArea = el("div", { class: "item-picker" }),
-    checks = [];
-  for (const type of equipment) {
-    const items = await all(`/equipment/${type._id}/items?status=AVAILABLE`);
-    if (!items.length) continue;
-    const required = request?.items.find(
-      (x) => x.equipment._id === type._id,
-    )?.quantity;
-    const group = el(
-      "fieldset",
-      {},
-      el(
-        "legend",
-        {},
-        type.name + (required ? ` · ${required} requested` : ""),
-      ),
-    );
-    for (const item of items) {
-      const check = el("input", { type: "checkbox", value: item._id });
-      checks.push(check);
-      group.append(
+  const catalog = el("div", { class: "borrow-catalog" }),
+    cartBody = el("div", { class: "cart-lines" }),
+    summary = el("p", { class: "cart-summary", role: "status" }),
+    cart = new Map(),
+    catalogCards = [];
+  const total = () =>
+    [...cart.values()].reduce((sum, row) => sum + row.ids.length, 0);
+  function renderCart() {
+    cartBody.replaceChildren();
+    if (!cart.size)
+      cartBody.append(
         el(
-          "label",
-          { class: "check-row" },
-          check,
-          el("span", {}, `${item.itemCode} · ${item.condition}`),
+          "div",
+          { class: "empty" },
+          el("strong", {}, "Your borrowing cart is empty"),
+          el("p", {}, "Add equipment from the available stock."),
+        ),
+      );
+    for (const [id, row] of cart) {
+      const change = (delta) => {
+        if (delta > 0) {
+          if (total() >= 100)
+            throw new Error("Issue up to 100 physical items at a time");
+          if (row.ids.length >= row.items.length)
+            throw new Error("All available items are already in your cart");
+          row.ids.push(row.items[row.ids.length]._id);
+        } else {
+          row.ids.pop();
+          if (!row.ids.length) cart.delete(id);
+        }
+        renderCart();
+      };
+      cartBody.append(
+        el(
+          "article",
+          { class: "cart-line" },
+          el(
+            "div",
+            {},
+            el("strong", {}, row.type.name),
+            el(
+              "small",
+              { class: "subline" },
+              row.items
+                .filter((x) => row.ids.includes(x._id))
+                .map((x) => x.itemCode)
+                .join(", "),
+            ),
+          ),
+          actions(
+            button("−", () => change(-1)),
+            el(
+              "span",
+              {
+                class: "cart-quantity",
+                "aria-label": `${row.type.name} cart quantity`,
+              },
+              row.ids.length,
+            ),
+            button("＋", () => change(1)),
+            button("Remove", () => {
+              cart.delete(id);
+              renderCart();
+            }),
+          ),
         ),
       );
     }
-    itemArea.append(group);
+    summary.textContent = `${cart.size} equipment ${cart.size === 1 ? "type" : "types"} · ${total()} physical ${total() === 1 ? "item" : "items"}`;
+    for (const entry of catalogCards) {
+      const remaining =
+        entry.items.length - (cart.get(entry.type._id)?.ids.length || 0);
+      entry.available.textContent = `${remaining} available to add`;
+      entry.add.dataset.keepDisabled = String(
+        remaining === 0 || total() >= 100,
+      );
+      entry.add.disabled = remaining === 0 || total() >= 100;
+      entry.quantity.max = Math.max(remaining, 1);
+      entry.quantity.disabled = remaining === 0 || total() >= 100;
+      entry.quantity.value = Math.min(
+        Math.max(Number(entry.quantity.value) || 1, 1),
+        Math.max(remaining, 1),
+      );
+    }
   }
+  const available = await Promise.all(
+    equipment.map((type) =>
+      all(`/equipment/${type._id}/items?status=AVAILABLE`),
+    ),
+  );
+  for (let i = 0; i < equipment.length; i++) {
+    const type = equipment[i],
+      items = available[i].filter((x) => x.condition !== "DAMAGED"),
+      required = request?.items.find(
+        (x) => x.equipment._id === type._id,
+      )?.quantity;
+    const quantity = el("input", {
+        type: "number",
+        min: 1,
+        max: items.length,
+        value: 1,
+        "aria-label": `${type.name} quantity to add`,
+      }),
+      stock = el("p", { class: "muted" });
+    const add = button(
+      "Add to cart",
+      () => {
+        const count = Number(quantity.value);
+        const row = cart.get(type._id) || { type, items, ids: [] };
+        if (
+          !Number.isInteger(count) ||
+          count < 1 ||
+          count > items.length - row.ids.length
+        )
+          throw new Error("Choose a quantity within the available stock");
+        if (total() + count > 100)
+          throw new Error("Issue up to 100 physical items at a time");
+        row.ids.push(
+          ...items
+            .slice(row.ids.length, row.ids.length + count)
+            .map((x) => x._id),
+        );
+        cart.set(type._id, row);
+        renderCart();
+      },
+      "primary",
+    );
+    const card = el(
+      "article",
+      { class: "borrow-card" },
+      photoUrl(type)
+        ? el("img", {
+            class: "cart-photo",
+            src: photoUrl(type),
+            crossOrigin: "use-credentials",
+            alt: `${type.name} photo`,
+          })
+        : el(
+            "div",
+            { class: "cart-photo no-photo", "aria-hidden": "true" },
+            "▦",
+          ),
+      el("h3", {}, type.name),
+      stock,
+      required ? el("p", { class: "muted" }, `${required} requested`) : null,
+      actions(quantity, add),
+    );
+    catalogCards.push({ type, items, available: stock, add, quantity, card });
+    catalog.append(card);
+  }
+  if (!available.some((items) => items.length))
+    catalog.prepend(
+      el(
+        "p",
+        { class: "stock-help" },
+        "No physical items are available. Set the total stock on an equipment record or add items first.",
+        link("Open equipment →", "/equipment.html"),
+      ),
+    );
+  const search = el("input", {
+    type: "search",
+    placeholder: "Find equipment…",
+    "aria-label": "Search available equipment",
+    onInput: (event) => {
+      const term = event.target.value.toLowerCase();
+      for (const entry of catalogCards)
+        entry.card.hidden = !entry.type.name.toLowerCase().includes(term);
+    },
+  });
+  renderCart();
   workflowDialog(
     request ? "Issue approved request" : "New borrowing",
     [
-      field("Borrower", user),
-      field("Expected return (your local time)", expected),
+      el(
+        "div",
+        { class: "issue-fields" },
+        field("Borrower", user),
+        field("Expected return (your local time)", expected),
+      ),
       field("Purpose", purpose),
       field("Notes", notes),
       el(
+        "div",
+        { class: "borrow-cart-layout" },
+        el("section", {}, el("h3", {}, "Available equipment"), search, catalog),
+        el(
+          "section",
+          { class: "borrow-cart" },
+          el("h3", {}, "Borrowing cart"),
+          cartBody,
+          summary,
+        ),
+      ),
+      el(
         "p",
         { class: "muted" },
-        "Select the individual items to issue. Availability is verified again atomically when saved.",
+        "Each quantity represents individually tracked physical items. All items are issued together; availability is checked again when you confirm. Maximum 100 items per issue.",
       ),
-      itemArea,
     ],
     "Confirm issuance",
     async () => {
-      const itemIds = checks.filter((x) => x.checked).map((x) => x.value);
-      if (!itemIds.length) throw new Error("Select at least one item");
+      const itemIds = [...cart.values()].flatMap((x) => x.ids);
+      if (!itemIds.length)
+        throw new Error("Add at least one item to your borrowing cart");
+      if (!user.value) throw new Error("Choose an active borrower");
       await api("/borrowings", {
         method: "POST",
         body: {

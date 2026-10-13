@@ -65,6 +65,11 @@ export const Equipment = make(
     category: ref("Category"),
     minimumStock: { type: Number, min: 0, default: 0 },
     imageUrl: text(2048),
+    hasPhoto: { type: Boolean, default: false },
+    photo: {
+      type: new Schema({ data: Buffer, contentType: String }, { _id: false }),
+      select: false,
+    },
     archivedAt: { type: Date, default: null },
     revision: { type: Number, default: 0 },
   },
