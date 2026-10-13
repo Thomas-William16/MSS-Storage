@@ -5,13 +5,13 @@ import { config } from "../config/env.js";
 export const hash = (value) =>
   crypto.createHash("sha256").update(value).digest("hex");
 export const permissionMatrix = {
-  inventory: ["ADMIN", "STORAGE_KEEPER", "LEADER", "SCOUT"],
+  inventory: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
   manageInventory: ["ADMIN", "STORAGE_KEEPER"],
   borrow: ["ADMIN", "STORAGE_KEEPER"],
-  requests: ["ADMIN", "STORAGE_KEEPER", "LEADER", "SCOUT"],
+  requests: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
   reviewRequests: ["ADMIN", "STORAGE_KEEPER"],
   maintenance: ["ADMIN", "STORAGE_KEEPER"],
-  reportDamage: ["ADMIN", "STORAGE_KEEPER", "LEADER", "SCOUT"],
+  reportDamage: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
   reports: ["ADMIN", "STORAGE_KEEPER"],
   users: ["ADMIN"],
   taxonomy: ["ADMIN"],

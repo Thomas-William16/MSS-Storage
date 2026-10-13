@@ -387,6 +387,14 @@ export async function borrowingDetail(root, id) {
           { class: "muted" },
           "Select only the items being returned now. Damaged items enter maintenance; lost items are recorded as lost.",
         ),
+        actions(
+          button("Select all", () => {
+            for (const entry of entries) entry.check.checked = true;
+          }),
+          button("Clear selection", () => {
+            for (const entry of entries) entry.check.checked = false;
+          }),
+        ),
         table(
           [
             { label: "Return", render: (x) => x.check },

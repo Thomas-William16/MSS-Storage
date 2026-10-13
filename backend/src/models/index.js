@@ -11,7 +11,7 @@ const make = (name, fields, indexes = []) => {
   for (const [keys, options] of indexes) schema.index(keys, options);
   return mongoose.model(name, schema);
 };
-export const roles = ["ADMIN", "STORAGE_KEEPER", "LEADER", "SCOUT"];
+export const roles = ["ADMIN", "STORAGE_KEEPER", "SCOUT"];
 export const conditions = ["NEW", "GOOD", "FAIR", "DAMAGED"];
 export const statuses = [
   "AVAILABLE",
@@ -48,15 +48,6 @@ export const Category = make(
   },
   [[{ name: 1 }, { unique: true }]],
 );
-export const Location = make(
-  "Location",
-  {
-    name: { type: String, required: true, maxlength: 100 },
-    description: text(),
-    revision: { type: Number, default: 0 },
-  },
-  [[{ name: 1 }, { unique: true }]],
-);
 export const Equipment = make(
   "Equipment",
   {
@@ -83,7 +74,8 @@ export const EquipmentItem = make(
     serialNumber: text(120),
     condition: { type: String, enum: conditions, default: "GOOD" },
     status: { type: String, enum: statuses, default: "AVAILABLE" },
-    location: ref("Location", false),
+    // Retained only for backward compatibility; never accepted or exposed by the API.
+    location: { type: Schema.Types.ObjectId, select: false },
     notes: text(),
   },
   [

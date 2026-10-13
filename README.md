@@ -4,9 +4,9 @@ A real MongoDB-backed inventory application for Scout groups. Vanilla HTML/CSS/E
 
 ## Features
 
-- Four roles: ADMIN, STORAGE_KEEPER, LEADER, SCOUT; backend permissions and private-record ownership checks.
+- Three roles: ADMIN, STORAGE_KEEPER, SCOUT; backend permissions and private-record ownership checks.
 - Revocable HTTP-only cookie sessions, CSRF tokens, bcrypt passwords, rate limits, account deactivation, no self-registration.
-- Categories, locations, equipment catalog, uploaded photos, total stock that creates real items atomically, archive workflow, per-item conditions/statuses, bulk creation and code previews.
+- Categories, equipment catalog, uploaded photos, total stock that creates real items atomically, archive workflow, per-item conditions/statuses, bulk creation and code previews.
 - Multi-equipment borrowing cart with quantities, item-code review, concurrent reservation protection, partial returns, damaged/lost outcomes and overdue calculations.
 - Multi-equipment requests, approval/rejection/cancellation, separate confirmed issuance and status history.
 - Damage reporting, costs and repair workflows, authenticated QR lookup/download/individual and bulk printing.
@@ -141,3 +141,9 @@ Existing equipment created with no physical items stays at zero until you edit i
 ### Updating a downloaded Windows copy
 
 Stop the running app with Ctrl+C before updating. Download the newest scout-storage-app branch ZIP and extract into a **new folder**. Copy your existing ignored `.env` file and `.local-db` directory into that new project folder to retain account and inventory data. Do not copy `node_modules`. Open PowerShell in the new folder, run `npm ci`, then `npm run dev:local`. Keep the old folder as a backup until your accounts and inventory are verified. Never copy a live MongoDB data directory while its server is running.
+
+## Simplified roles and returns
+
+Only ADMIN, STORAGE_KEEPER and SCOUT are supported. On startup, existing LEADER accounts are migrated transactionally to SCOUT; their IDs, passwords and borrowing/request history are retained, their old sessions are revoked, and the conversion is audited. Sign in again after updating. Locations are removed from navigation, forms, reporting and API routes. Legacy location collections/references remain hidden for preservation; no location data is accepted by the API.
+
+In Record returns, **Select all** selects only outstanding return rows. **Clear selection** clears those rows. Neither changes return conditions, notes or Lost checkboxes. Returned/resolved items are excluded, and saving still uses the normal audited return transaction.

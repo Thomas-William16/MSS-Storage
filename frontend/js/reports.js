@@ -248,7 +248,6 @@ export async function reportsView(root) {
                     { label: "Equipment", render: (x) => x.equipmentId?.name },
                     { label: "Condition", render: (x) => badge(x.condition) },
                     { label: "Status", render: (x) => badge(x.status) },
-                    { label: "Location", render: (x) => x.location?.name },
                   ];
       body.replaceChildren(table(columns, result.data));
       pager.replaceChildren(
