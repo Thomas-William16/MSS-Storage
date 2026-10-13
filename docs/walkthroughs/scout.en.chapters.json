@@ -5,52 +5,52 @@
     "cue": "SCOUT · Demo data"
   },
   {
-    "at": "00:00:22",
+    "at": "00:00:21",
     "title": "Sign in",
     "cue": "Login → Sign in"
   },
   {
-    "at": "00:00:37",
+    "at": "00:00:36",
     "title": "Browse equipment",
     "cue": "Equipment → Equipment details"
   },
   {
-    "at": "00:00:55",
+    "at": "00:00:54",
     "title": "Request multiple equipment types",
     "cue": "Requests → New request"
   },
   {
-    "at": "00:01:13",
+    "at": "00:01:12",
     "title": "Track request decisions",
     "cue": "My requests → Request details → Status history"
   },
   {
-    "at": "00:01:32",
+    "at": "00:01:31",
     "title": "Cancel a request",
     "cue": "Request details → Cancel request"
   },
   {
-    "at": "00:01:48",
+    "at": "00:01:47",
     "title": "Your borrowing and due date",
     "cue": "Borrowings → My borrowing history"
   },
   {
-    "at": "00:02:08",
+    "at": "00:02:06",
     "title": "Report damage to your borrowed item",
     "cue": "Borrowed item → Report damage"
   },
   {
-    "at": "00:02:31",
+    "at": "00:02:29",
     "title": "Follow your damage reports",
     "cue": "Maintenance → My damage reports"
   },
   {
-    "at": "00:02:49",
+    "at": "00:02:47",
     "title": "QR labels and your account",
     "cue": "Item QR · Settings → My account"
   },
   {
-    "at": "00:03:08",
+    "at": "00:03:06",
     "title": "Sign out and return equipment",
     "cue": "Sign out"
   }

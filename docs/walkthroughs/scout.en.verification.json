@@ -1,9 +1,9 @@
 {
   "role": "SCOUT",
   "language": "English",
-  "narration": "computer-generated eSpeak NG English",
-  "durationSeconds": 206.4,
-  "bytes": 3051783,
+  "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
+  "durationSeconds": 204.205,
+  "bytes": 3740288,
   "verifiedScenes": 11,
   "assertions": [
     "All role workflow steps succeeded",
@@ -12,5 +12,7 @@
   ],
   "videoCodec": "H.264",
   "audioCodec": "AAC",
-  "isolatedDatabase": true
+  "isolatedDatabase": true,
+  "truePeakDbTP": -2.58,
+  "integratedLoudnessLUFS": -17.18
 }

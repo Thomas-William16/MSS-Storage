@@ -2,8 +2,8 @@
   "role": "ADMIN",
   "language": "English",
   "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
-  "durationSeconds": 237.55,
-  "bytes": 6290742,
+  "durationSeconds": 237.605,
+  "bytes": 6280098,
   "verifiedScenes": 19,
   "assertions": [
     "CSV download succeeded",
@@ -13,5 +13,7 @@
   ],
   "videoCodec": "H.264",
   "audioCodec": "AAC",
-  "isolatedDatabase": true
+  "isolatedDatabase": true,
+  "truePeakDbTP": -2.45,
+  "integratedLoudnessLUFS": -17.23
 }

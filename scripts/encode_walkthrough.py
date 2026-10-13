@@ -1,6 +1,7 @@
 import pathlib,json,wave,subprocess,sys,datetime,math,copy,os
 root=pathlib.Path(os.environ.get('WALKTHROUGH_BUILD','/workspace/walkthrough-build'));out=pathlib.Path('docs/walkthroughs').resolve()
 lang=os.environ.get('WALKTHROUGH_LANGUAGE','ar');language='English' if lang=='en' else 'Arabic'
+narrator=os.environ.get('WALKTHROUGH_NARRATOR',f'computer-generated eSpeak NG {language}')
 key=sys.argv[1];folder=root/key;timeline=json.load(open(folder/'timeline.json'))
 assert all(scene['verified'] for scene in timeline['scenes'])
 video=timeline['rawVideo']
@@ -62,17 +63,17 @@ for scene in timeline['scenes']:
 ass=folder/'captions.ass';ass.write_text(''.join(lines),encoding='utf-8')
 (out/f'{key}.{lang}.vtt').write_text(''.join(vtt).rstrip()+'\n',encoding='utf-8')
 with open(out/f'{key}.{lang}.chapters.json','w') as f:json.dump(chapters,f,ensure_ascii=False,indent=2)
-metadata=folder/'chapters.ffmeta';meta=[';FFMETADATA1\n',f'title=Scout Storage - {timeline["title"]}\n',f'comment={language} synthesized narration; real application with isolated demonstration data\n']
+metadata=folder/'chapters.ffmeta';meta=[';FFMETADATA1\n',f'title=Scout Storage - {timeline["title"]}\n',f'comment={narrator}; real application with isolated demonstration data; LibriTTS by Heiga Zen et al., CC BY 4.0\n' if 'LibriTTS' in narrator else f'comment={language} synthesized narration; real application with isolated demonstration data\n']
 for i,scene in enumerate(timeline['scenes']):
  meta+=['[CHAPTER]\n','TIMEBASE=1/1000\n',f'START={int(scene["startMs"])}\n',f'END={int(scene["endMs"])}\n',f'title={scene["title"]}\n']
 metadata.write_text(''.join(meta),encoding='utf-8')
-command=['ffmpeg','-hide_banner','-loglevel','warning','-y','-i',video,'-i',str(folder/'narration.wav'),'-f','ffmetadata','-i',str(metadata),'-map','0:v','-map','1:a','-map_metadata','2','-map_chapters','2','-vf',f'pad=1280:840:0:0:color=0x392b48,subtitles={ass}','-r','20','-c:v','libx264','-preset','fast','-crf','24','-threads','2','-pix_fmt','yuv420p','-c:a','aac','-b:a','64k','-t',str(duration),'-movflags','+faststart',str(out/f'{key}.{lang}.mp4')]
+command=['ffmpeg','-hide_banner','-loglevel','warning','-y','-i',video,'-i',str(folder/'narration.wav'),'-f','ffmetadata','-i',str(metadata),'-map','0:v','-map','1:a','-map_metadata','2','-map_chapters','2','-vf',f'pad=1280:840:0:0:color=0x392b48,subtitles={ass}','-r','20','-c:v','libx264','-preset','fast','-crf','24','-threads','2','-pix_fmt','yuv420p','-af','loudnorm=I=-16:TP=-3:LRA=7,aresample=48000,alimiter=limit=0.5:level=false:latency=true','-c:a','aac','-b:a','128k','-ar','48000','-t',str(duration),'-movflags','+faststart',str(out/f'{key}.{lang}.mp4')]
 subprocess.run(command,check=True)
 result=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-show_streams','-show_chapters','-of','json',str(out/f'{key}.{lang}.mp4')]))
 assert any(stream['codec_type']=='video' and stream['codec_name']=='h264' for stream in result['streams'])
 assert any(stream['codec_type']=='audio' and stream['codec_name']=='aac' for stream in result['streams'])
 assert len(result['chapters'])==len(timeline['scenes'])
 assert float(result['format']['duration'])>timeline['scenes'][-1]['startMs']/1000+timeline['scenes'][-1]['audioDuration']-.5
-(out/f'{key}.{lang}.verification.json').write_text(json.dumps({'role':timeline['role'],'language':language,'narration':f'computer-generated eSpeak NG {language}','durationSeconds':float(result['format']['duration']),'bytes':int(result['format']['size']),'verifiedScenes':len(timeline['scenes']),'assertions':timeline['assertions'],'videoCodec':'H.264','audioCodec':'AAC','isolatedDatabase':True},ensure_ascii=False,indent=2))
+(out/f'{key}.{lang}.verification.json').write_text(json.dumps({'role':timeline['role'],'language':language,'narration':narrator,'durationSeconds':float(result['format']['duration']),'bytes':int(result['format']['size']),'verifiedScenes':len(timeline['scenes']),'assertions':timeline['assertions'],'videoCodec':'H.264','audioCodec':'AAC','isolatedDatabase':True},ensure_ascii=False,indent=2))
 subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-ss',str(min(duration-1,timeline['scenes'][2]['startMs']/1000+5)),'-i',str(out/f'{key}.{lang}.mp4'),'-frames:v','1',str(folder/'preview.png')],check=True)
 print(key,'ENCODED',round(duration),'seconds',round(int(result['format']['size'])/1024/1024,2),'MB')

@@ -1,9 +1,9 @@
 {
   "role": "STORAGE_KEEPER",
   "language": "English",
-  "narration": "computer-generated eSpeak NG English",
-  "durationSeconds": 226.2,
-  "bytes": 3762438,
+  "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
+  "durationSeconds": 224.01,
+  "bytes": 4780593,
   "verifiedScenes": 12,
   "assertions": [
     "CSV download succeeded",
@@ -13,5 +13,7 @@
   ],
   "videoCodec": "H.264",
   "audioCodec": "AAC",
-  "isolatedDatabase": true
+  "isolatedDatabase": true,
+  "truePeakDbTP": -5.84,
+  "integratedLoudnessLUFS": -18.29
 }

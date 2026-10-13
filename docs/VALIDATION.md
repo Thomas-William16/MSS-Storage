@@ -47,3 +47,9 @@ Three MP4 walkthroughs contain real application footage with isolated demo data 
 English narration, captions and chapter titles reuse the 42 verified demo scenes. The in-app walkthrough page, navigation, styles and public media route were removed at the user’s request. MP4 files are delivered separately for social media sharing.
 
 All three English MP4s passed complete FFmpeg decoding and H.264/AAC/chapter checks; preview frames were inspected for readable English titles and scene alignment. JavaScript/HTML checks, formatting and git whitespace checks passed.
+
+## Clearer neural English voice
+
+All 42 narration scenes were regenerated using Piper LibriTTS high, speaker index 0, at a slightly slower rate with sentence pauses and explicit QR/CSV pronunciation. Verified recording timelines were retimed to prevent narration overlap. The standalone MP4s use AAC at 48 kHz, normalized volume and a final peak limiter. Voice provenance and attribution are in docs/walkthroughs/README.md. No website integration or runtime dependency was added.
+
+All final English files decoded successfully with their expected chapter counts. Measured integrated loudness is between -18.29 and -17.18 LUFS, and true peaks remain below 0 dBTP. SHA256 checksums were refreshed.
