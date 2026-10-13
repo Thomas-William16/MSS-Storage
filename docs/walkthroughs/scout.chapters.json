@@ -1,0 +1,57 @@
+[
+  {
+    "at": "00:00:00",
+    "title": "الكشّاف: الطلب والمتابعة",
+    "cue": "SCOUT · Demo data"
+  },
+  {
+    "at": "00:00:22",
+    "title": "الدخول بالحساب الذي أنشأه المدير",
+    "cue": "Login → Sign in"
+  },
+  {
+    "at": "00:00:37",
+    "title": "الاطلاع على المتاح والقطع الفردية",
+    "cue": "Equipment → Equipment details"
+  },
+  {
+    "at": "00:00:55",
+    "title": "طلب أكثر من نوع وتحديد المدة",
+    "cue": "Requests → New request"
+  },
+  {
+    "at": "00:01:13",
+    "title": "متابعة الحالة وسجل القرارات",
+    "cue": "My requests → Request details → Status history"
+  },
+  {
+    "at": "00:01:32",
+    "title": "إلغاء طلب لم يعد مطلوبًا",
+    "cue": "Request details → Cancel request"
+  },
+  {
+    "at": "00:01:48",
+    "title": "إعاراتك وموعد الإرجاع",
+    "cue": "Borrowings → My borrowing history"
+  },
+  {
+    "at": "00:02:08",
+    "title": "الإبلاغ عن تلف قطعة مستعارة باسمك",
+    "cue": "Borrowed item → Report damage"
+  },
+  {
+    "at": "00:02:31",
+    "title": "متابعة بلاغات التلف الخاصة بك",
+    "cue": "Maintenance → My damage reports"
+  },
+  {
+    "at": "00:02:49",
+    "title": "رمز القطعة وبيانات الحساب",
+    "cue": "Item QR · Settings → My account"
+  },
+  {
+    "at": "00:03:08",
+    "title": "إنهاء جلسة الكشّاف",
+    "cue": "Sign out"
+  }
+]

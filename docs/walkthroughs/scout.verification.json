@@ -1,0 +1,16 @@
+{
+  "role": "SCOUT",
+  "language": "Arabic",
+  "narration": "computer-generated eSpeak NG Arabic",
+  "durationSeconds": 206.4,
+  "bytes": 3390755,
+  "verifiedScenes": 11,
+  "assertions": [
+    "All role workflow steps succeeded",
+    "No browser errors",
+    "No production data used"
+  ],
+  "videoCodec": "H.264",
+  "audioCodec": "AAC",
+  "isolatedDatabase": true
+}
