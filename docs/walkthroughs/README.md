@@ -1,44 +1,35 @@
-# دليل الاستخدام بالفيديو — العربية
+# Standalone role walkthroughs
 
-ثلاثة تسجيلات من التطبيق الحقيقي تغطي الأدوار الحالية: **مسؤول النظام، أمين المخزن، والكشّاف**. التعليق الصوتي مولّد آليًا باللغة العربية، مع عناوين عربية ثابتة داخل الفيديو وترجمة اختيارية للكلام كاملًا. بيانات الحسابات والمخزون المعروضة تجريبية في قواعد منفصلة؛ لم تُستخدم بيانات المستخدمين الفعلية.
+Download these English MP4 files and upload them directly to your social media account. Each video shows the real application with isolated demonstration data and computer-generated English narration. Chapter titles appear in the video; optional complete speech captions are available as matching `.en.vtt` files.
 
-| الدور        | الفيديو                        | المحتوى                                                                                                                                                                                               |
-| ------------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| مسؤول النظام | [admin.ar.mp4](admin.ar.mp4)   | لوحة المتابعة، التصنيفات، المعدات والصور والمخزون، الدفعات والأكواد، المستخدمون، الطلبات والتسليم، سلة الإعارة، الإرجاع الجزئي وتحديد الكل، التالف والمفقود، الصيانة والتقارير والأرشفة وسجل العمليات |
-| أمين المخزن  | [keeper.ar.mp4](keeper.ar.mp4) | التشغيل اليومي، القطع الفردية، مراجعة الطلبات، تسليم عدة أنواع، استلام المعدات، تحديد الكل، بلاغ التلف والإصلاح، التقارير وحدود الصلاحيات                                                             |
-| الكشّاف      | [scout.ar.mp4](scout.ar.mp4)   | الدخول، المعدات المتاحة، الطلب متعدد الأنواع، متابعة القرار والإلغاء، الإعارات الخاصة، بلاغ التلف، متابعة البلاغ، رمز القطعة والحساب وتسجيل الخروج                                                    |
+| Role           | Video                          | Contents                                                                                                                |
+| -------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Administrator  | [admin.en.mp4](admin.en.mp4)   | Inventory, photos, stock, categories, users, requests, borrowing carts, returns, maintenance, reports and audit history |
+| Storage Keeper | [keeper.en.mp4](keeper.en.mp4) | Daily inventory operations, requests, issuing, returns, damage, repairs and reports                                     |
+| Scout          | [scout.en.mp4](scout.en.mp4)   | Browsing equipment, submitting and tracking requests, borrowing history and damage reporting                            |
 
-## المشاهدة
+On GitHub, open a video and select **Download raw file**. Alternatively, open the MP4 in `docs/walkthroughs` from your local checkout. These videos are standalone files; the website has no walkthrough page or media endpoint.
 
-- بعد تحديث المشروع وتشغيله، افتح **Walkthroughs** من القائمة الجانبية. اختر الدور ثم شغّل الفيديو. يمكنك اختيار فصل للانتقال مباشرة إلى الموضوع.
-- من النسخة المحلية للمشروع، افتح ملف MP4 داخل `docs/walkthroughs` بواسطة مشغّل الفيديو في ويندوز.
-- على GitHub، افتح ملف الفيديو واضغط **Download raw file** لتنزيله، أو استخدم روابط التنزيل المباشر في رسالة الشرح.
-- ملفات `.ar.vtt` تحتوي التعليق العربي كاملًا كتَرْجَمة اختيارية. ملفات `.chapters.json` تتضمن أوقات الفصول. لا تعرض كلمة مرور حقيقية في التسجيلات.
+Arabic recordings remain available as [admin.ar.mp4](admin.ar.mp4), [keeper.ar.mp4](keeper.ar.mp4) and [scout.ar.mp4](scout.ar.mp4).
 
-## ملاحظات مهمة
+The recordings cover the current three roles, without Leader or Locations. Select all returns does not mark items lost. Approval is separate from issuing. CSV export covers the current page. Scouts hand items back to staff, who record returns.
 
-دور القائد وخاصية المواقع أُزيلا. تحديد الكل في الإرجاع لا يحدّد خانة المفقود. الموافقة على طلب لا تعني التسليم. تصدير CSV يشمل الصفحة الحالية فقط. رمز QR يحتاج عنوان تطبيق يمكن للهاتف الوصول إليه؛ عنوان localhost لا يعمل من هاتف آخر. أمين المخزن والمدير يسجّلان الإرجاع، أما الكشّاف فيعرض سجلاته الخاصة ويبلّغ عن تلف قطعة مستعارة باسمه.
+## Production and verification
 
-## التحقق وإعادة الإنتاج
+All 42 recorded workflow scenes were verified using disposable databases. The English versions reuse those recordings with translated narration and titles. The narrator is synthesized with eSpeak NG, not a human voice. Source narration is in `scripts.en.json` and `scripts.ar.json`; verification files record codecs, duration and scene counts. SHA256 checksums are in `sha256.json`.
 
-`backend/scripts/record-walkthrough.js` يسجّل العمليات بواسطة Chromium وPlaywright على MongoDB replica set مؤقت لكل دور، مع تأكيد نجاح العمليات وعدم حدوث أخطاء في الصفحة. النصوص موجودة في `scripts.ar.json`. ملفات `.verification.json` تسجل المدة والترميز وعدد المشاهد المؤكدة. لم تُعدّل قاعدة المخزون المحلية أو أي قاعدة إنتاج.
+Optional production tooling requires FFmpeg, Chromium, Playwright, MongoDB test binaries and the Python packages in `scripts/walkthrough-requirements.txt`. These are not new application runtime dependencies. Keep recording databases separate from real inventory.
 
-للمنتجين فقط: التسجيل يحتاج FFmpeg وChromium وملفات WAV محسوبة في `WALKTHROUGH_BUILD/scripts.json`. يمكن توليد الكلام باستخدام eSpeak NG العربي من توزيعة Piper؛ مكتبة الصوت غير مضافة إلى اعتماديات التطبيق. التسجيل والفيديوهات المُرمّزة مستقلان عن تشغيل التطبيق العادي. استخدم قواعد بيانات اختبار منفصلة دائمًا. محرك eSpeak NG مولّد آلي ذو صوت اصطناعي؛ لا يمثل تسجيلًا بشريًا.
-
-خطوات إعادة الإنتاج على Linux، من جذر المشروع (اختياري):
+To generate English speech:
 
 ```sh
-python3 -m venv /workspace/.walkthrough-venv
-/workspace/.walkthrough-venv/bin/pip install -r scripts/walkthrough-requirements.txt
-/workspace/.walkthrough-venv/bin/python scripts/walkthrough_speech.py
-# ثبّت FFmpeg الخاص بـ Playwright في مجلد قابل للكتابة؛ يحتاج الوصول لمصدر Playwright الرسمي.
-PLAYWRIGHT_BROWSERS_PATH=/workspace/.playwright-browsers npx playwright install ffmpeg
-# كرّر الأمرين لكل من admin وkeeper وscout.
-PLAYWRIGHT_BROWSERS_PATH=/workspace/.playwright-browsers MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries node backend/scripts/record-walkthrough.js admin
-python3 scripts/encode_walkthrough.py admin
-MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries node backend/scripts/test-walkthroughs.js
+python scripts/walkthrough_speech.py --language en-us --scripts docs/walkthroughs/scripts.en.json --build /workspace/walkthrough-build-en
 ```
 
-في البيئة المستخدمة للإنتاج هنا استُخدم FFmpeg الموثوق المثبّت في النظام بدل تنزيل نسخة أخرى؛ ضُبط مجلد Playwright ليربط بذلك الملف. خط Noto Sans Arabic مطلوب لكتابة العناوين العربية بشكل صحيح. الإصدارات والترميز والمدة موثقة في ملفات التحقق.
+The recorder consumes the generated script timings. To encode an English timeline with verified scenes and English audio paths:
 
-تتضمن النسخة النهائية فترات تثبيت لقطات حقيقية لتناسب مدة التعليق الصوتي؛ لم تُختلق حالات أو أرقام في الواجهة. يمكن تفعيل `WALKTHROUGH_FAST=1` أثناء التسجيل ليضيف الترميز هذه الفترات بدل الانتظار داخل المتصفح.
+```sh
+WALKTHROUGH_BUILD=/workspace/walkthrough-build-en WALKTHROUGH_LANGUAGE=en python scripts/encode_walkthrough.py admin
+```
+
+Repeat for keeper and scout. English timelines can reuse the corresponding verified raw recordings, retaining scene IDs and timings and replacing titles, speech, audio paths and audio durations. Fast recordings are padded with real frozen frames to accommodate narration.

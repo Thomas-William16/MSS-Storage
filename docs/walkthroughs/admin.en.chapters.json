@@ -1,0 +1,97 @@
+[
+  {
+    "at": "00:00:00",
+    "title": "Administrator overview",
+    "cue": "ADMIN · Demo data"
+  },
+  {
+    "at": "00:00:15",
+    "title": "Sign in",
+    "cue": "Login → Sign in"
+  },
+  {
+    "at": "00:00:25",
+    "title": "Storage overview",
+    "cue": "Overview"
+  },
+  {
+    "at": "00:00:40",
+    "title": "Manage categories",
+    "cue": "Categories → Add new / Edit / Delete"
+  },
+  {
+    "at": "00:00:53",
+    "title": "Add equipment and a photo",
+    "cue": "Equipment → New equipment"
+  },
+  {
+    "at": "00:01:07",
+    "title": "Edit equipment and total stock",
+    "cue": "Equipment → Edit → Total stock"
+  },
+  {
+    "at": "00:01:23",
+    "title": "Add an item batch",
+    "cue": "Equipment details → Add items → Review batch"
+  },
+  {
+    "at": "00:01:38",
+    "title": "Item details and QR labels",
+    "cue": "Item details → QR preview / Download"
+  },
+  {
+    "at": "00:01:57",
+    "title": "Create users and assign roles",
+    "cue": "Users → New user → Role"
+  },
+  {
+    "at": "00:02:11",
+    "title": "Edit or deactivate an account",
+    "cue": "Users → Edit / Deactivate"
+  },
+  {
+    "at": "00:02:28",
+    "title": "Review requests",
+    "cue": "Requests → Approve / Reject"
+  },
+  {
+    "at": "00:02:43",
+    "title": "Issue an approved request",
+    "cue": "Approved request → Issue equipment"
+  },
+  {
+    "at": "00:02:56",
+    "title": "Borrow multiple equipment types",
+    "cue": "Borrowings → Issue equipment → Add to cart"
+  },
+  {
+    "at": "00:03:11",
+    "title": "Record a partial return",
+    "cue": "Borrowing details → Record returns"
+  },
+  {
+    "at": "00:03:24",
+    "title": "Select all and record condition",
+    "cue": "Record returns → Select all"
+  },
+  {
+    "at": "00:03:40",
+    "title": "Complete maintenance",
+    "cue": "Maintenance → Update → Complete"
+  },
+  {
+    "at": "00:03:54",
+    "title": "Reports and CSV export",
+    "cue": "Reports → Apply filters → Export current page"
+  },
+  {
+    "at": "00:04:11",
+    "title": "Archive and audit history",
+    "cue": "Equipment → Archive · Audit trail"
+  },
+  {
+    "at": "00:04:24",
+    "title": "Sign out",
+    "cue": "Sign out"
+  }
+]

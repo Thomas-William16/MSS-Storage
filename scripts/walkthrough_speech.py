@@ -2,6 +2,7 @@ import ctypes, json, wave, pathlib, argparse, importlib.util
 parser=argparse.ArgumentParser()
 parser.add_argument('--build',default='/workspace/walkthrough-build')
 parser.add_argument('--scripts',default='docs/walkthroughs/scripts.ar.json')
+parser.add_argument('--language',default='ar')
 args=parser.parse_args()
 build=pathlib.Path(args.build).resolve();(build/'audio').mkdir(parents=True,exist_ok=True)
 root=str(pathlib.Path(importlib.util.find_spec('piper').origin).parent)
@@ -9,7 +10,7 @@ lib=ctypes.CDLL(root+'/espeakbridge.so')
 lib.espeak_Initialize.argtypes=[ctypes.c_int,ctypes.c_int,ctypes.c_char_p,ctypes.c_int]
 rate=lib.espeak_Initialize(2,0,root.encode(),0)
 lib.espeak_SetVoiceByName.argtypes=[ctypes.c_char_p]
-assert lib.espeak_SetVoiceByName(b'ar')==0
+assert lib.espeak_SetVoiceByName(args.language.encode())==0
 lib.espeak_SetParameter(1,150,0)
 lib.espeak_SetParameter(2,85,0)
 chunks=[]

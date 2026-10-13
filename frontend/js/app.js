@@ -1,6 +1,5 @@
 import { session, logout, manager, admin, currentUser } from "./api.js";
 import { el, button, toast } from "./dom.js";
-import { walkthroughsView } from "./tutorials.js";
 import {
   equipmentView,
   equipmentDetail,
@@ -23,7 +22,6 @@ const nav = [
   ["requests.html", "Requests", "☷"],
   ["maintenance.html", "Maintenance", "⚒"],
   ["categories.html", "Categories", "⊞"],
-  ["walkthroughs.html", "Walkthroughs", "▶"],
 ];
 const root = document.getElementById("content");
 try {
@@ -96,7 +94,6 @@ try {
     if (!admin()) throw new Error("Administrator access required");
     await auditView(root);
   } else if (page === "settings.html") await settingsView(root);
-  else if (page === "walkthroughs.html") await walkthroughsView(root);
 } catch (error) {
   if (
     error.message.includes("Authentication") ||

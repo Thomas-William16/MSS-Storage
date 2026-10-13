@@ -86,22 +86,6 @@ const frontend = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../frontend",
 );
-const walkthroughMedia = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../docs/walkthroughs",
-);
-app.use(
-  "/walkthrough-media",
-  (req, res, next) => {
-    if (req.query.download === "1") res.attachment(path.basename(req.path));
-    next();
-  },
-  express.static(walkthroughMedia, {
-    index: false,
-    dotfiles: "deny",
-    maxAge: "1h",
-  }),
-);
 app.use(express.static(frontend, { index: "index.html" }));
 app.use((req, res) =>
   res.status(404).json({ error: { message: "Not found" } }),

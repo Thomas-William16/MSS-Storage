@@ -148,10 +148,8 @@ Only ADMIN, STORAGE_KEEPER and SCOUT are supported. On startup, existing LEADER 
 
 In Record returns, **Select all** selects only outstanding return rows. **Clear selection** clears those rows. Neither changes return conditions, notes or Lost checkboxes. Returned/resolved items are excluded, and saving still uses the normal audited return transaction.
 
-## Arabic role walkthrough videos
+## Standalone role walkthrough videos
 
-Open **Walkthroughs** in the app sidebar to watch separate Arabic videos for ADMIN, STORAGE_KEEPER and SCOUT, with synthesized Arabic narration, chapter titles, optional full captions, chapter seeking and downloads. See [the Arabic guide](docs/walkthroughs/README.md). Videos use isolated demonstration data, not users' inventory. They cover the current three-role app (no Leader or Locations), stock/photo creation, multi-equipment cart, requests, partial/Select all returns, damage/repairs, reports and administrative permissions.
+English MP4 videos for Administrator, Storage Keeper and Scout are in [docs/walkthroughs](docs/walkthroughs/README.md). Download the files for sharing or posting on social media. They include real app demonstrations using isolated demo data, computer-generated English narration, and chapter titles. Optional full captions are provided as VTT files. Arabic versions remain available in the same folder. Videos are standalone assets; there is no video page or media endpoint in the app.
 
-The backend serves the committed MP4/VTT/chapter files through `/walkthrough-media`. The Vercel frontend uses API_BASE_URL for this public training-media route; allow your exact backend origin in the final production media-src policy. Tutorial media contains no production credentials or private records. Watching a role's guide does not grant its permissions.
-
-`node backend/scripts/test-walkthroughs.js` verifies real byte-range media delivery, captions, browser playback and chapter seeking, and mobile layout using a disposable test database. Recording/narration production tooling is optional and is not part of normal application installation.
+Recording and narration tools are optional production helpers, not application dependencies.

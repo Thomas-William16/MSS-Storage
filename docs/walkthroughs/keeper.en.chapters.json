@@ -1,0 +1,62 @@
+[
+  {
+    "at": "00:00:00",
+    "title": "Storage Keeper overview",
+    "cue": "STORAGE_KEEPER · Demo data"
+  },
+  {
+    "at": "00:00:20",
+    "title": "Sign in and review the overview",
+    "cue": "Login → Overview"
+  },
+  {
+    "at": "00:00:38",
+    "title": "Add equipment and physical stock",
+    "cue": "Equipment → New equipment → Total stock"
+  },
+  {
+    "at": "00:00:57",
+    "title": "Manage individual items",
+    "cue": "Equipment details → Item details → Edit item"
+  },
+  {
+    "at": "00:01:18",
+    "title": "Review requests",
+    "cue": "Requests → Approve / Reject"
+  },
+  {
+    "at": "00:01:36",
+    "title": "Issue equipment with a cart",
+    "cue": "Borrowings → Issue equipment → Borrowing cart"
+  },
+  {
+    "at": "00:01:53",
+    "title": "Record returns and select all",
+    "cue": "Record returns → Select all → Record returns"
+  },
+  {
+    "at": "00:02:14",
+    "title": "Report damage",
+    "cue": "Item details → Report damage"
+  },
+  {
+    "at": "00:02:32",
+    "title": "Repair and return to service",
+    "cue": "Maintenance → Update / Complete"
+  },
+  {
+    "at": "00:02:52",
+    "title": "Operational reports",
+    "cue": "Reports → Inventory / Overdue / Maintenance"
+  },
+  {
+    "at": "00:03:10",
+    "title": "Role permissions",
+    "cue": "Categories: view only · No Users / Audit trail"
+  },
+  {
+    "at": "00:03:30",
+    "title": "Sign out",
+    "cue": "Sign out"
+  }
+]
