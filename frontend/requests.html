@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Scout Storage equipment and inventory management"
+    />
+    <title>Requests · Scout Storage</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script type="module" src="/js/app.js"></script>
+  </head>
+  <body>
+    <a href="#content" class="skip-link">Skip to content</a>
+    <aside class="sidebar">
+      <a href="/dashboard.html" class="brand"
+        ><span class="brand-mark" aria-hidden="true">⚜</span
+        ><span
+          ><strong>Scout Storage</strong
+          ><small>Ready for adventure</small></span
+        ></a
+      >
+      <p class="nav-label">WORKSPACE</p>
+      <nav id="navigation" aria-label="Main navigation"></nav>
+      <div class="sidebar-bottom">
+        Care for our gear.<br />Make every adventure possible.
+      </div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <button
+          id="menu-toggle"
+          class="button menu-toggle"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+          aria-controls="navigation"
+        >
+          ☰
+        </button>
+        <div class="breadcrumb">Workspace <strong>Scout Storage</strong></div>
+        <div class="account" id="account"></div>
+      </header>
+      <main id="content" class="content">
+        <p class="loading" role="status">Loading your workspace…</p>
+      </main>
+    </div>
+    <div id="toasts" aria-live="polite"></div>
+  </body>
+</html>

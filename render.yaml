@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: scout-storage-api
+    runtime: node
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: 1
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: COOKIE_SAME_SITE
+        value: lax

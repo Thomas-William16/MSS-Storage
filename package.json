@@ -1,0 +1,43 @@
+{
+  "name": "scout-storage",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch backend/server.js",
+    "start": "node --env-file-if-exists=.env backend/server.js",
+    "test": "vitest run",
+    "check": "node scripts/check.js",
+    "admin": "node --env-file-if-exists=.env backend/scripts/admin.js",
+    "dev:local": "node backend/scripts/local.js",
+    "test:browser": "node backend/scripts/browser-test.js",
+    "prepare:db": "node backend/scripts/prepare.js",
+    "test:startup": "node backend/scripts/startup-test.js",
+    "format": "prettier --write backend frontend scripts docs README.md package.json vitest.config.js render.yaml",
+    "format:check": "prettier --check backend frontend scripts docs README.md package.json vitest.config.js render.yaml",
+    "test:local": "node backend/scripts/local-test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.19.1",
+    "pino": "^9.14.0",
+    "qrcode": "^1.5.4",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "mongodb-memory-server": "^10.2.3",
+    "prettier": "^3.9.10",
+    "supertest": "^7.1.4",
+    "vitest": "^5.0.4"
+  }
+}
