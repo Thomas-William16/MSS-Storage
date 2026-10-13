@@ -1,0 +1,17 @@
+{
+  "role": "STORAGE_KEEPER",
+  "language": "Arabic",
+  "narration": "computer-generated eSpeak NG Arabic",
+  "durationSeconds": 226.2,
+  "bytes": 4139159,
+  "verifiedScenes": 12,
+  "assertions": [
+    "CSV download succeeded",
+    "All role workflow steps succeeded",
+    "No browser errors",
+    "No production data used"
+  ],
+  "videoCodec": "H.264",
+  "audioCodec": "AAC",
+  "isolatedDatabase": true
+}

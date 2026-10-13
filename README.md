@@ -147,3 +147,9 @@ Stop the running app with Ctrl+C before updating. Download the newest scout-stor
 Only ADMIN, STORAGE_KEEPER and SCOUT are supported. On startup, existing LEADER accounts are migrated transactionally to SCOUT; their IDs, passwords and borrowing/request history are retained, their old sessions are revoked, and the conversion is audited. Sign in again after updating. Locations are removed from navigation, forms, reporting and API routes. Legacy location collections/references remain hidden for preservation; no location data is accepted by the API.
 
 In Record returns, **Select all** selects only outstanding return rows. **Clear selection** clears those rows. Neither changes return conditions, notes or Lost checkboxes. Returned/resolved items are excluded, and saving still uses the normal audited return transaction.
+
+## Standalone role walkthrough videos
+
+English MP4 videos for Administrator, Storage Keeper and Scout are in [docs/walkthroughs](docs/walkthroughs/README.md). Download the files for sharing or posting on social media. They include real app demonstrations using isolated demo data, computer-generated English narration, and chapter titles. Optional full captions are provided as VTT files. Arabic versions remain available in the same folder. Videos are standalone assets; there is no video page or media endpoint in the app.
+
+Recording and narration tools are optional production helpers, not application dependencies.

@@ -35,3 +35,15 @@ Five regression tests cover initial physical-stock creation and immediate availa
 ## Role/location/return-selection update
 
 Regression tests verify Leader role creation/assignment is rejected, existing Leader accounts migrate to Scout exactly once with session revocation and preserved borrowing history, removed location routes/page return 404, item writes reject location fields and old references are hidden. Browser tests verify the Leader option and Locations navigation are absent. Select all and Clear selection are exercised on a three-item borrowing; Lost checkboxes remain untouched and the items are confirmed as ordinary returns.
+
+## Arabic walkthrough delivery
+
+Three MP4 walkthroughs contain real application footage with isolated demo data and synthesized Arabic narration: ADMIN (19 verified scenes, approximately 5:52), STORAGE_KEEPER (12 scenes, 3:46) and SCOUT (11 scenes, 3:26). All 42 workflow scenes completed their recorded actions and assertions with no uncaught browser errors. H.264 video/AAC audio, complete narration duration, chapter metadata and full decoding were verified. Preview frames were inspected for Arabic text and scene alignment.
+
+`node backend/scripts/test-walkthroughs.js` passed real MP4 range delivery, VTT caption parsing, browser decoding/playback for every role, chapter seeking, desktop/mobile layout and zero browser errors. The new Walkthroughs page lets all logged-in roles choose training videos without changing their actual permissions. The production database and local inventory were not used. Generated files and narration scripts are in docs/walkthroughs; source recording and production helpers are included for optional reproduction.
+
+## Standalone English walkthrough update
+
+English narration, captions and chapter titles reuse the 42 verified demo scenes. The in-app walkthrough page, navigation, styles and public media route were removed at the user’s request. MP4 files are delivered separately for social media sharing.
+
+All three English MP4s passed complete FFmpeg decoding and H.264/AAC/chapter checks; preview frames were inspected for readable English titles and scene alignment. JavaScript/HTML checks, formatting and git whitespace checks passed.

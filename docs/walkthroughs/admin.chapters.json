@@ -1,0 +1,97 @@
+[
+  {
+    "at": "00:00:00",
+    "title": "مسؤول النظام: نظرة عامة",
+    "cue": "ADMIN · Demo data"
+  },
+  {
+    "at": "00:00:20",
+    "title": "تسجيل الدخول بحساب المدير",
+    "cue": "Login → Sign in"
+  },
+  {
+    "at": "00:00:36",
+    "title": "لوحة المتابعة مبنية على بيانات المخزون",
+    "cue": "Overview"
+  },
+  {
+    "at": "00:00:56",
+    "title": "إدارة التصنيفات",
+    "cue": "Categories → Add new / Edit / Delete"
+  },
+  {
+    "at": "00:01:12",
+    "title": "إضافة معدات وصورة ومخزون فعلي",
+    "cue": "Equipment → New equipment"
+  },
+  {
+    "at": "00:01:31",
+    "title": "تعديل البيانات وزيادة إجمالي المخزون",
+    "cue": "Equipment → Edit → Total stock"
+  },
+  {
+    "at": "00:01:49",
+    "title": "إضافة دفعة ومراجعة الأكواد",
+    "cue": "Equipment details → Add items → Review batch"
+  },
+  {
+    "at": "00:02:09",
+    "title": "تفاصيل القطعة ورمز QR",
+    "cue": "Item details → QR preview / Download"
+  },
+  {
+    "at": "00:02:33",
+    "title": "إنشاء المستخدمين وتحديد صلاحياتهم",
+    "cue": "Users → New user → Role"
+  },
+  {
+    "at": "00:02:53",
+    "title": "تعديل الحساب وتعطيل الوصول",
+    "cue": "Users → Edit / Deactivate"
+  },
+  {
+    "at": "00:03:11",
+    "title": "مراجعة الطلبات وقبولها أو رفضها",
+    "cue": "Requests → Approve / Reject"
+  },
+  {
+    "at": "00:03:31",
+    "title": "تسليم طلب مقبول",
+    "cue": "Approved request → Issue equipment"
+  },
+  {
+    "at": "00:03:47",
+    "title": "إعارة عدة أنواع في سلة واحدة",
+    "cue": "Borrowings → Issue equipment → Add to cart"
+  },
+  {
+    "at": "00:04:04",
+    "title": "تسجيل إرجاع جزئي",
+    "cue": "Borrowing details → Record returns"
+  },
+  {
+    "at": "00:04:21",
+    "title": "تحديد الكل وإرجاع التالف أو تسجيل المفقود",
+    "cue": "Record returns → Select all"
+  },
+  {
+    "at": "00:04:41",
+    "title": "متابعة الإصلاح وإعادة القطعة للمتاح",
+    "cue": "Maintenance → Update → Complete"
+  },
+  {
+    "at": "00:05:00",
+    "title": "التقارير وتصدير الصفحة إلى CSV",
+    "cue": "Reports → Apply filters → Export current page"
+  },
+  {
+    "at": "00:05:19",
+    "title": "أرشفة المعدات ومراجعة سجل العمليات",
+    "cue": "Equipment → Archive · Audit trail"
+  },
+  {
+    "at": "00:05:35",
+    "title": "إنهاء جلسة المدير",
+    "cue": "Sign out"
+  }
+]

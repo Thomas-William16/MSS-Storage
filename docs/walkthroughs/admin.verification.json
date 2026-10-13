@@ -1,0 +1,17 @@
+{
+  "role": "ADMIN",
+  "language": "Arabic",
+  "narration": "computer-generated eSpeak NG Arabic",
+  "durationSeconds": 351.650023,
+  "bytes": 6538621,
+  "verifiedScenes": 19,
+  "assertions": [
+    "CSV download succeeded",
+    "All role workflow steps succeeded",
+    "No browser errors",
+    "No production data used"
+  ],
+  "videoCodec": "H.264",
+  "audioCodec": "AAC",
+  "isolatedDatabase": true
+}

@@ -1,0 +1,58 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.800
+Welcome to Scout Storage. This administrator walkthrough uses the real application with demonstration data. Administrators manage inventory, accounts, requests, borrowing, maintenance, and reports.
+
+00:00:15.800 --> 00:00:25.700
+Enter your administrator email and password, then select Sign in. The accounts shown here are demonstration accounts.
+
+00:00:25.700 --> 00:00:40.500
+The overview shows physical items, available stock, borrowed items, and maintenance. Review pending requests and overdue borrowing. These counts reflect recorded inventory activity.
+
+00:00:40.500 --> 00:00:53.000
+Administrators can add and edit categories. You can delete an unused category. Categories linked to existing equipment cannot be deleted.
+
+00:00:53.000 --> 00:01:07.700
+Enter an equipment name and select its category. Set Total stock and choose a photo from your computer. Saving creates individual physical items with separate codes, ready to borrow.
+
+00:01:07.700 --> 00:01:23.750
+Edit equipment to update its description or photo, or increase Total stock. Increasing stock creates more physical items. Record individual item states instead of reducing stock and deleting history.
+
+00:01:23.750 --> 00:01:38.850
+Open equipment details and add another batch. Choose the quantity and condition, review the generated codes, and confirm. Available and total counts refresh after the operation succeeds.
+
+00:01:38.850 --> 00:01:57.050
+Each code identifies one physical item. Its page shows condition, borrowing history, and maintenance. Download and print the QR label to open this page. A phone needs a reachable website address rather than your computer’s localhost address.
+
+00:01:57.050 --> 00:02:11.300
+Create a user and choose Administrator, Storage Keeper, or Scout. Passwords require at least twelve characters. These are the three supported roles; the Leader role has been removed.
+
+00:02:11.300 --> 00:02:28.000
+Administrators can change account details, roles, and passwords. Deactivating an account blocks access and revokes existing sessions while preserving request and borrowing records. Reactivate it when appropriate.
+
+00:02:28.000 --> 00:02:43.450
+Review requested equipment, quantities, and dates. Add notes when approving or rejecting. Approval does not hand over equipment. Issuing is a separate operation that checks availability again.
+
+00:02:43.450 --> 00:02:56.400
+Open Issue equipment from an approved request. Add the approved quantities to the cart and confirm. Selected items and the borrower must match the approved request.
+
+00:02:56.400 --> 00:03:11.650
+For direct borrowing, select the borrower, due date, and purpose. Add quantities from multiple equipment types to one cart. Review the item codes and confirm a single borrowing transaction.
+
+00:03:11.650 --> 00:03:24.250
+Select only the items that have returned and record their condition. Other items remain borrowed. The borrowing stays partially returned until all items are resolved.
+
+00:03:24.250 --> 00:03:40.250
+Select all checks the remaining items for return. It does not automatically mark them lost. Good items become available, and damaged items enter maintenance. Mark Lost only for an item that is actually missing.
+
+00:03:40.250 --> 00:03:54.950
+Record the repair status, cost, and notes. When finished, choose the condition after repair and confirm whether the item should return to available stock. You can also retire it from service.
+
+00:03:54.950 --> 00:04:11.350
+Reports cover inventory, borrowing, overdue items, damage, loss, and maintenance. Filter by category or dates. CSV export downloads the current displayed page, not every page of results.
+
+00:04:11.350 --> 00:04:24.450
+Archive equipment to preserve its history. Unresolved activity can prevent archiving. The audit trail records who made important changes and when they happened.
+
+00:04:24.450 --> 00:04:35.300
+Select Sign out when finished to revoke your server session. Only administrators manage users and categories and access the audit trail.

@@ -1,0 +1,17 @@
+{
+  "role": "ADMIN",
+  "language": "English",
+  "narration": "computer-generated eSpeak NG English",
+  "durationSeconds": 275.3,
+  "bytes": 5527793,
+  "verifiedScenes": 19,
+  "assertions": [
+    "CSV download succeeded",
+    "All role workflow steps succeeded",
+    "No browser errors",
+    "No production data used"
+  ],
+  "videoCodec": "H.264",
+  "audioCodec": "AAC",
+  "isolatedDatabase": true
+}

@@ -1,0 +1,272 @@
+{
+  "admin": {
+    "role": "ADMIN",
+    "title": "Administrator",
+    "scenes": [
+      {
+        "id": "intro",
+        "title": "Administrator overview",
+        "cue": "ADMIN \u00b7 Demo data",
+        "speech": "Welcome to Scout Storage. This administrator walkthrough uses the real application with demonstration data. Administrators manage inventory, accounts, requests, borrowing, maintenance, and reports."
+      },
+      {
+        "id": "login",
+        "title": "Sign in",
+        "cue": "Login \u2192 Sign in",
+        "speech": "Enter your administrator email and password, then select Sign in. The accounts shown here are demonstration accounts."
+      },
+      {
+        "id": "overview",
+        "title": "Storage overview",
+        "cue": "Overview",
+        "speech": "The overview shows physical items, available stock, borrowed items, and maintenance. Review pending requests and overdue borrowing. These counts reflect recorded inventory activity."
+      },
+      {
+        "id": "category",
+        "title": "Manage categories",
+        "cue": "Categories \u2192 Add new / Edit / Delete",
+        "speech": "Administrators can add and edit categories. You can delete an unused category. Categories linked to existing equipment cannot be deleted."
+      },
+      {
+        "id": "new-equipment",
+        "title": "Add equipment and a photo",
+        "cue": "Equipment \u2192 New equipment",
+        "speech": "Enter an equipment name and select its category. Set Total stock and choose a photo from your computer. Saving creates individual physical items with separate codes, ready to borrow."
+      },
+      {
+        "id": "stock",
+        "title": "Edit equipment and total stock",
+        "cue": "Equipment \u2192 Edit \u2192 Total stock",
+        "speech": "Edit equipment to update its description or photo, or increase Total stock. Increasing stock creates more physical items. Record individual item states instead of reducing stock and deleting history."
+      },
+      {
+        "id": "bulk",
+        "title": "Add an item batch",
+        "cue": "Equipment details \u2192 Add items \u2192 Review batch",
+        "speech": "Open equipment details and add another batch. Choose the quantity and condition, review the generated codes, and confirm. Available and total counts refresh after the operation succeeds."
+      },
+      {
+        "id": "item-qr",
+        "title": "Item details and QR labels",
+        "cue": "Item details \u2192 QR preview / Download",
+        "speech": "Each code identifies one physical item. Its page shows condition, borrowing history, and maintenance. Download and print the QR label to open this page. A phone needs a reachable website address rather than your computer\u2019s localhost address."
+      },
+      {
+        "id": "users",
+        "title": "Create users and assign roles",
+        "cue": "Users \u2192 New user \u2192 Role",
+        "speech": "Create a user and choose Administrator, Storage Keeper, or Scout. Passwords require at least twelve characters. These are the three supported roles; the Leader role has been removed."
+      },
+      {
+        "id": "account-access",
+        "title": "Edit or deactivate an account",
+        "cue": "Users \u2192 Edit / Deactivate",
+        "speech": "Administrators can change account details, roles, and passwords. Deactivating an account blocks access and revokes existing sessions while preserving request and borrowing records. Reactivate it when appropriate."
+      },
+      {
+        "id": "requests",
+        "title": "Review requests",
+        "cue": "Requests \u2192 Approve / Reject",
+        "speech": "Review requested equipment, quantities, and dates. Add notes when approving or rejecting. Approval does not hand over equipment. Issuing is a separate operation that checks availability again."
+      },
+      {
+        "id": "issue-approved",
+        "title": "Issue an approved request",
+        "cue": "Approved request \u2192 Issue equipment",
+        "speech": "Open Issue equipment from an approved request. Add the approved quantities to the cart and confirm. Selected items and the borrower must match the approved request."
+      },
+      {
+        "id": "cart",
+        "title": "Borrow multiple equipment types",
+        "cue": "Borrowings \u2192 Issue equipment \u2192 Add to cart",
+        "speech": "For direct borrowing, select the borrower, due date, and purpose. Add quantities from multiple equipment types to one cart. Review the item codes and confirm a single borrowing transaction."
+      },
+      {
+        "id": "partial-return",
+        "title": "Record a partial return",
+        "cue": "Borrowing details \u2192 Record returns",
+        "speech": "Select only the items that have returned and record their condition. Other items remain borrowed. The borrowing stays partially returned until all items are resolved."
+      },
+      {
+        "id": "all-return",
+        "title": "Select all and record condition",
+        "cue": "Record returns \u2192 Select all",
+        "speech": "Select all checks the remaining items for return. It does not automatically mark them lost. Good items become available, and damaged items enter maintenance. Mark Lost only for an item that is actually missing."
+      },
+      {
+        "id": "maintenance",
+        "title": "Complete maintenance",
+        "cue": "Maintenance \u2192 Update \u2192 Complete",
+        "speech": "Record the repair status, cost, and notes. When finished, choose the condition after repair and confirm whether the item should return to available stock. You can also retire it from service."
+      },
+      {
+        "id": "reports",
+        "title": "Reports and CSV export",
+        "cue": "Reports \u2192 Apply filters \u2192 Export current page",
+        "speech": "Reports cover inventory, borrowing, overdue items, damage, loss, and maintenance. Filter by category or dates. CSV export downloads the current displayed page, not every page of results."
+      },
+      {
+        "id": "archive-audit",
+        "title": "Archive and audit history",
+        "cue": "Equipment \u2192 Archive \u00b7 Audit trail",
+        "speech": "Archive equipment to preserve its history. Unresolved activity can prevent archiving. The audit trail records who made important changes and when they happened."
+      },
+      {
+        "id": "logout",
+        "title": "Sign out",
+        "cue": "Sign out",
+        "speech": "Select Sign out when finished to revoke your server session. Only administrators manage users and categories and access the audit trail."
+      }
+    ]
+  },
+  "keeper": {
+    "role": "STORAGE_KEEPER",
+    "title": "Storage Keeper",
+    "scenes": [
+      {
+        "id": "intro",
+        "title": "Storage Keeper overview",
+        "cue": "STORAGE_KEEPER \u00b7 Demo data",
+        "speech": "This walkthrough covers the Storage Keeper role: managing equipment and items, issuing and receiving borrowing, reviewing requests, maintenance, and operational reports. It uses demonstration data and computer-generated narration."
+      },
+      {
+        "id": "login",
+        "title": "Sign in and review the overview",
+        "cue": "Login \u2192 Overview",
+        "speech": "Sign in using the account created by your administrator. Review available and borrowed items, pending requests, and overdue borrowing. User management and the administrator audit trail are not available to this role."
+      },
+      {
+        "id": "inventory",
+        "title": "Add equipment and physical stock",
+        "cue": "Equipment \u2192 New equipment \u2192 Total stock",
+        "speech": "Storage Keepers can add equipment and upload a photo. Set the total number of physical items before saving. Borrowing requires available individual items with separate codes."
+      },
+      {
+        "id": "items",
+        "title": "Manage individual items",
+        "cue": "Equipment details \u2192 Item details \u2192 Edit item",
+        "speech": "Open an item to review its code, serial number, and condition. Edit permitted details and notes. Change a borrowed item through the return workflow, and an item in maintenance through its repair record."
+      },
+      {
+        "id": "requests",
+        "title": "Review requests",
+        "cue": "Requests \u2192 Approve / Reject",
+        "speech": "Approve or reject requests and explain your decision. Check the requested quantity and dates. Approval does not issue equipment or guarantee that stock will remain available."
+      },
+      {
+        "id": "cart",
+        "title": "Issue equipment with a cart",
+        "cue": "Borrowings \u2192 Issue equipment \u2192 Borrowing cart",
+        "speech": "Select the borrower and due date, then add equipment to the cart. Combine multiple equipment types, adjust quantities, or remove a row. Confirmation issues all selected items together if they remain available."
+      },
+      {
+        "id": "return",
+        "title": "Record returns and select all",
+        "cue": "Record returns \u2192 Select all \u2192 Record returns",
+        "speech": "Open the borrowing when items arrive. Select all chooses only unresolved items. Review each condition and notes before saving. For a partial return, deselect anything that has not returned."
+      },
+      {
+        "id": "damage",
+        "title": "Report damage",
+        "cue": "Item details \u2192 Report damage",
+        "speech": "Open the individual item and select Report damage. Describe the problem. An available item moves into maintenance and cannot be borrowed until its repair is completed."
+      },
+      {
+        "id": "repair",
+        "title": "Repair and return to service",
+        "cue": "Maintenance \u2192 Update / Complete",
+        "speech": "Update the repair status, cost, and notes, then record completion. Choose the new condition and return it to available stock, or retire it. Do not complete a repair while the item is still outside the store."
+      },
+      {
+        "id": "reports",
+        "title": "Operational reports",
+        "cue": "Reports \u2192 Inventory / Overdue / Maintenance",
+        "speech": "Review inventory, overdue borrowing, maintenance, damaged items, and lost items. Filter results and export the current page to a CSV file for daily follow-up."
+      },
+      {
+        "id": "limits",
+        "title": "Role permissions",
+        "cue": "Categories: view only \u00b7 No Users / Audit trail",
+        "speech": "Storage Keepers can view categories but cannot create or delete them. User management and audit history belong to administrators. Ask an administrator when an account or category needs changing."
+      },
+      {
+        "id": "logout",
+        "title": "Sign out",
+        "cue": "Sign out",
+        "speech": "Sign out after work, especially on a shared computer. The Storage Keeper role handles daily operations and does not manage user accounts."
+      }
+    ]
+  },
+  "scout": {
+    "role": "SCOUT",
+    "title": "Scout",
+    "scenes": [
+      {
+        "id": "intro",
+        "title": "Scout overview",
+        "cue": "SCOUT \u00b7 Demo data",
+        "speech": "Scouts can browse equipment, submit and track requests, view their own borrowing, and report damage to an item borrowed in their name. Scouts cannot manage inventory, issue equipment, or record returns."
+      },
+      {
+        "id": "login",
+        "title": "Sign in",
+        "cue": "Login \u2192 Sign in",
+        "speech": "Use the email and password provided by your administrator. There is no public administrator registration. After signing in, you see the functions permitted for a Scout."
+      },
+      {
+        "id": "equipment",
+        "title": "Browse equipment",
+        "cue": "Equipment \u2192 Equipment details",
+        "speech": "Browse equipment to see available quantities and other item states. Open equipment details to see individual items and codes. Scouts cannot add equipment or change stock."
+      },
+      {
+        "id": "request",
+        "title": "Request multiple equipment types",
+        "cue": "Requests \u2192 New request",
+        "speech": "Create a request with the required start and end dates and purpose. Enter a quantity for each equipment type, then submit. A request does not reserve stock or automatically create a borrowing."
+      },
+      {
+        "id": "tracking",
+        "title": "Track request decisions",
+        "cue": "My requests \u2192 Request details \u2192 Status history",
+        "speech": "Open your request to review its status, decision notes, and history. You can see only your own requests. Approval accepts the request; an administrator or Storage Keeper records the handover separately."
+      },
+      {
+        "id": "cancel",
+        "title": "Cancel a request",
+        "cue": "Request details \u2192 Cancel request",
+        "speech": "Cancel your own pending or approved request before equipment is issued. Enter a reason and confirm. You cannot cancel another person\u2019s request or change an approval decision yourself."
+      },
+      {
+        "id": "borrowing",
+        "title": "Your borrowing and due date",
+        "cue": "Borrowings \u2192 My borrowing history",
+        "speech": "Open your borrowing history to see the items issued to you and their due date. Review each item\u2019s state and any recorded return date. Administrators and Storage Keepers record equipment handover and returns."
+      },
+      {
+        "id": "damage",
+        "title": "Report damage to your borrowed item",
+        "cue": "Borrowed item \u2192 Report damage",
+        "speech": "If an item borrowed in your name is damaged, open that item\u2019s page and select Report damage. Give a clear description. Scouts can report only their own currently borrowed items. The item stays borrowed until staff record its return."
+      },
+      {
+        "id": "maintenance",
+        "title": "Follow your damage reports",
+        "cue": "Maintenance \u2192 My damage reports",
+        "speech": "The maintenance page shows the damage reports you submitted. Storage Keepers and administrators update repairs, costs, and return items to stock. Scouts do not have repair completion controls."
+      },
+      {
+        "id": "qr-account",
+        "title": "QR labels and your account",
+        "cue": "Item QR \u00b7 Settings \u2192 My account",
+        "speech": "An item\u2019s QR label opens its details page and does not grant additional permissions. Your account page shows your name, email, and role. Ask an administrator to change account details or reset your password."
+      },
+      {
+        "id": "logout",
+        "title": "Sign out and return equipment",
+        "cue": "Sign out",
+        "speech": "Sign out when finished. Other users\u2019 private records are outside your permissions. To return equipment, hand it to the Storage Keeper so they can record the return and each item\u2019s condition."
+      }
+    ]
+  }
+}
