@@ -1,9 +1,9 @@
 {
   "role": "ADMIN",
   "language": "English",
-  "narration": "computer-generated eSpeak NG English",
-  "durationSeconds": 275.3,
-  "bytes": 5527793,
+  "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
+  "durationSeconds": 237.55,
+  "bytes": 6290742,
   "verifiedScenes": 19,
   "assertions": [
     "CSV download succeeded",

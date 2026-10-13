@@ -5,92 +5,92 @@
     "cue": "ADMIN · Demo data"
   },
   {
-    "at": "00:00:15",
+    "at": "00:00:13",
     "title": "Sign in",
     "cue": "Login → Sign in"
   },
   {
-    "at": "00:00:25",
+    "at": "00:00:22",
     "title": "Storage overview",
     "cue": "Overview"
   },
   {
-    "at": "00:00:40",
+    "at": "00:00:35",
     "title": "Manage categories",
     "cue": "Categories → Add new / Edit / Delete"
   },
   {
-    "at": "00:00:53",
+    "at": "00:00:48",
     "title": "Add equipment and a photo",
     "cue": "Equipment → New equipment"
   },
   {
-    "at": "00:01:07",
+    "at": "00:01:00",
     "title": "Edit equipment and total stock",
     "cue": "Equipment → Edit → Total stock"
   },
   {
-    "at": "00:01:23",
+    "at": "00:01:14",
     "title": "Add an item batch",
     "cue": "Equipment details → Add items → Review batch"
   },
   {
-    "at": "00:01:38",
+    "at": "00:01:27",
     "title": "Item details and QR labels",
     "cue": "Item details → QR preview / Download"
   },
   {
-    "at": "00:01:57",
+    "at": "00:01:43",
     "title": "Create users and assign roles",
     "cue": "Users → New user → Role"
   },
   {
-    "at": "00:02:11",
+    "at": "00:01:55",
     "title": "Edit or deactivate an account",
     "cue": "Users → Edit / Deactivate"
   },
   {
-    "at": "00:02:28",
+    "at": "00:02:09",
     "title": "Review requests",
     "cue": "Requests → Approve / Reject"
   },
   {
-    "at": "00:02:43",
+    "at": "00:02:23",
     "title": "Issue an approved request",
     "cue": "Approved request → Issue equipment"
   },
   {
-    "at": "00:02:56",
+    "at": "00:02:34",
     "title": "Borrow multiple equipment types",
     "cue": "Borrowings → Issue equipment → Add to cart"
   },
   {
-    "at": "00:03:11",
+    "at": "00:02:46",
     "title": "Record a partial return",
     "cue": "Borrowing details → Record returns"
   },
   {
-    "at": "00:03:24",
+    "at": "00:02:57",
     "title": "Select all and record condition",
     "cue": "Record returns → Select all"
   },
   {
-    "at": "00:03:40",
+    "at": "00:03:11",
     "title": "Complete maintenance",
     "cue": "Maintenance → Update → Complete"
   },
   {
-    "at": "00:03:54",
+    "at": "00:03:23",
     "title": "Reports and CSV export",
     "cue": "Reports → Apply filters → Export current page"
   },
   {
-    "at": "00:04:11",
+    "at": "00:03:38",
     "title": "Archive and audit history",
     "cue": "Equipment → Archive · Audit trail"
   },
   {
-    "at": "00:04:24",
+    "at": "00:03:48",
     "title": "Sign out",
     "cue": "Sign out"
   }
