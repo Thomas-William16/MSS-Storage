@@ -53,3 +53,7 @@ All three English MP4s passed complete FFmpeg decoding and H.264/AAC/chapter che
 All 42 narration scenes were regenerated using Piper LibriTTS high, speaker index 0, at a slightly slower rate with sentence pauses and explicit QR/CSV pronunciation. Verified recording timelines were retimed to prevent narration overlap. The standalone MP4s use AAC at 48 kHz, normalized volume and a final peak limiter. Voice provenance and attribution are in docs/walkthroughs/README.md. No website integration or runtime dependency was added.
 
 All final English files decoded successfully with their expected chapter counts. Measured integrated loudness is between -18.29 and -17.18 LUFS, and true peaks remain below 0 dBTP. SHA256 checksums were refreshed.
+
+## Shorter pauses and background music
+
+The approved English voice recordings were retained. Silence detection trims longer quiet gaps, retaining approximately 140 ms within sentences and a short scene transition; a guard refuses to discard samples above the silence threshold. Full scene footage is retimed rather than dropping actions. Matching chapters and VTT captions were regenerated. An original soft instrumental is mixed more than 22 dB below the narration RMS, with fades and further ducking during speech. All final MP4s passed full decoding, expected chapter counts, end-time alignment, and true-peak checks below 0 dBTP. Verification files record durations, time removed and measured voice/music levels. The website remains unchanged.

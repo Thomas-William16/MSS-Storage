@@ -50,3 +50,13 @@ WALKTHROUGH_BUILD=/workspace/walkthrough-build-natural WALKTHROUGH_LANGUAGE=en W
 ```
 
 Provide a verified English timeline in the chosen build directory for each role before encoding. Repeat encoding for keeper and scout. No voice model or new runtime dependency is added to the website.
+
+## Shorter pauses and subtle background music
+
+The current English MP4s preserve the approved neural voice while shortening longer silent gaps to approximately 140 ms and leaving a brief transition between scenes. All visual actions remain in the footage, with scene timing adjusted to the shorter narration. Chapter timestamps and full captions match the revised timing.
+
+A soft original instrumental bed of major-seventh pads and sparse bell-like notes plays very quietly underneath the voice, fades in/out and ducks further during speech. It contains no vocals or external samples. The measured music and voice levels and time reductions are recorded in each English verification file.
+
+Optional reproduction: `python scripts/polish_walkthroughs.py admin --source /path/to/original-admin.mp4` (repeat for keeper and scout) uses the approved source MP4s, creates retained copies outside the repository, and produces the updated standalone videos. It requires FFmpeg and NumPy in the optional narration environment.
+
+Use the original approved English MP4s from commit `f657e9015f00afe2a575966ea29c5a11cc3ff697` as source files when reproducing from a fresh checkout. The helper rejects an already-mixed source unless an original file is supplied, to avoid adding music twice.

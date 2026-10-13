@@ -2,8 +2,8 @@
   "role": "ADMIN",
   "language": "English",
   "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
-  "durationSeconds": 237.605,
-  "bytes": 6280098,
+  "durationSeconds": 197.95,
+  "bytes": 8180689,
   "verifiedScenes": 19,
   "assertions": [
     "CSV download succeeded",
@@ -14,6 +14,12 @@
   "videoCodec": "H.264",
   "audioCodec": "AAC",
   "isolatedDatabase": true,
+  "pauseReductionSeconds": 39.6,
+  "pauseTargetSeconds": 0.14,
+  "backgroundMusic": "Original soft synthesized instrumental, no vocals",
+  "musicRmsDbFS": -47.51,
+  "narrationRmsDbFS": -17.05,
+  "fullSceneActionsRetained": true,
   "truePeakDbTP": -2.45,
-  "integratedLoudnessLUFS": -17.23
+  "integratedLoudnessLUFS": -17.22
 }

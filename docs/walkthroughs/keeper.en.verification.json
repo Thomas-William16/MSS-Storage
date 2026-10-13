@@ -2,8 +2,8 @@
   "role": "STORAGE_KEEPER",
   "language": "English",
   "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
-  "durationSeconds": 224.01,
-  "bytes": 4780593,
+  "durationSeconds": 129.65,
+  "bytes": 5026655,
   "verifiedScenes": 12,
   "assertions": [
     "CSV download succeeded",
@@ -14,6 +14,12 @@
   "videoCodec": "H.264",
   "audioCodec": "AAC",
   "isolatedDatabase": true,
-  "truePeakDbTP": -5.84,
-  "integratedLoudnessLUFS": -18.29
+  "pauseReductionSeconds": 94.3,
+  "pauseTargetSeconds": 0.14,
+  "backgroundMusic": "Original soft synthesized instrumental, no vocals",
+  "musicRmsDbFS": -47.58,
+  "narrationRmsDbFS": -18.04,
+  "fullSceneActionsRetained": true,
+  "truePeakDbTP": -5.8,
+  "integratedLoudnessLUFS": -18.3
 }

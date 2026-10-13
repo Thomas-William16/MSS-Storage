@@ -2,8 +2,8 @@
   "role": "SCOUT",
   "language": "English",
   "narration": "AI-generated Piper LibriTTS high voice, speaker 0",
-  "durationSeconds": 204.205,
-  "bytes": 3740288,
+  "durationSeconds": 123.05,
+  "bytes": 4516284,
   "verifiedScenes": 11,
   "assertions": [
     "All role workflow steps succeeded",
@@ -13,6 +13,12 @@
   "videoCodec": "H.264",
   "audioCodec": "AAC",
   "isolatedDatabase": true,
-  "truePeakDbTP": -2.58,
+  "pauseReductionSeconds": 81.05,
+  "pauseTargetSeconds": 0.14,
+  "backgroundMusic": "Original soft synthesized instrumental, no vocals",
+  "musicRmsDbFS": -47.62,
+  "narrationRmsDbFS": -16.97,
+  "fullSceneActionsRetained": true,
+  "truePeakDbTP": -2.62,
   "integratedLoudnessLUFS": -17.18
 }
