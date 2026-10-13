@@ -59,7 +59,7 @@ workflows.get(
     );
     const items = await BorrowingItem.find({ borrowing: record._id }).populate({
       path: "equipmentItem",
-      populate: { path: "equipmentId location" },
+      populate: { path: "equipmentId" },
     });
     respond(res, {
       ...record.toObject(),

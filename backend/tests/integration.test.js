@@ -87,6 +87,18 @@ beforeEach(async () => {
     expect(res.status, res.text).toBe(200);
     csrf[role] = res.body.data.csrfToken;
   }
+  users.OTHER_SCOUT = await User.create({
+    name: "Other scout",
+    email: "other@test.local",
+    role: "SCOUT",
+    passwordHash,
+  });
+  clients.OTHER_SCOUT = request.agent(app);
+  const otherLogin = await clients.OTHER_SCOUT.post("/api/v1/auth/login")
+    .set("Origin", origin)
+    .send({ email: "other@test.local", password: secret });
+  expect(otherLogin.status).toBe(200);
+  csrf.OTHER_SCOUT = otherLogin.body.data.csrfToken;
   category = await Category.create({ name: "Camping" });
   equipment = await Equipment.create({
     name: "Tent",
@@ -216,12 +228,17 @@ describe("Authentication and access", () => {
     expect((await clients.SCOUT.get("/api/v1/auth/me")).status).toBe(401);
   });
   it("never returns a newly changed password hash", async () => {
-    const res = await send("ADMIN", "patch", `/users/${users.LEADER._id}`, {
-      password: secret + "a",
-    });
+    const res = await send(
+      "ADMIN",
+      "patch",
+      `/users/${users.OTHER_SCOUT._id}`,
+      {
+        password: secret + "a",
+      },
+    );
     expect(res.status).toBe(200);
     expect(res.body.data.passwordHash).toBeUndefined();
-    expect((await clients.LEADER.get("/api/v1/auth/me")).status).toBe(401);
+    expect((await clients.OTHER_SCOUT.get("/api/v1/auth/me")).status).toBe(401);
   });
 });
 describe("Inventory integrity", () => {
@@ -403,11 +420,11 @@ describe("Borrowing and returns", () => {
     expect(
       (await clients.SCOUT.get(`/api/v1/borrowings/${id}`)).body.data.overdue,
     ).toBe(true);
-    expect((await clients.LEADER.get(`/api/v1/borrowings/${id}`)).status).toBe(
-      403,
-    );
     expect(
-      (await clients.LEADER.get("/api/v1/borrowings")).body.data,
+      (await clients.OTHER_SCOUT.get(`/api/v1/borrowings/${id}`)).status,
+    ).toBe(403);
+    expect(
+      (await clients.OTHER_SCOUT.get("/api/v1/borrowings")).body.data,
     ).toHaveLength(0);
     expect(
       (await clients.ADMIN.get("/api/v1/reports/overdue")).body.meta.total,
@@ -450,9 +467,9 @@ describe("Requests, maintenance and reporting", () => {
       created = await req(),
       id = created.body.data._id;
     expect(created.status).toBe(201);
-    expect((await clients.LEADER.get(`/api/v1/requests/${id}`)).status).toBe(
-      403,
-    );
+    expect(
+      (await clients.OTHER_SCOUT.get(`/api/v1/requests/${id}`)).status,
+    ).toBe(403);
     expect(
       (
         await send("ADMIN", "post", `/requests/${id}/approve`, {
@@ -480,7 +497,7 @@ describe("Requests, maintenance and reporting", () => {
     ).toBe(409);
     expect(
       (
-        await send("LEADER", "post", `/requests/${id}/cancel`, {
+        await send("OTHER_SCOUT", "post", `/requests/${id}/cancel`, {
           notes: "Cancel",
         })
       ).status,
@@ -524,7 +541,7 @@ describe("Requests, maintenance and reporting", () => {
       borrowed = await loan([item._id]);
     expect(
       (
-        await send("LEADER", "post", "/maintenance", {
+        await send("OTHER_SCOUT", "post", "/maintenance", {
           equipmentItem: item._id,
           description: "Broken",
         })
@@ -858,5 +875,85 @@ describe("Equipment photos and total stock", () => {
       await BorrowingItem.countDocuments({ borrowing: issued.body.data._id }),
     ).toBe(3);
     expect(await EquipmentItem.countDocuments({ status: "BORROWED" })).toBe(3);
+  });
+});
+
+describe("Retired role and locations", () => {
+  it("rejects Leader assignments and migrates existing accounts once, retaining history", async () => {
+    expect(
+      (
+        await send("ADMIN", "post", "/users", {
+          name: "Leader",
+          email: "leader@test.local",
+          password: secret,
+          role: "LEADER",
+        })
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await send("ADMIN", "patch", `/users/${users.SCOUT._id}`, {
+          role: "LEADER",
+        })
+      ).status,
+    ).toBe(400);
+    const [item] = await items(1);
+    const borrowing = await loan([item._id], {
+      user: String(users.OTHER_SCOUT._id),
+    });
+    expect(borrowing.status).toBe(201);
+    await User.collection.updateOne(
+      { _id: users.OTHER_SCOUT._id },
+      { $set: { role: "LEADER" } },
+    );
+    const { migrateLeaderAccounts } =
+      await import("../src/services/migrations.js");
+    expect(await migrateLeaderAccounts()).toBe(1);
+    expect((await User.findById(users.OTHER_SCOUT._id)).role).toBe("SCOUT");
+    expect(await Session.countDocuments({ user: users.OTHER_SCOUT._id })).toBe(
+      0,
+    );
+    expect(
+      (await Borrowing.findById(borrowing.body.data._id)).user.toString(),
+    ).toBe(String(users.OTHER_SCOUT._id));
+    expect(await migrateLeaderAccounts()).toBe(0);
+    expect(
+      await AuditLog.countDocuments({ action: "LEADER_ACCOUNTS_MIGRATED" }),
+    ).toBe(1);
+  });
+  it("removes location routes and inputs and hides existing location references", async () => {
+    expect((await clients.ADMIN.get("/api/v1/locations")).status).toBe(404);
+    expect(
+      (await send("ADMIN", "post", "/locations", { name: "Shelf" })).status,
+    ).toBe(404);
+    expect((await request(app).get("/locations.html")).status).toBe(404);
+    const locationId = String(new mongoose.Types.ObjectId());
+    expect(
+      (
+        await send("ADMIN", "post", `/equipment/${equipment._id}/items/bulk`, {
+          quantity: 1,
+          location: locationId,
+        })
+      ).status,
+    ).toBe(400);
+    const [item] = await items(1);
+    await EquipmentItem.collection.updateOne(
+      { _id: new mongoose.Types.ObjectId(item._id) },
+      { $set: { location: new mongoose.Types.ObjectId(locationId) } },
+    );
+    const detail = await clients.ADMIN.get(`/api/v1/items/${item._id}`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.data.location).toBeUndefined();
+    expect(
+      (await clients.ADMIN.get(`/api/v1/equipment/${equipment._id}/items`)).body
+        .data[0].location,
+    ).toBeUndefined();
+    expect(
+      (
+        await send("ADMIN", "patch", `/items/${item._id}`, {
+          location: locationId,
+        })
+      ).status,
+    ).toBe(400);
   });
 });

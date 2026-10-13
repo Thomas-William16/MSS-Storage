@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { config } from "./env.js";
 import * as models from "../models/index.js";
+import { migrateLeaderAccounts } from "../services/migrations.js";
 export async function connectDatabase(uri = config.mongo) {
   if (!uri) throw new Error("MONGODB_URI is required");
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
@@ -13,4 +14,5 @@ export async function connectDatabase(uri = config.mongo) {
   }
   for (const model of Object.values(models))
     if (model?.modelName) await model.init();
+  await migrateLeaderAccounts();
 }

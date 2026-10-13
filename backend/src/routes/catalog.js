@@ -3,7 +3,6 @@ import QRCode from "qrcode";
 import {
   User,
   Category,
-  Location,
   Equipment,
   EquipmentItem,
   BorrowingItem,
@@ -83,7 +82,6 @@ const itemSchema = z.strictObject({
     .optional(),
   serialNumber: str(120).optional(),
   condition: z.enum(conditions).optional(),
-  location: id.optional(),
   notes: str().optional(),
 });
 catalog.get("/users", permit("borrow"), async (req, res) => {
@@ -189,7 +187,6 @@ catalog.patch(
 );
 for (const [path, model, dependent, field] of [
   ["categories", Category, Equipment, "category"],
-  ["locations", Location, EquipmentItem, "location"],
 ]) {
   catalog.get(`/${path}`, permit("inventory"), async (req, res) => {
     const paging = pagination(req);
@@ -464,7 +461,7 @@ catalog.get(
         z.enum(["AVAILABLE", "BORROWED", "MAINTENANCE", "LOST", "RETIRED"]),
         paging.status,
       );
-    res.json(await list(EquipmentItem, filter, paging, ["location"]));
+    res.json(await list(EquipmentItem, filter, paging));
   },
 );
 catalog.post(
@@ -538,7 +535,7 @@ catalog.get(
 );
 catalog.get("/items/:id", pathId, permit("inventory"), async (req, res) => {
   const item = await EquipmentItem.findById(req.params.id).populate(
-    "equipmentId location",
+    "equipmentId",
   );
   if (!item) fail(404, "Item not found");
   const history = operational(req.user)

@@ -2,7 +2,6 @@ import {
   Equipment,
   EquipmentItem,
   Counter,
-  Location,
   Category,
   BorrowingItem,
   Maintenance,
@@ -26,7 +25,6 @@ export async function createItems(user, equipmentId, input) {
 }
 export async function createItemsInSession(user, equipmentId, input, session) {
   const equipment = await activeEquipment(equipmentId, session);
-  if (input.location) await reference(Location, input.location, session);
   const quantity = input.quantity || 1;
   const counter = await Counter.findOneAndUpdate(
     { _id: String(equipmentId) },
@@ -45,7 +43,6 @@ export async function createItemsInSession(user, equipmentId, input, session) {
       input.codes?.[i] ||
       input.itemCode ||
       `${prefix}-${String(equipmentId).slice(-6).toUpperCase()}-${String(counter.value - quantity + i + 1).padStart(3, "0")}`,
-    location: input.location,
     condition: input.condition || "GOOD",
     status: input.condition === "DAMAGED" ? "MAINTENANCE" : "AVAILABLE",
     notes: input.notes || "",
@@ -115,7 +112,6 @@ export async function inventoryStats(filter = {}) {
 export async function updateItem(user, id, input) {
   return transaction(async (session) => {
     const item = await found(EquipmentItem, id, session);
-    if (input.location) await reference(Location, input.location, session);
     if (input.condition && ["BORROWED", "MAINTENANCE"].includes(item.status))
       fail(409, "Record condition through return or maintenance");
     if (input.status && !["AVAILABLE", "LOST", "RETIRED"].includes(item.status))

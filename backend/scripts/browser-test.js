@@ -84,6 +84,20 @@ try {
   await page.getByRole("link", { name: "Camp Stove", exact: true }).waitFor();
   await page.goto("http://localhost:3000/users.html");
   await page.getByRole("button", { name: "New user" }).click();
+  assert.equal(
+    await page
+      .getByLabel("Role", { exact: true })
+      .locator('option[value="LEADER"]')
+      .count(),
+    0,
+  );
+  assert.equal(
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "Locations", exact: true })
+      .count(),
+    0,
+  );
   await page.getByLabel("Full name").fill("Patrol Scout");
   await page.getByLabel("Email", { exact: true }).fill("scout@browser.test");
   await page
@@ -133,10 +147,23 @@ try {
   await page.getByRole("cell", { name: "Browser verified camp" }).waitFor();
   await page.getByRole("link", { name: /BR-/ }).first().click();
   await page.getByRole("button", { name: "Record returns" }).click();
+  await page.getByRole("button", { name: "Select all", exact: true }).click();
   for (const check of await page
     .getByRole("checkbox", { name: /^Return / })
     .all())
-    await check.check();
+    assert.equal(await check.isChecked(), true);
+  for (const check of await page
+    .getByRole("checkbox", { name: "Mark lost", exact: true })
+    .all())
+    assert.equal(await check.isChecked(), false);
+  await page
+    .getByRole("button", { name: "Clear selection", exact: true })
+    .click();
+  for (const check of await page
+    .getByRole("checkbox", { name: /^Return / })
+    .all())
+    assert.equal(await check.isChecked(), false);
+  await page.getByRole("button", { name: "Select all", exact: true }).click();
   await page
     .getByRole("button", { name: "Record returns", exact: true })
     .last()
@@ -173,13 +200,7 @@ try {
   await page.getByRole("button", { name: "Complete", exact: true }).click();
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.locator(".badge.completed").waitFor();
-  for (const route of [
-    "reports",
-    "audit-logs",
-    "locations",
-    "settings",
-    "dashboard",
-  ]) {
+  for (const route of ["reports", "audit-logs", "settings", "dashboard"]) {
     await page.goto(`http://localhost:3000/${route}.html`);
     await page.locator("main h1").waitFor();
     assert.equal(await page.locator("main .form-error").count(), 0, route);

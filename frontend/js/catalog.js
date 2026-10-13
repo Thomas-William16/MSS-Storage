@@ -153,8 +153,7 @@ export async function equipmentView(root) {
   });
 }
 export async function equipmentDetail(root, id) {
-  const { data: record } = await api(`/equipment/${id}`),
-    locations = await all("/locations");
+  const { data: record } = await api(`/equipment/${id}`);
   let reload;
   async function batch() {
     formModal(
@@ -174,16 +173,6 @@ export async function equipmentDetail(root, id) {
           type: "select",
           options: conditions,
           value: "GOOD",
-        },
-        {
-          name: "location",
-          label: "Location",
-          type: "select",
-          required: false,
-          options: [
-            { value: "", label: "Unassigned" },
-            ...optionRows(locations),
-          ],
         },
         { name: "notes", label: "Notes", type: "textarea" },
         {
@@ -287,7 +276,6 @@ export async function equipmentDetail(root, id) {
       },
       { label: "Condition", render: (x) => badge(x.condition) },
       { label: "Status", render: (x) => badge(x.status) },
-      { label: "Location", render: (x) => x.location?.name || "Unassigned" },
       { label: "Serial", key: "serialNumber" },
       { label: "Notes", key: "notes" },
     ],
@@ -346,7 +334,6 @@ async function qrImage(id) {
 
 export async function itemDetail(root, id) {
   const { data: item } = await api(`/items/${id}`);
-  const locations = await all("/locations");
   async function edit() {
     formModal(
       "Edit physical item",
@@ -379,17 +366,6 @@ export async function itemDetail(root, id) {
               },
             ]
           : []),
-        {
-          name: "location",
-          label: "Location",
-          type: "select",
-          required: false,
-          value: item.location?._id,
-          options: [
-            { value: "", label: "Keep current / unassigned" },
-            ...optionRows(locations),
-          ],
-        },
         { name: "notes", label: "Notes", type: "textarea", value: item.notes },
       ],
       async (data) => {
@@ -440,8 +416,6 @@ export async function itemDetail(root, id) {
           el("dd", {}, badge(item.status)),
           el("dt", {}, "Condition"),
           el("dd", {}, badge(item.condition)),
-          el("dt", {}, "Location"),
-          el("dd", {}, item.location?.name || "Unassigned"),
           el("dt", {}, "Serial"),
           el("dd", {}, item.serialNumber || "—"),
           el("dt", {}, "Notes"),
@@ -500,12 +474,10 @@ export async function itemDetail(root, id) {
 }
 export async function taxonomyView(root, path) {
   let reload;
-  const title = path === "categories" ? "Categories" : "Locations";
+  const title = "Categories";
   const edit = (record) =>
     formModal(
-      record
-        ? "Edit record"
-        : `New ${path === "categories" ? "category" : "location"}`,
+      record ? "Edit record" : "New category",
       [
         { name: "name", label: "Name", value: record?.name, maxLength: 100 },
         {
@@ -597,9 +569,10 @@ export async function usersView(root) {
           label: "Role",
           type: "select",
           value: record?.role || "SCOUT",
-          options: ["SCOUT", "LEADER", "STORAGE_KEEPER", "ADMIN"].map(
-            (value) => ({ value, label: value.replaceAll("_", " ") }),
-          ),
+          options: ["SCOUT", "STORAGE_KEEPER", "ADMIN"].map((value) => ({
+            value,
+            label: value.replaceAll("_", " "),
+          })),
         },
       ],
       async (data) => {

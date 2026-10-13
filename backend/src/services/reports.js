@@ -94,7 +94,7 @@ export async function report(type, paging) {
         ...(type === "lost" ? { status: "LOST" } : { condition: "DAMAGED" }),
       },
       paging,
-      ["equipmentId", "location"],
+      ["equipmentId"],
     );
   if (type === "maintenance") {
     const itemIds = equipmentIds

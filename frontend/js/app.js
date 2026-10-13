@@ -22,7 +22,6 @@ const nav = [
   ["requests.html", "Requests", "☷"],
   ["maintenance.html", "Maintenance", "⚒"],
   ["categories.html", "Categories", "⊞"],
-  ["locations.html", "Locations", "⌖"],
 ];
 const root = document.getElementById("content");
 try {
@@ -83,7 +82,7 @@ try {
   else if (page === "borrowings.html") await borrowingsView(root, id);
   else if (page === "requests.html") await requestsView(root, id);
   else if (page === "maintenance.html") await maintenanceView(root);
-  else if (["categories.html", "locations.html"].includes(page))
+  else if (page === "categories.html")
     await taxonomyView(root, page.split(".")[0]);
   else if (page === "users.html") {
     if (!admin()) throw new Error("Administrator access required");
