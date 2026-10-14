@@ -1,12 +1,14 @@
 import "dotenv/config";
+const frontendUrl = process.env.FRONTEND_URL || process.env.RENDER_EXTERNAL_URL;
+const publicUrl = process.env.PUBLIC_APP_URL || process.env.RENDER_EXTERNAL_URL;
 export const config = {
   production: process.env.NODE_ENV === "production",
   port: Number(process.env.PORT || 3000),
   mongo: process.env.MONGODB_URI,
-  origins: (process.env.FRONTEND_URL || "http://localhost:3000")
+  origins: (frontendUrl || "http://localhost:3000")
     .split(",")
     .map((x) => new URL(x.trim()).origin),
-  publicUrl: process.env.PUBLIC_APP_URL || "http://localhost:3000",
+  publicUrl: publicUrl || "http://localhost:3000",
   sameSite: process.env.COOKIE_SAME_SITE || "lax",
   sessionHours: 8,
 };
@@ -14,8 +16,8 @@ if (!["lax", "strict", "none"].includes(config.sameSite))
   throw new Error("Invalid COOKIE_SAME_SITE");
 if (
   config.production &&
-  (!process.env.FRONTEND_URL ||
-    !process.env.PUBLIC_APP_URL ||
+  (!frontendUrl ||
+    !publicUrl ||
     !config.origins.every((x) => x.startsWith("https://")) ||
     !config.publicUrl.startsWith("https://"))
 )
