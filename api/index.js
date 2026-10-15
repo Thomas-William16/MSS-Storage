@@ -12,7 +12,14 @@ export default async function handler(req, res) {
     });
     await databaseReady;
   } catch (error) {
-    logger.error({ name: error.name }, "Database initialization failed");
+    logger.error(
+  {
+    name: error.name,
+    code: error.code,
+    codeName: error.codeName,
+  },
+  "Database initialization failed",
+);
     return res
       .status(503)
       .json({ error: { message: "Service temporarily unavailable" } });
