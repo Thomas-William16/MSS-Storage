@@ -17,6 +17,11 @@ export default async function handler(req, res) {
     name: error.name,
     code: error.code,
     codeName: error.codeName,
+    reason: /bad auth|authentication failed|auth failed|SCRAM/i.test(error.message || "")
+  ? "authentication_failed"
+  : /not authorized|unauthorized|permission denied/i.test(error.message || "")
+    ? "permission_denied"
+    : "other_database_error",
   },
   "Database initialization failed",
 );
