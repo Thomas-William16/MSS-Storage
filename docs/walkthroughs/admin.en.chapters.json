@@ -1,96 +1,96 @@
 [
   {
-    "at": "00:00:00",
+    "at": "00:00:00.000",
     "title": "Administrator overview",
-    "cue": "ADMIN · Demo data"
+    "cue": "ADMIN \u00b7 Demo data"
   },
   {
-    "at": "00:00:15",
+    "at": "00:00:11.500",
     "title": "Sign in",
-    "cue": "Login → Sign in"
+    "cue": "Login \u2192 Sign in"
   },
   {
-    "at": "00:00:25",
+    "at": "00:00:18.400",
     "title": "Storage overview",
     "cue": "Overview"
   },
   {
-    "at": "00:00:40",
+    "at": "00:00:29.850",
     "title": "Manage categories",
-    "cue": "Categories → Add new / Edit / Delete"
+    "cue": "Categories \u2192 Add new / Edit / Delete"
   },
   {
-    "at": "00:00:53",
+    "at": "00:00:37.950",
     "title": "Add equipment and a photo",
-    "cue": "Equipment → New equipment"
+    "cue": "Equipment \u2192 New equipment"
   },
   {
-    "at": "00:01:07",
+    "at": "00:00:48.500",
     "title": "Edit equipment and total stock",
-    "cue": "Equipment → Edit → Total stock"
+    "cue": "Equipment \u2192 Edit \u2192 Total stock"
   },
   {
-    "at": "00:01:23",
+    "at": "00:01:00.300",
     "title": "Add an item batch",
-    "cue": "Equipment details → Add items → Review batch"
+    "cue": "Equipment details \u2192 Add items \u2192 Review batch"
   },
   {
-    "at": "00:01:38",
+    "at": "00:01:11.450",
     "title": "Item details and QR labels",
-    "cue": "Item details → QR preview / Download"
+    "cue": "Item details \u2192 QR preview / Download"
   },
   {
-    "at": "00:01:57",
+    "at": "00:01:25.350",
     "title": "Create users and assign roles",
-    "cue": "Users → New user → Role"
+    "cue": "Users \u2192 New user \u2192 Role"
   },
   {
-    "at": "00:02:11",
+    "at": "00:01:35.300",
     "title": "Edit or deactivate an account",
-    "cue": "Users → Edit / Deactivate"
+    "cue": "Users \u2192 Edit / Deactivate"
   },
   {
-    "at": "00:02:28",
+    "at": "00:01:47.700",
     "title": "Review requests",
-    "cue": "Requests → Approve / Reject"
+    "cue": "Requests \u2192 Approve / Reject"
   },
   {
-    "at": "00:02:43",
+    "at": "00:01:59.000",
     "title": "Issue an approved request",
-    "cue": "Approved request → Issue equipment"
+    "cue": "Approved request \u2192 Issue equipment"
   },
   {
-    "at": "00:02:56",
+    "at": "00:02:08.150",
     "title": "Borrow multiple equipment types",
-    "cue": "Borrowings → Issue equipment → Add to cart"
+    "cue": "Borrowings \u2192 Issue equipment \u2192 Add to cart"
   },
   {
-    "at": "00:03:11",
+    "at": "00:02:18.700",
     "title": "Record a partial return",
-    "cue": "Borrowing details → Record returns"
+    "cue": "Borrowing details \u2192 Record returns"
   },
   {
-    "at": "00:03:24",
+    "at": "00:02:27.600",
     "title": "Select all and record condition",
-    "cue": "Record returns → Select all"
+    "cue": "Record returns \u2192 Select all"
   },
   {
-    "at": "00:03:40",
+    "at": "00:02:39.150",
     "title": "Complete maintenance",
-    "cue": "Maintenance → Update → Complete"
+    "cue": "Maintenance \u2192 Update \u2192 Complete"
   },
   {
-    "at": "00:03:54",
+    "at": "00:02:49.950",
     "title": "Reports and CSV export",
-    "cue": "Reports → Apply filters → Export current page"
+    "cue": "Reports \u2192 Apply filters \u2192 Export current page"
   },
   {
-    "at": "00:04:11",
+    "at": "00:03:02.500",
     "title": "Archive and audit history",
-    "cue": "Equipment → Archive · Audit trail"
+    "cue": "Equipment \u2192 Archive \u00b7 Audit trail"
   },
   {
-    "at": "00:04:24",
+    "at": "00:03:10.700",
     "title": "Sign out",
     "cue": "Sign out"
   }

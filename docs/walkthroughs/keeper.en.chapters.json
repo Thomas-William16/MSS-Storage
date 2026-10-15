@@ -1,61 +1,61 @@
 [
   {
-    "at": "00:00:00",
+    "at": "00:00:00.000",
     "title": "Storage Keeper overview",
-    "cue": "STORAGE_KEEPER · Demo data"
+    "cue": "STORAGE_KEEPER \u00b7 Demo data"
   },
   {
-    "at": "00:00:20",
+    "at": "00:00:13.950",
     "title": "Sign in and review the overview",
-    "cue": "Login → Overview"
+    "cue": "Login \u2192 Overview"
   },
   {
-    "at": "00:00:38",
+    "at": "00:00:26.050",
     "title": "Add equipment and physical stock",
-    "cue": "Equipment → New equipment → Total stock"
+    "cue": "Equipment \u2192 New equipment \u2192 Total stock"
   },
   {
-    "at": "00:00:57",
+    "at": "00:00:35.450",
     "title": "Manage individual items",
-    "cue": "Equipment details → Item details → Edit item"
+    "cue": "Equipment details \u2192 Item details \u2192 Edit item"
   },
   {
-    "at": "00:01:18",
+    "at": "00:00:46.450",
     "title": "Review requests",
-    "cue": "Requests → Approve / Reject"
+    "cue": "Requests \u2192 Approve / Reject"
   },
   {
-    "at": "00:01:36",
+    "at": "00:00:55.750",
     "title": "Issue equipment with a cart",
-    "cue": "Borrowings → Issue equipment → Borrowing cart"
+    "cue": "Borrowings \u2192 Issue equipment \u2192 Borrowing cart"
   },
   {
-    "at": "00:01:53",
+    "at": "00:01:07.200",
     "title": "Record returns and select all",
-    "cue": "Record returns → Select all → Record returns"
+    "cue": "Record returns \u2192 Select all \u2192 Record returns"
   },
   {
-    "at": "00:02:14",
+    "at": "00:01:18.500",
     "title": "Report damage",
-    "cue": "Item details → Report damage"
+    "cue": "Item details \u2192 Report damage"
   },
   {
-    "at": "00:02:32",
+    "at": "00:01:27.800",
     "title": "Repair and return to service",
-    "cue": "Maintenance → Update / Complete"
+    "cue": "Maintenance \u2192 Update / Complete"
   },
   {
-    "at": "00:02:52",
+    "at": "00:01:39.550",
     "title": "Operational reports",
-    "cue": "Reports → Inventory / Overdue / Maintenance"
+    "cue": "Reports \u2192 Inventory / Overdue / Maintenance"
   },
   {
-    "at": "00:03:10",
+    "at": "00:01:50.450",
     "title": "Role permissions",
-    "cue": "Categories: view only · No Users / Audit trail"
+    "cue": "Categories: view only \u00b7 No Users / Audit trail"
   },
   {
-    "at": "00:03:30",
+    "at": "00:02:01.400",
     "title": "Sign out",
     "cue": "Sign out"
   }

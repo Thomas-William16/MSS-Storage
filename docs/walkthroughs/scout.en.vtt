@@ -1,34 +1,34 @@
 WEBVTT
 
-00:00:00.876 --> 00:00:22.370
+00:00:00.000 --> 00:00:11.350
 Scouts can browse equipment, submit and track requests, view their own borrowing, and report damage to an item borrowed in their name. Scouts cannot manage inventory, issue equipment, or record returns.
 
-00:00:22.370 --> 00:00:37.841
+00:00:11.350 --> 00:00:21.000
 Use the email and password provided by your administrator. There is no public administrator registration. After signing in, you see the functions permitted for a Scout.
 
-00:00:37.841 --> 00:00:55.562
+00:00:21.000 --> 00:00:31.350
 Browse equipment to see available quantities and other item states. Open equipment details to see individual items and codes. Scouts cannot add equipment or change stock.
 
-00:00:55.562 --> 00:01:13.697
+00:00:31.350 --> 00:00:42.500
 Create a request with the required start and end dates and purpose. Enter a quantity for each equipment type, then submit. A request does not reserve stock or automatically create a borrowing.
 
-00:01:13.697 --> 00:01:32.835
+00:00:42.500 --> 00:00:54.500
 Open your request to review its status, decision notes, and history. You can see only your own requests. Approval accepts the request; an administrator or Storage Keeper records the handover separately.
 
-00:01:32.835 --> 00:01:48.787
+00:00:54.500 --> 00:01:04.450
 Cancel your own pending or approved request before equipment is issued. Enter a reason and confirm. You cannot cancel another person’s request or change an approval decision yourself.
 
-00:01:48.787 --> 00:02:08.642
+00:01:04.450 --> 00:01:15.850
 Open your borrowing history to see the items issued to you and their due date. Review each item’s state and any recorded return date. Administrators and Storage Keepers record equipment handover and returns.
 
-00:02:08.642 --> 00:02:31.079
+00:01:15.850 --> 00:01:28.650
 If an item borrowed in your name is damaged, open that item’s page and select Report damage. Give a clear description. Scouts can report only their own currently borrowed items. The item stays borrowed until staff record its return.
 
-00:02:31.079 --> 00:02:49.912
+00:01:28.650 --> 00:01:40.200
 The maintenance page shows the damage reports you submitted. Storage Keepers and administrators update repairs, costs, and return items to stock. Scouts do not have repair completion controls.
 
-00:02:49.912 --> 00:03:08.320
+00:01:40.200 --> 00:01:52.950
 An item’s QR label opens its details page and does not grant additional permissions. Your account page shows your name, email, and role. Ask an administrator to change account details or reset your password.
 
-00:03:08.320 --> 00:03:26.365
+00:01:52.950 --> 00:02:03.050
 Sign out when finished. Other users’ private records are outside your permissions. To return equipment, hand it to the Storage Keeper so they can record the return and each item’s condition.

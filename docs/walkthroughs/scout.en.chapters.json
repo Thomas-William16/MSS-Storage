@@ -1,56 +1,56 @@
 [
   {
-    "at": "00:00:00",
+    "at": "00:00:00.000",
     "title": "Scout overview",
-    "cue": "SCOUT · Demo data"
+    "cue": "SCOUT \u00b7 Demo data"
   },
   {
-    "at": "00:00:22",
+    "at": "00:00:11.350",
     "title": "Sign in",
-    "cue": "Login → Sign in"
+    "cue": "Login \u2192 Sign in"
   },
   {
-    "at": "00:00:37",
+    "at": "00:00:21.000",
     "title": "Browse equipment",
-    "cue": "Equipment → Equipment details"
+    "cue": "Equipment \u2192 Equipment details"
   },
   {
-    "at": "00:00:55",
+    "at": "00:00:31.350",
     "title": "Request multiple equipment types",
-    "cue": "Requests → New request"
+    "cue": "Requests \u2192 New request"
   },
   {
-    "at": "00:01:13",
+    "at": "00:00:42.500",
     "title": "Track request decisions",
-    "cue": "My requests → Request details → Status history"
+    "cue": "My requests \u2192 Request details \u2192 Status history"
   },
   {
-    "at": "00:01:32",
+    "at": "00:00:54.500",
     "title": "Cancel a request",
-    "cue": "Request details → Cancel request"
+    "cue": "Request details \u2192 Cancel request"
   },
   {
-    "at": "00:01:48",
+    "at": "00:01:04.450",
     "title": "Your borrowing and due date",
-    "cue": "Borrowings → My borrowing history"
+    "cue": "Borrowings \u2192 My borrowing history"
   },
   {
-    "at": "00:02:08",
+    "at": "00:01:15.850",
     "title": "Report damage to your borrowed item",
-    "cue": "Borrowed item → Report damage"
+    "cue": "Borrowed item \u2192 Report damage"
   },
   {
-    "at": "00:02:31",
+    "at": "00:01:28.650",
     "title": "Follow your damage reports",
-    "cue": "Maintenance → My damage reports"
+    "cue": "Maintenance \u2192 My damage reports"
   },
   {
-    "at": "00:02:49",
+    "at": "00:01:40.200",
     "title": "QR labels and your account",
-    "cue": "Item QR · Settings → My account"
+    "cue": "Item QR \u00b7 Settings \u2192 My account"
   },
   {
-    "at": "00:03:08",
+    "at": "00:01:52.950",
     "title": "Sign out and return equipment",
     "cue": "Sign out"
   }

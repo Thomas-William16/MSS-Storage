@@ -1,37 +1,37 @@
 WEBVTT
 
-00:00:00.897 --> 00:00:20.344
+00:00:00.000 --> 00:00:13.950
 This walkthrough covers the Storage Keeper role: managing equipment and items, issuing and receiving borrowing, reviewing requests, maintenance, and operational reports. It uses demonstration data and computer-generated narration.
 
-00:00:20.344 --> 00:00:38.805
+00:00:13.950 --> 00:00:26.050
 Sign in using the account created by your administrator. Review available and borrowed items, pending requests, and overdue borrowing. User management and the administrator audit trail are not available to this role.
 
-00:00:38.806 --> 00:00:57.760
+00:00:26.050 --> 00:00:35.450
 Storage Keepers can add equipment and upload a photo. Set the total number of physical items before saving. Borrowing requires available individual items with separate codes.
 
-00:00:57.760 --> 00:01:18.804
+00:00:35.450 --> 00:00:46.450
 Open an item to review its code, serial number, and condition. Edit permitted details and notes. Change a borrowed item through the return workflow, and an item in maintenance through its repair record.
 
-00:01:18.804 --> 00:01:36.057
+00:00:46.450 --> 00:00:55.750
 Approve or reject requests and explain your decision. Check the requested quantity and dates. Approval does not issue equipment or guarantee that stock will remain available.
 
-00:01:36.057 --> 00:01:53.817
+00:00:55.750 --> 00:01:07.200
 Select the borrower and due date, then add equipment to the cart. Combine multiple equipment types, adjust quantities, or remove a row. Confirmation issues all selected items together if they remain available.
 
-00:01:53.817 --> 00:02:14.142
+00:01:07.200 --> 00:01:18.500
 Open the borrowing when items arrive. Select all chooses only unresolved items. Review each condition and notes before saving. For a partial return, deselect anything that has not returned.
 
-00:02:14.142 --> 00:02:32.966
+00:01:18.500 --> 00:01:27.800
 Open the individual item and select Report damage. Describe the problem. An available item moves into maintenance and cannot be borrowed until its repair is completed.
 
-00:02:32.966 --> 00:02:52.492
+00:01:27.800 --> 00:01:39.550
 Update the repair status, cost, and notes, then record completion. Choose the new condition and return it to available stock, or retire it. Do not complete a repair while the item is still outside the store.
 
-00:02:52.492 --> 00:03:10.831
+00:01:39.550 --> 00:01:50.450
 Review inventory, overdue borrowing, maintenance, damaged items, and lost items. Filter results and export the current page to a CSV file for daily follow-up.
 
-00:03:10.831 --> 00:03:30.010
+00:01:50.450 --> 00:02:01.400
 Storage Keepers can view categories but cannot create or delete them. User management and audit history belong to administrators. Ask an administrator when an account or category needs changing.
 
-00:03:30.010 --> 00:03:46.347
+00:02:01.400 --> 00:02:09.650
 Sign out after work, especially on a shared computer. The Storage Keeper role handles daily operations and does not manage user accounts.
