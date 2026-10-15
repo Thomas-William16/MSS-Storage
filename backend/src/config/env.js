@@ -1,6 +1,11 @@
 import "dotenv/config";
-const frontendUrl = process.env.FRONTEND_URL || process.env.RENDER_EXTERNAL_URL;
-const publicUrl = process.env.PUBLIC_APP_URL || process.env.RENDER_EXTERNAL_URL;
+const vercelUrl =
+  process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+const hostedUrl =
+  process.env.RENDER_EXTERNAL_URL ||
+  (vercelUrl ? `https://${vercelUrl}` : undefined);
+const frontendUrl = process.env.FRONTEND_URL || hostedUrl;
+const publicUrl = process.env.PUBLIC_APP_URL || hostedUrl;
 export const config = {
   production: process.env.NODE_ENV === "production",
   port: Number(process.env.PORT || 3000),

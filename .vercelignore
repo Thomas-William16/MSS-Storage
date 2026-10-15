@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+.local-db
+node_modules
+docs
+scripts
+backend/tests
+backend/scripts

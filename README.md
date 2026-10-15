@@ -97,6 +97,16 @@ See [docs/API.md](docs/API.md) for routes, JSON request bodies and the full perm
 
 Physical items and borrowing history are never destructively deleted. Equipment is archived (remaining AVAILABLE items become RETIRED) and users deactivated. Equipment photos can be uploaded as JPEG, PNG or WebP (up to 5 MB, 16 million pixels). The backend decodes, strips metadata, resizes and re-encodes them as JPEG, stores them in MongoDB, and serves them only to authenticated inventory viewers. SVG, animated and invalid images are rejected. Photo bytes are excluded from JSON responses and audit logs. Legacy HTTPS image URLs remain supported by the API for compatibility. QR codes require normal authentication and do not grant permissions.
 
+## No-card deployment: Vercel Hobby and Atlas Free
+
+Deploy from the repository root using the root `vercel.json`, with Framework set to Other and Node.js 24. The `api/index.js` adapter serves the website and API together through one Vercel Function and reuses a small database pool on warm invocations. `public/` is intentionally empty; source code and documentation are not a static website output. Production dependencies and the frontend/backend files needed by the function are bundled, while local databases, environment files and walkthrough videos are excluded.
+
+Set the encrypted production `MONGODB_URI` in Vercel to your Atlas replica-set connection string and `TRUST_PROXY=1`, `COOKIE_SAME_SITE=lax`, `NODE_ENV=production`. The public URL and allowed browser origin default to Vercel's production hostname, so leave frontend `API_BASE_URL` empty. Explicit FRONTEND_URL/PUBLIC_APP_URL values still override the platform default. Use the production address to test sign-in and QR labels.
+
+Vercel Hobby is intended for personal/noncommercial use and has usage limits. Atlas Free remains subject to its storage and network limits. Vercel function request bodies are limited to 4.5 MB: keep equipment photo files below 3 MB because the app sends them as base64 JSON. Larger photos can still be used in the local app. The current in-memory request/login limiters apply per function instance rather than across every instance. Initialize the first administrator securely with `npm run admin` from an interactive machine permitted by Atlas; do not place administrator passwords in deployment commands.
+
+`MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries node backend/scripts/test-serverless.js` verifies the handler locally with a disposable replica set, including concurrent cold initialization, production origin fallback, frontend/assets, authenticated API access and CSRF logout. A live Vercel deployment still requires account access, an Atlas network policy allowing its connections and checks against the actual deployed URL.
+
 ## Atlas, Vercel and backend deployment
 
 1. Create an Atlas cluster (replica-set capability), database and a dedicated application database user with least required permissions. Configure Atlas network access for your backend host's egress addresses; avoid a permanent unrestricted IP allowlist. Store the URI in your backend host's secret settings.
@@ -106,7 +116,7 @@ Physical items and borrowing history are never destructively deleted. Equipment 
 5. Set backend `FRONTEND_URL` and `PUBLIC_APP_URL` to the frontend HTTPS origin; choose same-site custom domains and verify login/CSRF/logout, QR lookup, one complete borrow/return flow and responsive layout on the deployed origins.
 6. Configure monitoring for DB availability, HTTP errors and storage capacity. Serve TLS on both hosts. Schedule backups and test restores before storing real user information.
 
-Vercel static hosting does **not** run Express. The backend remains a persistent Node server on Render/Railway. No cloud resources are created or published automatically by this repository.
+The separate frontend-only configuration in `frontend/vercel.json` serves static assets and requires an external backend. The root Vercel configuration instead runs the complete app through the serverless adapter described above. No cloud resources are created or published automatically by this repository.
 
 ## Security and operational guidance
 
