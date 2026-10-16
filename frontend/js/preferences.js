@@ -6,6 +6,8 @@ const translations = {
   Requests: "الطلبات",
   Maintenance: "الصيانة",
   Categories: "الفئات",
+  "＋ Add new category": "＋ إضافة فئة جديدة",
+  "New category": "فئة جديدة",
   Reports: "التقارير",
   Users: "المستخدمون",
   "Audit trail": "سجل التدقيق",

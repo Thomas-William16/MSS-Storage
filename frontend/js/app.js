@@ -5,7 +5,6 @@ import {
   equipmentView,
   equipmentDetail,
   itemDetail,
-  taxonomyView,
   usersView,
 } from "./catalog.js";
 import { borrowingsView, requestsView, maintenanceView } from "./workflows.js";
@@ -22,7 +21,6 @@ const nav = [
   ["borrowings.html", "Borrowings", "⇄"],
   ["requests.html", "Requests", "☷"],
   ["maintenance.html", "Maintenance", "⚒"],
-  ["categories.html", "Categories", "⊞"],
 ];
 const root = document.getElementById("content");
 try {
@@ -83,8 +81,6 @@ try {
   else if (page === "borrowings.html") await borrowingsView(root, id);
   else if (page === "requests.html") await requestsView(root, id);
   else if (page === "maintenance.html") await maintenanceView(root);
-  else if (page === "categories.html")
-    await taxonomyView(root, page.split(".")[0]);
   else if (page === "users.html") {
     if (!admin()) throw new Error("Administrator access required");
     await usersView(root);

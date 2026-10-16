@@ -23,6 +23,26 @@ const optionRows = (rows) => rows.map((x) => ({ value: x._id, label: x.name }));
 export async function equipmentView(root) {
   const categories = await all("/categories");
   let reload;
+  function addCategory() {
+    formModal(
+      "New category",
+      [
+        { name: "name", label: "Name", maxLength: 100 },
+        {
+          name: "description",
+          label: "Description",
+          type: "textarea",
+          required: false,
+        },
+      ],
+      async (data) => {
+        await api("/categories", { method: "POST", body: data });
+        // Rebuild the list so the new category is ready in filters and equipment forms.
+        root.replaceChildren();
+        await equipmentView(root);
+      },
+    );
+  }
   async function edit(record = {}) {
     formModal(
       record._id ? "Edit equipment" : "New equipment",
@@ -74,6 +94,7 @@ export async function equipmentView(root) {
       ...(manager()
         ? [button("＋ New equipment", () => edit(), "primary")]
         : []),
+      ...(admin() ? [button("＋ Add new category", addCategory)] : []),
     ),
   );
   const container = panel("Equipment inventory");
@@ -439,67 +460,6 @@ export async function itemDetail(root, id) {
         ),
       ),
     );
-}
-export async function taxonomyView(root, path) {
-  let reload;
-  const title = "Categories";
-  const edit = (record) =>
-    formModal(
-      record ? "Edit record" : "New category",
-      [
-        { name: "name", label: "Name", value: record?.name, maxLength: 100 },
-        {
-          name: "description",
-          label: "Description",
-          type: "textarea",
-          value: record?.description,
-        },
-      ],
-      async (data) => {
-        await api(record ? `/${path}/${record._id}` : `/${path}`, {
-          method: record ? "PATCH" : "POST",
-          body: data,
-        });
-        await reload();
-      },
-    );
-  root.append(
-    header(
-      title,
-      `Organize the equipment catalog by ${path}.`,
-      ...(admin() ? [button("＋ Add new", () => edit(), "primary")] : []),
-    ),
-  );
-  const container = panel(title);
-  root.append(container);
-  reload = pagedList(container, {
-    path: `/${path}`,
-    columns: [
-      { label: "Name", key: "name" },
-      { label: "Description", key: "description" },
-      ...(admin()
-        ? [
-            {
-              label: "Actions",
-              render: (x) =>
-                actions(
-                  button("Edit", () => edit(x)),
-                  button("Delete", () =>
-                    confirmAction(
-                      "Delete record?",
-                      `${x.name} can be deleted only if it is unused.`,
-                      async () => {
-                        await api(`/${path}/${x._id}`, { method: "DELETE" });
-                        await reload();
-                      },
-                    ),
-                  ),
-                ),
-            },
-          ]
-        : []),
-    ],
-  });
 }
 export async function usersView(root) {
   let reload;

@@ -333,25 +333,15 @@ try {
   };
   const admin = {
     category: async () => {
-      await go("/categories.html");
-      await click(page.getByRole("button", { name: "Add new" }));
+      await go("/equipment.html");
+      await click(page.getByRole("button", { name: "Add new category" }));
       await fill("Name", "Expedition tools");
       await fill("Description", "Demo category created by an administrator");
       await save();
-      const row = page.getByRole("row").filter({ hasText: "Expedition tools" });
-      await click(row.getByRole("button", { name: "Edit", exact: true }));
-      await fill("Description", "Edited category description");
-      await save();
-      await click(
-        page
-          .getByRole("row")
-          .filter({ hasText: "Expedition tools" })
-          .getByRole("button", { name: "Delete", exact: true }),
-      );
-      await click(page.getByRole("button", { name: "Confirm", exact: true }));
       await page
-        .getByRole("cell", { name: "Expedition tools", exact: true })
-        .waitFor({ state: "hidden" });
+        .getByLabel("All categories")
+        .locator("option", { hasText: "Expedition tools" })
+        .waitFor({ state: "attached" });
     },
     "new-equipment": async () => {
       await go("/equipment.html");
@@ -593,9 +583,9 @@ try {
       reportDamage(tents[2]._id, "Demo damage report: torn seam"),
     repair,
     limits: async () => {
-      await go("/categories.html");
+      await go("/equipment.html");
       assert.equal(
-        await page.getByRole("button", { name: "Add new" }).count(),
+        await page.getByRole("button", { name: "Add new category" }).count(),
         0,
       );
       assert.equal(

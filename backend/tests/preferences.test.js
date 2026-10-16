@@ -23,6 +23,8 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
     await page.route("**/api/v1/**", async (route) => {
       const path = new URL(route.request().url()).pathname;
       let data = {};
+      if (path.endsWith("/categories") || path.endsWith("/equipment"))
+        data = [];
       if (path.endsWith("/auth/me"))
         data = {
           user: { _id: "scout1", name: "Test User", role },
@@ -51,6 +53,16 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
     });
     const base = `http://127.0.0.1:${server.address().port}`;
     for (role of ["ADMIN", "STORAGE_KEEPER", "SCOUT"]) {
+      await page.goto(`${base}/equipment.html`);
+      await page
+        .getByRole("heading", { name: "Equipment", exact: true })
+        .waitFor();
+      expect(
+        await page.locator('#navigation a[href="categories.html"]').count(),
+      ).toBe(0);
+      expect(
+        await page.getByRole("button", { name: "Add new category" }).count(),
+      ).toBe(role === "ADMIN" ? 1 : 0);
       await page.goto(`${base}/borrowings.html?id=loan1`);
       await page
         .getByRole("button", { name: "Record returns", exact: true })

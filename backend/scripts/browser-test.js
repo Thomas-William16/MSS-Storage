@@ -41,14 +41,28 @@ try {
   await page.waitForURL("**/dashboard.html");
   await page.getByRole("heading", { name: "Storage overview" }).waitFor();
   await page.goto("http://localhost:3000/categories.html");
-  await page.getByRole("button", { name: "Add new" }).click();
+  await page.waitForURL("**/equipment.html");
+  assert.equal(
+    await page.locator('#navigation a[href="categories.html"]').count(),
+    0,
+  );
+  await page.getByRole("button", { name: "Add new category" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Camping");
   await page.getByRole("button", { name: "Save", exact: true }).click();
-  await page.getByRole("cell", { name: "Camping", exact: true }).waitFor();
-  await page.goto("http://localhost:3000/equipment.html");
+  await page
+    .getByLabel("All categories")
+    .locator("option", { hasText: "Camping" })
+    .waitFor({ state: "attached" });
   await page.getByRole("button", { name: "New equipment" }).click();
   assert.equal(await page.locator('input[type="file"]').count(), 0);
   await page.getByLabel("Equipment name").fill("Patrol Tent");
+  assert.equal(
+    await page
+      .getByLabel("Category", { exact: true })
+      .locator("option", { hasText: "Camping" })
+      .count(),
+    1,
+  );
   await page.getByLabel("Total stock", { exact: true }).fill("2");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.getByRole("link", { name: "Patrol Tent" }).click();
