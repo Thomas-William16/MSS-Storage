@@ -10,7 +10,8 @@ Browser authentication uses an opaque random session cookie (HttpOnly, Secure in
 | Manage equipment and physical items     | Yes               | Yes               | No                            |
 | Read categories                         | Yes               | Yes               | Yes                           |
 | Write/delete categories                 | Yes               | No                | No                            |
-| Issue/return/correct borrowings         | Yes               | Yes               | No                            |
+| Issue/correct borrowings                | Yes               | Yes               | No                            |
+| Return borrowing items                  | All               | All               | Own                           |
 | Read borrowings                         | All               | All               | Own                           |
 | Create/read/cancel requests             | All               | All               | Own                           |
 | Approve/reject requests                 | Yes               | Yes               | No                            |
@@ -53,7 +54,7 @@ Status totals partition physical items. DAMAGED is a condition count and overlap
 
 - `GET /borrowings`, `GET /borrowings/:id`: operational roles see all; others see own. Detail includes physical item lines and return history.
 - `POST /borrowings`: `{user,itemIds:[unique IDs],expectedReturnDate,purpose,notes?,requestId?}`. Future return date required; active borrower; all items AVAILABLE, non-damaged, unarchived. Transaction retries serialize competing writes. Either every selected item is borrowed or none.
-- `POST /borrowings/:id/return`: `{items:[{itemId,condition,lost?:boolean,notes?}]}`. Each item must be an outstanding line of this borrowing. Good/new/fair → AVAILABLE, damaged → MAINTENANCE, lost → LOST. PARTIAL until no outstanding lines remain; then RETURNED. History retained.
+- `POST /borrowings/:id/return`: `{items:[{itemId,condition,lost?:boolean,notes?}]}`. Admins and Keepers may return any borrowing; Scouts may return only their own. Ownership is checked inside the transaction before any item changes. Each item must be an outstanding line of this borrowing. Good/new/fair → AVAILABLE, damaged → MAINTENANCE, lost → LOST. PARTIAL until no outstanding lines remain; then RETURNED. History retained.
 - `POST /borrowings/:id/cancel`: `{notes}`. Staff-only correction for erroneous issuance when no item has been returned. Confirm items never physically left storage. All lines retained with CANCELLED resolution; no history deletion.
 
 ## Requests and maintenance

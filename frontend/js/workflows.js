@@ -429,7 +429,8 @@ export async function borrowingDetail(root, id) {
     header(
       `Borrowing BR-${short(id)}`,
       `${record.user?.name} · ${record.purpose}`,
-      ...(manager() && ["ACTIVE", "PARTIAL"].includes(record.status)
+      ...((manager() || record.user?._id === currentUser._id) &&
+      ["ACTIVE", "PARTIAL"].includes(record.status)
         ? [button("Record returns", returns, "primary")]
         : []),
       ...(manager() && record.status === "ACTIVE"

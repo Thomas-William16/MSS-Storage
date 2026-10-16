@@ -8,6 +8,7 @@ import {
 } from "../models/index.js";
 import { transaction, found, audit } from "./common.js";
 import { activeEquipment } from "./inventory.js";
+import { own } from "../middleware/security.js";
 import { fail } from "../utils/errors.js";
 export async function issue(user, input) {
   return transaction(async (session) => {
@@ -107,6 +108,7 @@ export async function issue(user, input) {
 export async function returnItems(user, id, input) {
   return transaction(async (session) => {
     const borrowing = await found(Borrowing, id, session);
+    own(borrowing, user);
     if (!["ACTIVE", "PARTIAL"].includes(borrowing.status))
       fail(409, "Borrowing is already resolved");
     for (const entry of input.items) {

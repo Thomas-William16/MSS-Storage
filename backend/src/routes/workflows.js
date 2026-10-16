@@ -88,7 +88,7 @@ workflows.post(
 workflows.post(
   "/borrowings/:id/return",
   pathId,
-  permit("borrow"),
+  permit("requests"),
   body(
     z.strictObject({
       items: z

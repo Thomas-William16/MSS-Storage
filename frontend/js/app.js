@@ -1,3 +1,4 @@
+import "./preferences.js";
 import { session, logout, manager, admin, currentUser } from "./api.js";
 import { el, button, toast } from "./dom.js";
 import {

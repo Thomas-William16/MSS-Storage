@@ -328,6 +328,70 @@ describe("Inventory integrity", () => {
   });
 });
 describe("Borrowing and returns", () => {
+  it("lets Scouts return only their own borrowing and rejects foreign items atomically", async () => {
+    const created = await items(3);
+    const ownLoan = await loan(created.slice(0, 2).map((x) => x._id));
+    const otherLoan = await loan([created[2]._id], {
+      user: String(users.OTHER_SCOUT._id),
+    });
+    const id = ownLoan.body.data._id;
+    const payload = { items: [{ itemId: created[0]._id, condition: "GOOD" }] };
+    expect(
+      (await send("OTHER_SCOUT", "post", `/borrowings/${id}/return`, payload))
+        .status,
+    ).toBe(403);
+    expect((await EquipmentItem.findById(created[0]._id)).status).toBe(
+      "BORROWED",
+    );
+    expect(
+      (
+        await send("SCOUT", "post", `/borrowings/${id}/return`, {
+          items: [
+            ...payload.items,
+            { itemId: created[2]._id, condition: "GOOD" },
+          ],
+        })
+      ).status,
+    ).toBe(400);
+    expect(
+      await BorrowingItem.countDocuments({
+        borrowing: id,
+        returnedAt: { $ne: null },
+      }),
+    ).toBe(0);
+    const partial = await send(
+      "SCOUT",
+      "post",
+      `/borrowings/${id}/return`,
+      payload,
+    );
+    expect(partial.status, partial.text).toBe(200);
+    expect(partial.body.data.status).toBe("PARTIAL");
+    expect(
+      (await send("SCOUT", "post", `/borrowings/${id}/return`, payload)).status,
+    ).toBe(409);
+    const complete = await send("SCOUT", "post", `/borrowings/${id}/return`, {
+      items: [{ itemId: created[1]._id, condition: "DAMAGED", notes: "Torn" }],
+    });
+    expect(complete.status, complete.text).toBe(200);
+    expect(complete.body.data.status).toBe("RETURNED");
+    expect((await EquipmentItem.findById(created[1]._id)).status).toBe(
+      "MAINTENANCE",
+    );
+    expect((await Borrowing.findById(otherLoan.body.data._id)).status).toBe(
+      "ACTIVE",
+    );
+    expect(
+      (
+        await send(
+          "SCOUT",
+          "post",
+          `/borrowings/${otherLoan.body.data._id}/cancel`,
+          { notes: "No" },
+        )
+      ).status,
+    ).toBe(403);
+  });
   it("borrows available items, prevents status edits and archive during borrowing", async () => {
     const created = await items(2),
       res = await loan(created.map((x) => x._id));

@@ -1,3 +1,4 @@
+import "./preferences.js";
 import { login, session } from "./api.js";
 const form = document.getElementById("login-form"),
   error = document.getElementById("login-error"),

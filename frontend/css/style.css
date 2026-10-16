@@ -1049,3 +1049,129 @@ code {
     margin-top: 6px;
   }
 }
+
+/* Shared appearance controls and logical layout for both writing directions. */
+.preference-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.login-main {
+  position: relative;
+}
+.login-main > .preference-controls {
+  position: absolute;
+  inset-block-start: 24px;
+  inset-inline-end: 24px;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eee6f4;
+  --muted: #c0b1c4;
+  --primary: #c5a0e0;
+  --primary-dark: #241c30;
+  --line: #54455d;
+  --bg: #19151f;
+  --white: #292230;
+}
+[data-theme="dark"]
+  :is(
+    .topbar,
+    .button.secondary,
+    input,
+    select,
+    textarea,
+    .modal,
+    .borrow-card
+  ) {
+  background: var(--white);
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme="dark"]
+  :is(th, .cart-line, .borrow-cart, .cart-summary, .no-photo) {
+  background: #352b3e;
+  color: var(--ink);
+}
+[data-theme="dark"] td {
+  border-color: var(--line);
+}
+[data-theme="dark"] .button.primary {
+  background: #78508f;
+  color: #fff;
+}
+[dir="rtl"] .sidebar {
+  inset: 0 0 0 auto;
+}
+[dir="rtl"] .main {
+  margin-left: 0;
+  margin-right: 238px;
+}
+[dir="rtl"] .nav-link.active {
+  border-left: 0;
+  border-right: 3px solid var(--accent);
+  padding-left: 14px;
+  padding-right: 11px;
+}
+[dir="rtl"] :is(th, td) {
+  text-align: right;
+}
+[dir="rtl"] .account {
+  margin-left: 0;
+  margin-inline-start: 12px;
+}
+[dir="rtl"]
+  input:is(
+    [type="email"],
+    [type="password"],
+    [type="number"],
+    [type="datetime-local"]
+  ) {
+  direction: ltr;
+}
+@media (max-width: 1100px) {
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 80px;
+    gap: 10px;
+  }
+}
+@media (max-width: 1100px) {
+  [dir="rtl"] .main {
+    margin-right: 205px;
+  }
+}
+@media (max-width: 760px) {
+  [dir="rtl"] .main {
+    margin-right: 0;
+  }
+  [dir="rtl"] .sidebar {
+    transform: translateX(100%);
+  }
+  [dir="rtl"] .menu-open .sidebar {
+    transform: translateX(0);
+  }
+  .preference-controls .button {
+    padding: 8px;
+  }
+}
+[data-theme="dark"] .login-page {
+  background: var(--bg);
+}
+[data-theme="dark"] :is(.avatar, .button.secondary:hover) {
+  background: #45344f;
+  color: var(--ink);
+}
+[dir="rtl"] :is(.search-form, .pagination span) {
+  margin-right: 0;
+  margin-inline-end: auto;
+}
+[dir="rtl"] .breadcrumb strong {
+  margin-left: 0;
+  margin-inline-start: 12px;
+}
+.login-main {
+  padding-block-start: 90px;
+}
