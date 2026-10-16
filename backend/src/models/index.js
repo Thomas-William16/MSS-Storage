@@ -55,8 +55,9 @@ export const Equipment = make(
     description: text(),
     category: ref("Category"),
     minimumStock: { type: Number, min: 0, default: 0 },
-    imageUrl: text(2048),
-    hasPhoto: { type: Boolean, default: false },
+    // Legacy image fields are retained for preservation and excluded from reads.
+    imageUrl: { ...text(2048), select: false },
+    hasPhoto: { type: Boolean, select: false },
     photo: {
       type: new Schema({ data: Buffer, contentType: String }, { _id: false }),
       select: false,

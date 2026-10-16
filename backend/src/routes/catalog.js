@@ -39,7 +39,6 @@ import {
 import { fail } from "../utils/errors.js";
 import { config } from "../config/env.js";
 import bcrypt from "bcryptjs";
-import { preparePhoto } from "../services/photos.js";
 export const catalog = Router();
 const respond = (res, data, status = 200) => res.status(status).json({ data });
 const userSchema = z.strictObject({
@@ -62,19 +61,6 @@ const equipmentSchema = z.strictObject({
   category: id,
   minimumStock: z.number().int().min(0).max(100000).optional(),
   totalStock: z.number().int().min(0).max(100000).optional(),
-  photo: z
-    .strictObject({ data: z.string().min(1).max(6990508) })
-    .nullable()
-    .optional(),
-  imageUrl: z
-    .union([
-      z.literal(""),
-      z
-        .url()
-        .max(2048)
-        .refine((x) => x.startsWith("https://"), "Use an HTTPS image URL"),
-    ])
-    .optional(),
 });
 const itemSchema = z.strictObject({
   itemCode: str(80)
@@ -295,6 +281,8 @@ catalog.get("/equipment/:id", pathId, permit("inventory"), async (req, res) => {
 function equipmentResponse(record) {
   const data = record.toObject();
   delete data.photo;
+  delete data.hasPhoto;
+  delete data.imageUrl;
   return data;
 }
 async function applyStock(user, record, totalStock, session) {
@@ -317,28 +305,17 @@ catalog.post(
   permit("manageInventory"),
   body(equipmentSchema),
   async (req, res) => {
-    const { totalStock, photo, ...fields } = req.input;
-    const prepared = await preparePhoto(photo);
+    const { totalStock, ...fields } = req.input;
     const result = await transaction(async (session) => {
       await reference(Category, fields.category, session);
-      const [record] = await Equipment.create(
-        [
-          {
-            ...fields,
-            ...(prepared !== undefined
-              ? { photo: prepared, hasPhoto: !!prepared }
-              : {}),
-          },
-        ],
-        { session },
-      );
+      const [record] = await Equipment.create([fields], { session });
       await applyStock(req.user, record, totalStock, session);
       await audit(
         req.user,
         "EQUIPMENT_CREATED",
         "Equipment",
         record._id,
-        { totalStock: totalStock || 0, hasPhoto: !!prepared },
+        { totalStock: totalStock || 0 },
         session,
       );
       return equipmentResponse(record);
@@ -352,18 +329,13 @@ catalog.patch(
   permit("manageInventory"),
   body(equipmentSchema.partial()),
   async (req, res) => {
-    const { totalStock, photo, ...fields } = req.input;
-    const prepared = await preparePhoto(photo);
+    const { totalStock, ...fields } = req.input;
     const result = await transaction(async (session) => {
       const record = await found(Equipment, req.params.id, session);
       if (record.archivedAt) fail(409, "Archived equipment is read-only");
       if (fields.category) await reference(Category, fields.category, session);
       Object.assign(record, fields);
       record.revision += 1;
-      if (prepared !== undefined) {
-        record.photo = prepared;
-        record.hasPhoto = !!prepared;
-      }
       await record.save({ session });
       await applyStock(req.user, record, totalStock, session);
       await audit(
@@ -377,19 +349,6 @@ catalog.patch(
       return equipmentResponse(record);
     });
     respond(res, result);
-  },
-);
-catalog.get(
-  "/equipment/:id/photo",
-  pathId,
-  permit("inventory"),
-  async (req, res) => {
-    const record = await Equipment.findById(req.params.id).select("+photo");
-    if (!record?.photo?.data) fail(404, "Equipment photo not found");
-    res
-      .set("Content-Type", record.photo.contentType)
-      .set("Cache-Control", "private, no-cache")
-      .send(record.photo.data);
   },
 );
 catalog.delete(

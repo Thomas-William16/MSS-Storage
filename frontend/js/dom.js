@@ -175,7 +175,6 @@ export function formModal(
     form = el("form"),
     error = el("p", { class: "form-error", role: "alert" }),
     inputs = {};
-  const previewUrls = [];
   const submitButton = el(
     "button",
     { type: "submit", class: "button primary" },
@@ -225,8 +224,6 @@ export function formModal(
         placeholder: field.placeholder,
         autocomplete: field.autocomplete || "off",
       });
-    if (field.type === "file")
-      input.accept = field.accept || "image/jpeg,image/png,image/webp";
     inputs[field.name] = input;
     form.append(
       el(
@@ -237,28 +234,6 @@ export function formModal(
         field.hint ? el("small", { class: "muted" }, field.hint) : null,
       ),
     );
-    if (field.type === "file") {
-      const preview = el("img", {
-        class: "photo-preview",
-        alt: "Equipment photo preview",
-        crossOrigin: "use-credentials",
-        hidden: !field.previewUrl,
-        src: field.previewUrl,
-      });
-      form.append(preview);
-      input.addEventListener("change", () => {
-        const file = input.files[0];
-        if (!file) {
-          preview.hidden = !field.previewUrl;
-          if (field.previewUrl) preview.src = field.previewUrl;
-          return;
-        }
-        const url = URL.createObjectURL(file);
-        previewUrls.push(url);
-        preview.src = url;
-        preview.hidden = false;
-      });
-    }
   }
   form.append(
     error,
@@ -274,11 +249,6 @@ export function formModal(
     try {
       const data = {};
       for (const field of fields) {
-        if (field.type === "file") {
-          if (inputs[field.name].files[0])
-            data[field.name] = inputs[field.name].files[0];
-          continue;
-        }
         const value = inputs[field.name].value;
         if (value === "" && field.required === false) continue;
         data[field.name] = field.type === "number" ? Number(value) : value;
@@ -293,7 +263,6 @@ export function formModal(
     }
   });
   dialog.addEventListener("close", () => {
-    previewUrls.forEach((url) => URL.revokeObjectURL(url));
     dialog.remove();
   });
   dialog.append(form);

@@ -8,7 +8,6 @@ import { chromium } from "@playwright/test";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import sharp from "sharp";
 import {
   User,
   Category,
@@ -137,11 +136,6 @@ try {
     "APPROVED",
     "Approved by the demo administrator",
   );
-  const photo = await sharp({
-    create: { width: 320, height: 180, channels: 3, background: "#71508b" },
-  })
-    .png()
-    .toBuffer();
   server = await new Promise((resolve) => {
     const s = app.listen(port, "127.0.0.1", () => resolve(s));
   });
@@ -364,12 +358,7 @@ try {
       await click(page.getByRole("button", { name: "New equipment" }));
       await fill("Equipment name", "Camp Lantern");
       await page.getByLabel("Total stock", { exact: true }).fill("2");
-      await fill("Description", "Demo lantern with a sample photo");
-      await page.getByLabel("Equipment photo", { exact: true }).setInputFiles({
-        name: "demo-photo.png",
-        mimeType: "image/png",
-        buffer: photo,
-      });
+      await fill("Description", "Demo lantern");
       await pause(1200);
       await save();
       lantern = await Equipment.findOne({ name: "Camp Lantern" });
@@ -552,11 +541,6 @@ try {
       await click(page.getByRole("button", { name: "New equipment" }));
       await fill("Equipment name", "Camp Rope");
       await page.getByLabel("Total stock", { exact: true }).fill("2");
-      await page.getByLabel("Equipment photo", { exact: true }).setInputFiles({
-        name: "demo-photo.png",
-        mimeType: "image/png",
-        buffer: photo,
-      });
       await save();
       assert.equal(
         await EquipmentItem.countDocuments({

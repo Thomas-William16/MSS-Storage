@@ -15,7 +15,6 @@ import {
   toast,
 } from "./dom.js";
 import { pagedList } from "./lists.js";
-import { photoUrl, readPhoto } from "./photos.js";
 const conditions = ["NEW", "GOOD", "FAIR", "DAMAGED"].map((value) => ({
   value,
   label: value,
@@ -58,18 +57,8 @@ export async function equipmentView(root) {
             ? "Increase to add physical items. Existing items and their history are kept."
             : "Creates this many individually coded items, immediately available to borrow.",
         },
-        {
-          name: "photo",
-          label: "Equipment photo",
-          type: "file",
-          required: false,
-          accept: "image/jpeg,image/png,image/webp",
-          previewUrl: record._id ? photoUrl(record) : undefined,
-          hint: "JPEG, PNG or WebP, up to 5 MB. Choose a file from your computer.",
-        },
       ],
       async (data) => {
-        if (data.photo) data.photo = await readPhoto(data.photo);
         await api(record._id ? `/equipment/${record._id}` : "/equipment", {
           method: record._id ? "PATCH" : "POST",
           body: data,
@@ -105,18 +94,6 @@ export async function equipmentView(root) {
           el(
             "div",
             { class: "equipment-cell" },
-            photoUrl(x)
-              ? el("img", {
-                  class: "equipment-thumb",
-                  src: photoUrl(x),
-                  crossOrigin: "use-credentials",
-                  alt: `${x.name} photo`,
-                })
-              : el(
-                  "span",
-                  { class: "equipment-thumb no-photo", "aria-hidden": "true" },
-                  "▦",
-                ),
             el(
               "div",
               {},
@@ -236,15 +213,6 @@ export async function equipmentDetail(root, id) {
   }
   showCounts(record.counts);
   root.append(stats);
-  if (photoUrl(record))
-    root.append(
-      el("img", {
-        class: "equipment-cover",
-        src: photoUrl(record),
-        crossOrigin: "use-credentials",
-        alt: `${record.name} photo`,
-      }),
-    );
   root.append(
     el(
       "p",

@@ -17,7 +17,6 @@ import {
   iso,
 } from "./dom.js";
 import { pagedList } from "./lists.js";
-import { photoUrl } from "./photos.js";
 const opts = (values) =>
   values.map((value) => ({ value, label: value.replaceAll("_", " ") }));
 function workflowDialog(title, content, submit, action) {
@@ -218,18 +217,6 @@ export async function issueDialog(refresh, request) {
     const card = el(
       "article",
       { class: "borrow-card" },
-      photoUrl(type)
-        ? el("img", {
-            class: "cart-photo",
-            src: photoUrl(type),
-            crossOrigin: "use-credentials",
-            alt: `${type.name} photo`,
-          })
-        : el(
-            "div",
-            { class: "cart-photo no-photo", "aria-hidden": "true" },
-            "▦",
-          ),
       el("h3", {}, type.name),
       stock,
       required ? el("p", { class: "muted" }, `${required} requested`) : null,

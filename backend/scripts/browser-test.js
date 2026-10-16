@@ -1,5 +1,4 @@
 import "./test-env.js";
-import sharp from "sharp";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import { spawn } from "node:child_process";
 import { chromium } from "@playwright/test";
@@ -48,25 +47,15 @@ try {
   await page.getByRole("cell", { name: "Camping", exact: true }).waitFor();
   await page.goto("http://localhost:3000/equipment.html");
   await page.getByRole("button", { name: "New equipment" }).click();
+  assert.equal(await page.locator('input[type="file"]').count(), 0);
   await page.getByLabel("Equipment name").fill("Patrol Tent");
   await page.getByLabel("Total stock", { exact: true }).fill("2");
-  await page.getByLabel("Equipment photo", { exact: true }).setInputFiles({
-    name: "tent.png",
-    mimeType: "image/png",
-    buffer: await sharp({
-      create: { width: 40, height: 40, channels: 3, background: "#71508b" },
-    })
-      .png()
-      .toBuffer(),
-  });
-  await page.getByRole("img", { name: "Equipment photo preview" }).waitFor();
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.getByRole("link", { name: "Patrol Tent" }).click();
   await page
     .locator('[data-count="available"] strong')
     .filter({ hasText: /^2$/ })
     .waitFor();
-  await page.getByRole("img", { name: "Patrol Tent photo" }).waitFor();
   await page.getByRole("button", { name: "Add items" }).click();
   await page.getByLabel("Quantity", { exact: true }).fill("2");
   await page.getByRole("button", { name: "Review batch", exact: true }).click();
@@ -279,7 +268,7 @@ try {
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL("**/login.html");
   console.log(
-    "Browser integration passed: login, taxonomy, equipment/photo/initial stock/bulk items, user, multi-type borrowing cart/return, request/approval, damage/repair, QR, reports/audit/settings, mobile navigation, scout request/cancellation and logout.",
+    "Browser integration passed: login, taxonomy, equipment/initial stock/bulk items, user, multi-type borrowing cart/return, request/approval, damage/repair, QR, reports/audit/settings, mobile navigation, scout request/cancellation and logout.",
   );
 } catch (error) {
   await page?.screenshot({

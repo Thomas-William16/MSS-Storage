@@ -6,7 +6,7 @@ A real MongoDB-backed inventory application for Scout groups. Vanilla HTML/CSS/E
 
 - Three roles: ADMIN, STORAGE_KEEPER, SCOUT; backend permissions and private-record ownership checks.
 - Revocable HTTP-only cookie sessions, CSRF tokens, bcrypt passwords, rate limits, account deactivation, no self-registration.
-- Categories, equipment catalog, uploaded photos, total stock that creates real items atomically, archive workflow, per-item conditions/statuses, bulk creation and code previews.
+- Categories, equipment catalog, total stock that creates real items atomically, archive workflow, per-item conditions/statuses, bulk creation and code previews.
 - Multi-equipment borrowing cart with quantities, item-code review, concurrent reservation protection, partial returns, damaged/lost outcomes and overdue calculations.
 - Multi-equipment requests, approval/rejection/cancellation, separate confirmed issuance and status history.
 - Damage reporting, costs and repair workflows, authenticated QR lookup/download/individual and bulk printing.
@@ -95,7 +95,7 @@ MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries npm test
 
 See [docs/API.md](docs/API.md) for routes, JSON request bodies and the full permission matrix. All lists paginate. CSV exports contain the selected **page**, so export each desired page or use the API for complete extraction. Inventory status counts partition items; DAMAGED is an overlapping condition metric and is not added to totals. Requests do not reserve inventory, even when approved; issuance rechecks stock. Availability is current physical stock rather than future-date scheduling/reservations. Dates are stored in UTC; the browser displays/converts local dates. Maintenance costs are numeric amounts in your organization's chosen currency; no currency conversion is performed.
 
-Physical items and borrowing history are never destructively deleted. Equipment is archived (remaining AVAILABLE items become RETIRED) and users deactivated. Equipment photos can be uploaded as JPEG, PNG or WebP (up to 5 MB, 16 million pixels). The backend decodes, strips metadata, resizes and re-encodes them as JPEG, stores them in MongoDB, and serves them only to authenticated inventory viewers. SVG, animated and invalid images are rejected. Photo bytes are excluded from JSON responses and audit logs. Legacy HTTPS image URLs remain supported by the API for compatibility. QR codes require normal authentication and do not grant permissions.
+Physical items and borrowing history are never destructively deleted. Equipment is archived (remaining AVAILABLE items become RETIRED) and users deactivated. Equipment photos are no longer supported. Existing image data stays preserved in the database but is hidden; photo uploads and image URLs are rejected by the API. QR codes require normal authentication and do not grant permissions.
 
 ## No-card deployment: Vercel Hobby and Atlas Free
 
@@ -103,7 +103,7 @@ Deploy from the repository root using the root `vercel.json`, with Framework set
 
 Set the encrypted production `MONGODB_URI` in Vercel to your Atlas replica-set connection string and `TRUST_PROXY=1`, `COOKIE_SAME_SITE=lax`, `NODE_ENV=production`. The public URL and allowed browser origin default to Vercel's production hostname, so leave frontend `API_BASE_URL` empty. Explicit FRONTEND_URL/PUBLIC_APP_URL values still override the platform default. Use the production address to test sign-in and QR labels.
 
-Vercel Hobby is intended for personal/noncommercial use and has usage limits. Atlas Free remains subject to its storage and network limits. Vercel function request bodies are limited to 4.5 MB: keep equipment photo files below 3 MB because the app sends them as base64 JSON. Larger photos can still be used in the local app. The current in-memory request/login limiters apply per function instance rather than across every instance. Initialize the first administrator securely with `npm run admin` from an interactive machine permitted by Atlas; do not place administrator passwords in deployment commands.
+Vercel Hobby is intended for personal/noncommercial use and has usage limits. Atlas Free remains subject to its storage and network limits. The current in-memory request/login limiters apply per function instance rather than across every instance. Initialize the first administrator securely with `npm run admin` from an interactive machine permitted by Atlas; do not place administrator passwords in deployment commands.
 
 `MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries node backend/scripts/test-serverless.js` verifies the handler locally with a disposable replica set, including concurrent cold initialization, production origin fallback, frontend/assets, authenticated API access and CSRF logout. A live Vercel deployment still requires account access, an Atlas network policy allowing its connections and checks against the actual deployed URL.
 
@@ -142,7 +142,7 @@ Enable Atlas scheduled backups and retention, limit restore access, and perform 
 - Replica-set test download blocked: allow `fastdl.mongodb.org` and reuse the verified binary cache; do not disable TLS or checksum verification.
 - npm cache not writable: use `npm ci --cache /workspace/.npm-cache` in the cloud workspace.
 
-## Equipment stock, photos and borrowing cart
+## Equipment stock and borrowing cart
 
 New equipment asks for **Total stock**, not a minimum-stock threshold. Entering 3 creates three individually coded GOOD/AVAILABLE physical items together with the equipment record. Availability and dashboard totals come from these real records, and detail counts refresh immediately after adding a batch. Editing total stock upward adds the difference (up to 500 per operation). Reductions are rejected to preserve individual item and borrowing history; retire items through the item workflow. The legacy minimumStock API field remains for existing low-stock settings.
 

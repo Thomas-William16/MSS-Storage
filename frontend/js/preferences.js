@@ -183,7 +183,6 @@ Object.assign(translations, {
   "＋ New equipment": "＋ معدات جديدة",
   Category: "الفئة",
   "Edit equipment": "تعديل المعدات",
-  "Equipment photo": "صورة المعدات",
   "Add items": "إضافة قطع",
   Before: "قبل",
   After: "بعد",

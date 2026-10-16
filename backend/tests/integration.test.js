@@ -799,7 +799,7 @@ describe("Additional state and HTTP invariants", () => {
   });
 });
 
-describe("Equipment photos and total stock", () => {
+describe("Equipment stock and removed photo support", () => {
   it("creates real available items with total stock and updates dashboard counts immediately", async () => {
     const res = await send("ADMIN", "post", "/equipment", {
       name: "Rope",
@@ -854,73 +854,74 @@ describe("Equipment photos and total stock", () => {
     ).toBe(400);
     expect(await Equipment.exists({ name: "Huge batch" })).toBeNull();
   });
-  it("decodes and stores uploaded photos, limits exposure, and supports replacement/removal", async () => {
-    const { default: sharp } = await import("sharp");
-    const { randomBytes } = await import("node:crypto");
-    const raw = randomBytes(400 * 400 * 3);
-    const image = await sharp(raw, {
-      raw: { width: 400, height: 400, channels: 3 },
-    })
-      .png()
-      .toBuffer();
-    expect(image.length).toBeGreaterThan(64000);
-    const res = await send("ADMIN", "post", "/equipment", {
-      name: "Photo tent",
-      category: String(category._id),
-      totalStock: 2,
-      photo: { data: image.toString("base64") },
-    });
-    expect(res.status, res.text).toBe(201);
-    expect(res.body.data.hasPhoto).toBe(true);
-    expect(res.body.data.photo).toBeUndefined();
-    const photo = await clients.SCOUT.get(
-      `/api/v1/equipment/${res.body.data._id}/photo`,
-    );
-    expect(photo.status).toBe(200);
-    expect(photo.headers["content-type"]).toContain("image/jpeg");
-    expect((await sharp(photo.body).metadata()).format).toBe("jpeg");
-    expect(
-      (await request(app).get(`/api/v1/equipment/${res.body.data._id}/photo`))
-        .status,
-    ).toBe(401);
-    const detail = await clients.ADMIN.get(
-      `/api/v1/equipment/${res.body.data._id}`,
-    );
-    expect(detail.body.data.photo).toBeUndefined();
-    expect(JSON.stringify(await AuditLog.find())).not.toContain(
-      image.toString("base64").slice(0, 100),
-    );
-    const cleared = await send(
-      "ADMIN",
-      "patch",
-      `/equipment/${res.body.data._id}`,
+  it("rejects photo uploads and legacy image URLs without modifying equipment or stock", async () => {
+    for (const fields of [
+      { photo: { data: "aGVsbG8=" } },
       { photo: null },
-    );
-    expect(cleared.status).toBe(200);
-    expect(cleared.body.data.hasPhoto).toBe(false);
-    expect(
-      (await clients.ADMIN.get(`/api/v1/equipment/${res.body.data._id}/photo`))
-        .status,
-    ).toBe(404);
-  });
-  it("rejects invalid or unsafe images without creating equipment or stock", async () => {
-    for (const value of [
-      "not base64",
-      Buffer.from("not an image").toString("base64"),
-      Buffer.from(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>',
-      ).toString("base64"),
+      { imageUrl: "https://example.com/tent.jpg" },
     ]) {
-      const res = await send("ADMIN", "post", "/equipment", {
-        name: "Invalid photo",
+      const created = await send("ADMIN", "post", "/equipment", {
+        name: "Rejected photo",
         category: String(category._id),
         totalStock: 3,
-        photo: { data: value },
+        ...fields,
       });
-      expect(res.status, res.text).toBe(400);
+      expect(created.status, created.text).toBe(400);
+      const patched = await send(
+        "ADMIN",
+        "patch",
+        `/equipment/${equipment._id}`,
+        { name: "Do not save", totalStock: 4, ...fields },
+      );
+      expect(patched.status, patched.text).toBe(400);
     }
-    expect(await Equipment.exists({ name: "Invalid photo" })).toBeNull();
+    expect(await Equipment.exists({ name: "Rejected photo" })).toBeNull();
+    expect((await Equipment.findById(equipment._id)).name).toBe("Tent");
     expect(await EquipmentItem.countDocuments()).toBe(0);
+  });
+  it("hides preserved legacy photos and removes their download endpoint", async () => {
+    const photo = {
+      data: Buffer.from("legacy image"),
+      contentType: "image/jpeg",
+    };
+    await Equipment.collection.updateOne(
+      { _id: equipment._id },
+      {
+        $set: {
+          photo,
+          hasPhoto: true,
+          imageUrl: "https://example.com/old.jpg",
+        },
+      },
+    );
+    for (const role of roles) {
+      for (const path of ["/equipment", `/equipment/${equipment._id}`]) {
+        const response = await clients[role].get(`/api/v1${path}`);
+        expect(response.status, response.text).toBe(200);
+        const rows = Array.isArray(response.body.data)
+          ? response.body.data
+          : [response.body.data];
+        for (const row of rows) {
+          expect(row.photo).toBeUndefined();
+          expect(row.hasPhoto).toBeUndefined();
+          expect(row.imageUrl).toBeUndefined();
+        }
+      }
+      expect(
+        (await clients[role].get(`/api/v1/equipment/${equipment._id}/photo`))
+          .status,
+      ).toBe(404);
+    }
+    expect(
+      (
+        await send("ADMIN", "patch", `/equipment/${equipment._id}`, {
+          description: "Updated",
+        })
+      ).status,
+    ).toBe(200);
+    const stored = await Equipment.collection.findOne({ _id: equipment._id });
+    expect(stored.hasPhoto).toBe(true);
+    expect(stored.photo.contentType).toBe("image/jpeg");
   });
   it("issues several equipment types together in one borrowing", async () => {
     const tents = await items(2);
