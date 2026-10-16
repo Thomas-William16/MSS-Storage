@@ -163,3 +163,11 @@ In Record returns, **Select all** selects only outstanding return rows. **Clear 
 English MP4 videos for Administrator, Storage Keeper and Scout are in [docs/walkthroughs](docs/walkthroughs/README.md). Download the files for sharing or posting on social media. They include real app demonstrations using isolated demo data, computer-generated English narration, and chapter titles. Optional full captions are provided as VTT files. Arabic versions remain available in the same folder. Videos are standalone assets; there is no video page or media endpoint in the app.
 
 Recording and narration tools are optional production helpers, not application dependencies.
+
+## Everyday use
+
+The dashboard shows role-specific shortcuts: Scouts can request equipment or open their borrowings; Admins and Storage Keepers can issue equipment or open returns. Active and partially returned borrowings have a Return items action in the list. The existing condition, damage, loss and ownership rules apply to these returns.
+
+Admins can create a category beside the category dropdown while adding or editing equipment. The equipment draft is retained, the new category is selected, and the list filter updates immediately. Availability shows available items out of total stock. Requests flag unavailable stock and quantities above current availability; requests for future activities remain possible and do not reserve stock.
+
+Success notices describe completed actions, including the number returned, marked lost and still outstanding. Arabic/English and dark-mode preferences are saved in the browser. Arabic uses RTL layouts and localized Gregorian dates; mobile returns use labeled cards so notes and condition controls stay usable.

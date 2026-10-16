@@ -12,6 +12,7 @@ import {
   stat,
   toast,
 } from "./dom.js";
+import { issueDialog, requestDialog } from "./workflows.js";
 import { pagedList } from "./lists.js";
 export async function dashboardView(root) {
   const { data } = await api("/reports/dashboard");
@@ -20,6 +21,45 @@ export async function dashboardView(root) {
     header(
       "Storage overview",
       `Good ${hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening"}, ${currentUser.name}. Here’s the latest from your storage.`,
+    ),
+  );
+  const refresh = async () => {
+    root.replaceChildren();
+    await dashboardView(root);
+  };
+  root.append(
+    panel(
+      "Quick actions",
+      el(
+        "div",
+        { class: "quick-actions" },
+        ...(manager()
+          ? [
+              button("Issue equipment", () => issueDialog(refresh), "primary"),
+              el(
+                "a",
+                { href: "/borrowings.html", class: "button secondary" },
+                "Record returns",
+              ),
+            ]
+          : [
+              button(
+                "Request equipment",
+                () => requestDialog(refresh),
+                "primary",
+              ),
+              el(
+                "a",
+                { href: "/borrowings.html", class: "button secondary" },
+                "My borrowings",
+              ),
+            ]),
+        el(
+          "a",
+          { href: "/equipment.html", class: "button secondary" },
+          "Browse equipment",
+        ),
+      ),
     ),
   );
   root.append(

@@ -5,6 +5,7 @@ export function pagedList(
   { path, columns, filters = [], search = true },
 ) {
   let page = 1;
+  const filterInputs = new Map();
   const values = {},
     body = el("div"),
     pagination = el("div", { class: "pagination" }),
@@ -38,6 +39,7 @@ export function pagedList(
       el("option", { value: "" }, filter.label),
       filter.options.map((x) => el("option", { value: x.value }, x.label)),
     );
+    filterInputs.set(filter.name, { select, label: filter.label });
     select.addEventListener("change", () => {
       values[filter.name] = select.value;
       page = 1;
@@ -87,6 +89,16 @@ export function pagedList(
       );
     }
   }
+  load.setFilterOptions = (name, options) => {
+    const entry = filterInputs.get(name);
+    if (!entry) return;
+    const selected = entry.select.value;
+    entry.select.replaceChildren(
+      el("option", { value: "" }, entry.label),
+      ...options.map((x) => el("option", { value: x.value }, x.label)),
+    );
+    entry.select.value = selected;
+  };
   load();
   return load;
 }

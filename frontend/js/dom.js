@@ -1,3 +1,5 @@
+import { dateText } from "./i18n.js";
+
 export function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
@@ -43,13 +45,7 @@ export const badge = (value) =>
     { class: `badge ${String(value).toLowerCase()}` },
     String(value).replaceAll("_", " "),
   );
-export const fmt = (value) =>
-  value
-    ? new Date(value).toLocaleString(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
-    : "—";
+export const fmt = dateText;
 export const short = (value) =>
   String(value || "")
     .slice(-8)
@@ -63,8 +59,8 @@ export function toast(message, type = "success") {
   document.getElementById("toasts").append(node);
   setTimeout(() => node.remove(), 7000);
 }
-export function table(columns, rows) {
-  const wrapper = el("div", { class: "table-wrap" });
+export function table(columns, rows, className = "") {
+  const wrapper = el("div", { class: `table-wrap ${className}` });
   const tbody = el("tbody");
   for (const row of rows)
     tbody.append(
@@ -74,7 +70,7 @@ export function table(columns, rows) {
         columns.map((column) =>
           el(
             "td",
-            {},
+            { "data-label": column.label },
             column.render ? column.render(row) : (row[column.key] ?? "—"),
           ),
         ),
@@ -106,6 +102,18 @@ export function table(columns, rows) {
       ),
     );
   return wrapper;
+}
+export function availability(counts) {
+  const available = counts.available || 0,
+    total = counts.total || 0;
+  return el(
+    "span",
+    { class: available ? "availability" : "availability unavailable" },
+    el("strong", {}, `${available} available out of ${total}`),
+    available
+      ? null
+      : el("small", { class: "subline" }, "Currently unavailable"),
+  );
 }
 export const actions = (...buttons) => el("div", { class: "actions" }, buttons);
 export const link = (text, href) => el("a", { href, class: "text-link" }, text);
@@ -169,7 +177,7 @@ export function formModal(
   title,
   fields,
   onSubmit,
-  { submit = "Save", intro } = {},
+  { submit = "Save", intro, success = "Saved successfully" } = {},
 ) {
   const dialog = el("dialog", { class: "modal" }),
     form = el("form"),
@@ -183,7 +191,7 @@ export function formModal(
   form.append(el("h2", {}, title));
   if (intro) form.append(el("p", { class: "muted" }, intro));
   for (const field of fields) {
-    const inputId = `field-${field.name}`;
+    const inputId = `field-${field.name}-${crypto.randomUUID()}`;
     let input;
     if (field.type === "select")
       input = el(
@@ -231,6 +239,9 @@ export function formModal(
         { class: "field" },
         el("label", { htmlFor: inputId }, field.label),
         input,
+        field.action
+          ? button(field.action.label, () => field.action.run(input))
+          : null,
         field.hint ? el("small", { class: "muted" }, field.hint) : null,
       ),
     );
@@ -253,9 +264,9 @@ export function formModal(
         if (value === "" && field.required === false) continue;
         data[field.name] = field.type === "number" ? Number(value) : value;
       }
-      await onSubmit(data, dialog);
+      const message = await onSubmit(data, dialog);
       dialog.close();
-      toast("Saved successfully");
+      toast(typeof message === "string" ? message : success);
     } catch (err) {
       error.textContent = err.message;
     } finally {

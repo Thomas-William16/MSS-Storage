@@ -13,6 +13,7 @@ import {
   formModal,
   confirmAction,
   toast,
+  availability,
 } from "./dom.js";
 import { pagedList } from "./lists.js";
 const conditions = ["NEW", "GOOD", "FAIR", "DAMAGED"].map((value) => ({
@@ -23,7 +24,7 @@ const optionRows = (rows) => rows.map((x) => ({ value: x._id, label: x.name }));
 export async function equipmentView(root) {
   const categories = await all("/categories");
   let reload;
-  function addCategory() {
+  function addCategory(select) {
     formModal(
       "New category",
       [
@@ -36,10 +37,21 @@ export async function equipmentView(root) {
         },
       ],
       async (data) => {
-        await api("/categories", { method: "POST", body: data });
-        // Rebuild the list so the new category is ready in filters and equipment forms.
-        root.replaceChildren();
-        await equipmentView(root);
+        const { data: category } = await api("/categories", {
+          method: "POST",
+          body: data,
+        });
+        categories.push(category);
+        categories.sort((a, b) => a.name.localeCompare(b.name));
+        reload.setFilterOptions("category", optionRows(categories));
+        if (select) {
+          select.replaceChildren(
+            ...categories.map((x) => el("option", { value: x._id }, x.name)),
+          );
+          select.value = category._id;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        return "Category created and ready to use.";
       },
     );
   }
@@ -59,6 +71,7 @@ export async function equipmentView(root) {
           type: "select",
           value: record.category?._id,
           options: optionRows(categories),
+          action: admin() ? { label: "Add category", run: addCategory } : null,
         },
         {
           name: "description",
@@ -84,6 +97,9 @@ export async function equipmentView(root) {
           body: data,
         });
         await reload();
+        return record._id
+          ? "Equipment updated."
+          : `Equipment created with ${data.totalStock} available items.`;
       },
     );
   }
@@ -94,7 +110,7 @@ export async function equipmentView(root) {
       ...(manager()
         ? [button("＋ New equipment", () => edit(), "primary")]
         : []),
-      ...(admin() ? [button("＋ Add new category", addCategory)] : []),
+      ...(admin() ? [button("＋ Add new category", () => addCategory())] : []),
     ),
   );
   const container = panel("Equipment inventory");
@@ -125,7 +141,7 @@ export async function equipmentView(root) {
       },
       { label: "Category", render: (x) => x.category?.name },
       { label: "Total", render: (x) => x.counts.total },
-      { label: "Available", render: (x) => badge(x.counts.available) },
+      { label: "Availability", render: (x) => availability(x.counts) },
       { label: "Borrowed", render: (x) => x.counts.borrowed },
       { label: "Maintenance", render: (x) => x.counts.maintenance },
       {
@@ -199,8 +215,8 @@ export async function equipmentDetail(root, id) {
           method: "POST",
           body: data,
         });
-        toast(`Created ${result.data.length} physical items`);
         await reload();
+        return `Created ${result.data.length} physical items`;
       },
       { submit: "Review batch" },
     );
@@ -359,7 +375,9 @@ export async function itemDetail(root, id) {
       ],
       async (data) => {
         await api(`/items/${id}`, { method: "PATCH", body: data });
-        location.reload();
+        root.replaceChildren();
+        await itemDetail(root, id);
+        return "Item updated.";
       },
     );
   }
@@ -384,7 +402,9 @@ export async function itemDetail(root, id) {
               method: "POST",
               body: { ...data, equipmentItem: id },
             });
-            location.reload();
+            root.replaceChildren();
+            await itemDetail(root, id);
+            return "Damage reported; repair tracking started.";
           },
         ),
       ),
@@ -509,6 +529,7 @@ export async function usersView(root) {
           body: data,
         });
         await reload();
+        return record ? "User updated." : "User created.";
       },
     );
   root.append(

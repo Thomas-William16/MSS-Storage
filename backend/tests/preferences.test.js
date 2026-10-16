@@ -23,6 +23,17 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
     await page.route("**/api/v1/**", async (route) => {
       const path = new URL(route.request().url()).pathname;
       let data = {};
+      if (path.endsWith("/reports/dashboard"))
+        data = {
+          counts: {},
+          physicalItems: 0,
+          equipmentTypes: 0,
+          overdue: 0,
+          pendingRequests: 0,
+          lowStock: [],
+          recentBorrowings: [],
+          recentActivity: [],
+        };
       if (path.endsWith("/categories") || path.endsWith("/equipment"))
         data = [];
       if (path.endsWith("/auth/me"))
@@ -53,6 +64,28 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
     });
     const base = `http://127.0.0.1:${server.address().port}`;
     for (role of ["ADMIN", "STORAGE_KEEPER", "SCOUT"]) {
+      await page.goto(`${base}/dashboard.html`);
+      await page
+        .getByRole("heading", { name: "Quick actions", exact: true })
+        .waitFor();
+      expect(
+        await page
+          .locator(".quick-actions")
+          .getByRole("button", {
+            name: role === "SCOUT" ? "Request equipment" : "Issue equipment",
+            exact: true,
+          })
+          .count(),
+      ).toBe(1);
+      expect(
+        await page
+          .locator(".quick-actions")
+          .getByRole("link", {
+            name: role === "SCOUT" ? "My borrowings" : "Record returns",
+            exact: true,
+          })
+          .count(),
+      ).toBe(1);
       await page.goto(`${base}/equipment.html`);
       await page
         .getByRole("heading", { name: "Equipment", exact: true })
@@ -83,6 +116,17 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
       await page
         .getByRole("button", { name: "تسجيل الإرجاع", exact: true })
         .click();
+      await page.setViewportSize({ width: 390, height: 844 });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      expect(
+        await page
+          .locator("dialog")
+          .evaluate((node) => getComputedStyle(node).backgroundColor),
+      ).toBe("rgb(41, 34, 48)");
       await page
         .getByRole("button", { name: "تحديد الكل", exact: true })
         .click();

@@ -38,9 +38,9 @@ function workflowDialog(title, content, submit, action) {
     save.disabled = true;
     error.textContent = "";
     try {
-      await action();
+      const message = await action();
       dialog.close();
-      toast("Saved successfully");
+      toast(message || "Saved successfully");
     } catch (err) {
       error.textContent = err.message;
     } finally {
@@ -218,6 +218,11 @@ export async function issueDialog(refresh, request) {
       "article",
       { class: "borrow-card" },
       el("h3", {}, type.name),
+      el(
+        "div",
+        { class: "availability" },
+        `${items.length} available out of ${type.counts?.total || items.length}`,
+      ),
       stock,
       required ? el("p", { class: "muted" }, `${required} requested`) : null,
       actions(quantity, add),
@@ -291,7 +296,9 @@ export async function issueDialog(refresh, request) {
           ...(request ? { requestId: request._id } : {}),
         },
       });
-      await refresh();
+      const message = `${itemIds.length} ${itemIds.length === 1 ? "item" : "items"} issued successfully.`;
+      await refresh(message);
+      return message;
     },
   );
 }
@@ -331,6 +338,17 @@ export async function borrowingsView(root, id) {
       { label: "Purpose", key: "purpose" },
       { label: "Due", render: (x) => fmt(x.expectedReturnDate) },
       {
+        label: "Actions",
+        render: (x) =>
+          canReturn(x)
+            ? button(
+                "Return items",
+                () => returnDialog(x._id, reload),
+                "primary",
+              )
+            : "—",
+      },
+      {
         label: "Status",
         render: (x) =>
           actions(badge(x.status), x.overdue ? badge("OVERDUE") : null),
@@ -338,87 +356,108 @@ export async function borrowingsView(root, id) {
     ],
   });
 }
+const canReturn = (record) =>
+  ["ACTIVE", "PARTIAL"].includes(record.status) &&
+  (manager() || (record.user?._id || record.user) === currentUser._id);
+export async function returnDialog(id, refresh) {
+  const { data: record } = await api(`/borrowings/${id}`);
+  if (!canReturn(record))
+    throw new Error("This borrowing has no items you can return.");
+  const outstanding = record.items.filter((x) => !x.returnedAt),
+    entries = [];
+  const rows = outstanding.map((line) => {
+    const check = el("input", {
+        type: "checkbox",
+        "aria-label": `Return ${line.equipmentItem.itemCode}`,
+      }),
+      condition = el(
+        "select",
+        { "aria-label": "Returned condition" },
+        opts(["GOOD", "NEW", "FAIR", "DAMAGED"]).map((x) =>
+          el("option", { value: x.value }, x.label),
+        ),
+      ),
+      lost = el("input", { type: "checkbox", "aria-label": "Mark lost" }),
+      notes = el("input", { maxLength: 2000, "aria-label": "Return notes" });
+    entries.push({ line, check, condition, lost, notes });
+    return {
+      code: line.equipmentItem.itemCode,
+      check,
+      condition,
+      lost,
+      notes,
+    };
+  });
+  workflowDialog(
+    "Return or resolve items",
+    [
+      el(
+        "p",
+        { class: "muted" },
+        "Select only the items being returned now. Damaged items enter maintenance; lost items are recorded as lost.",
+      ),
+      actions(
+        button("Select all", () => {
+          for (const entry of entries) entry.check.checked = true;
+        }),
+        button("Clear selection", () => {
+          for (const entry of entries) entry.check.checked = false;
+        }),
+      ),
+      table(
+        [
+          { label: "Return", render: (x) => x.check },
+          { label: "Item", key: "code" },
+          { label: "Condition", render: (x) => x.condition },
+          { label: "Lost", render: (x) => x.lost },
+          { label: "Notes", render: (x) => x.notes },
+        ],
+        rows,
+        "return-table",
+      ),
+    ],
+    "Record returns",
+    async () => {
+      const items = entries
+        .filter((x) => x.check.checked)
+        .map((x) => ({
+          itemId: x.line.equipmentItem._id,
+          condition: x.condition.value,
+          lost: x.lost.checked,
+          notes: x.notes.value,
+        }));
+      if (!items.length) throw new Error("Select at least one item");
+      await api(`/borrowings/${id}/return`, {
+        method: "POST",
+        body: { items },
+      });
+      const { data: updated } = await api(`/borrowings/${id}`);
+      await refresh();
+      const lostCount = items.filter((x) => x.lost).length;
+      return `${items.length - lostCount} ${items.length - lostCount === 1 ? "item" : "items"} returned; ${lostCount} marked lost; ${updated.items.filter((x) => !x.returnedAt).length} still outstanding.`;
+    },
+  );
+}
 export async function borrowingDetail(root, id) {
   const { data: record } = await api(`/borrowings/${id}`);
-  async function returns() {
-    const outstanding = record.items.filter((x) => !x.returnedAt),
-      entries = [];
-    const rows = outstanding.map((line) => {
-      const check = el("input", {
-          type: "checkbox",
-          "aria-label": `Return ${line.equipmentItem.itemCode}`,
-        }),
-        condition = el(
-          "select",
-          { "aria-label": "Returned condition" },
-          opts(["GOOD", "NEW", "FAIR", "DAMAGED"]).map((x) =>
-            el("option", { value: x.value }, x.label),
-          ),
-        ),
-        lost = el("input", { type: "checkbox", "aria-label": "Mark lost" }),
-        notes = el("input", { maxLength: 2000, "aria-label": "Return notes" });
-      entries.push({ line, check, condition, lost, notes });
-      return {
-        code: line.equipmentItem.itemCode,
-        check,
-        condition,
-        lost,
-        notes,
-      };
-    });
-    workflowDialog(
-      "Return or resolve items",
-      [
-        el(
-          "p",
-          { class: "muted" },
-          "Select only the items being returned now. Damaged items enter maintenance; lost items are recorded as lost.",
-        ),
-        actions(
-          button("Select all", () => {
-            for (const entry of entries) entry.check.checked = true;
-          }),
-          button("Clear selection", () => {
-            for (const entry of entries) entry.check.checked = false;
-          }),
-        ),
-        table(
-          [
-            { label: "Return", render: (x) => x.check },
-            { label: "Item", key: "code" },
-            { label: "Condition", render: (x) => x.condition },
-            { label: "Lost", render: (x) => x.lost },
-            { label: "Notes", render: (x) => x.notes },
-          ],
-          rows,
-        ),
-      ],
-      "Record returns",
-      async () => {
-        const items = entries
-          .filter((x) => x.check.checked)
-          .map((x) => ({
-            itemId: x.line.equipmentItem._id,
-            condition: x.condition.value,
-            lost: x.lost.checked,
-            notes: x.notes.value,
-          }));
-        if (!items.length) throw new Error("Select at least one item");
-        await api(`/borrowings/${id}/return`, {
-          method: "POST",
-          body: { items },
-        });
-        location.reload();
-      },
-    );
-  }
+
   root.append(
     header(
       `Borrowing BR-${short(id)}`,
       `${record.user?.name} · ${record.purpose}`,
       ...((manager() || record.user?._id === currentUser._id) &&
       ["ACTIVE", "PARTIAL"].includes(record.status)
-        ? [button("Record returns", returns, "primary")]
+        ? [
+            button(
+              "Record returns",
+              () =>
+                returnDialog(id, async () => {
+                  root.replaceChildren();
+                  await borrowingDetail(root, id);
+                }),
+              "primary",
+            ),
+          ]
         : []),
       ...(manager() && record.status === "ACTIVE"
         ? [
@@ -446,7 +485,9 @@ export async function borrowingDetail(root, id) {
                     method: "POST",
                     body: data,
                   });
-                  location.reload();
+                  root.replaceChildren();
+                  await borrowingDetail(root, id);
+                  return "Erroneous issuance cancelled; items restored to stock.";
                 },
               ),
             ),
@@ -523,11 +564,39 @@ export async function requestDialog(refresh) {
       max: 500,
       value: 0,
     });
+    const warning = el("p", {
+      class: "stock-warning",
+      role: "status",
+      id: `stock-${type._id}`,
+    });
+    quantity.setAttribute("aria-describedby", warning.id);
+    quantity.addEventListener("input", () => {
+      warning.textContent =
+        Number(quantity.value) > type.counts.available
+          ? "Requested quantity exceeds current availability. Approval depends on stock."
+          : "";
+    });
     rows.push({ type, quantity });
     choices.append(
-      field(
-        `${type.name} · ${type.counts.available} currently available`,
-        quantity,
+      el(
+        "section",
+        {
+          class: type.counts.available
+            ? "request-choice"
+            : "request-choice unavailable",
+        },
+        field(
+          `${type.name} · ${type.counts.available} currently available out of ${type.counts.total}`,
+          quantity,
+        ),
+        type.counts.available
+          ? null
+          : el(
+              "p",
+              { class: "stock-warning" },
+              "Currently unavailable. You can request for a future date; approval depends on stock.",
+            ),
+        warning,
       ),
     );
   }
@@ -563,6 +632,7 @@ export async function requestDialog(refresh) {
         },
       });
       await refresh();
+      return "Request submitted for approval.";
     },
   );
 }
@@ -627,7 +697,13 @@ export async function requestDetail(root, id) {
       ],
       async (data) => {
         await api(`/requests/${id}/${name}`, { method: "POST", body: data });
-        location.reload();
+        root.replaceChildren();
+        await requestDetail(root, id);
+        return {
+          approve: "Request approved.",
+          reject: "Request rejected.",
+          cancel: "Request cancelled.",
+        }[name];
       },
     );
   if (manager() && record.status === "PENDING")
@@ -641,7 +717,11 @@ export async function requestDetail(root, id) {
     buttons.push(
       button(
         "Issue equipment",
-        () => issueDialog(() => location.assign("/borrowings.html"), record),
+        () =>
+          issueDialog((message) => {
+            sessionStorage.setItem("scout-notice", message);
+            location.assign("/borrowings.html");
+          }, record),
         "primary",
       ),
     );
@@ -713,6 +793,7 @@ export async function maintenanceView(root) {
       async (data) => {
         await api("/maintenance", { method: "POST", body: data });
         await reload();
+        return "Damage reported; repair tracking started.";
       },
     );
   const update = (record) =>
@@ -748,6 +829,7 @@ export async function maintenanceView(root) {
           body: data,
         });
         await reload();
+        return "Maintenance updated.";
       },
     );
   const complete = (record) =>
@@ -792,6 +874,9 @@ export async function maintenanceView(root) {
           body: data,
         });
         await reload();
+        return data.restore
+          ? "Repair completed; item returned to available stock."
+          : "Repair completed; item retired.";
       },
     );
   root.append(

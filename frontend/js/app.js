@@ -91,6 +91,11 @@ try {
     if (!admin()) throw new Error("Administrator access required");
     await auditView(root);
   } else if (page === "settings.html") await settingsView(root);
+  const notice = sessionStorage.getItem("scout-notice");
+  if (notice) {
+    sessionStorage.removeItem("scout-notice");
+    toast(notice);
+  }
 } catch (error) {
   if (
     error.message.includes("Authentication") ||

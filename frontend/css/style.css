@@ -1136,3 +1136,129 @@ code {
 .login-main {
   padding-block-start: 90px;
 }
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.quick-actions .button {
+  padding: 14px 20px;
+  font-size: 14px;
+  text-align: center;
+}
+.availability {
+  font-size: 12px;
+  color: var(--ink);
+}
+.unavailable {
+  color: #a85847;
+}
+.request-choice {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+}
+.request-choice.unavailable {
+  border-style: dashed;
+}
+.stock-warning {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+[data-theme="dark"] .unavailable {
+  color: #f2b7a9;
+}
+.modal {
+  max-block-size: 90dvh;
+  overflow-y: auto;
+}
+.modal :is(input, select, textarea) {
+  min-inline-size: 0;
+}
+.modal .field > .button {
+  justify-self: start;
+}
+[dir="rtl"] :is(.stat, .field, .request-choice) {
+  text-align: start;
+}
+[dir="rtl"] .stat:before {
+  right: auto;
+  inset-inline-end: 24px;
+}
+[dir="rtl"] .table-wrap {
+  direction: rtl;
+}
+@media (max-width: 760px) {
+  .quick-actions {
+    flex-direction: column;
+  }
+  .quick-actions .button {
+    width: 100%;
+    white-space: normal;
+  }
+  .page-heading {
+    align-items: stretch;
+  }
+  .page-heading > .actions {
+    justify-content: flex-start;
+  }
+  .borrow-catalog {
+    grid-template-columns: 1fr;
+  }
+  .modal {
+    width: calc(100% - 24px);
+    padding: 20px 16px;
+  }
+  .request-picker {
+    grid-template-columns: 1fr;
+  }
+  .modal .table-wrap {
+    max-inline-size: 100%;
+  }
+}
+@media (max-width: 760px) {
+  .return-table :is(table, tbody) {
+    display: block;
+    width: 100%;
+  }
+  .return-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .return-table tr {
+    display: grid;
+    gap: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin-block: 12px;
+  }
+  .return-table td {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    white-space: normal;
+  }
+  .return-table td::before {
+    content: attr(data-label);
+    font-weight: 650;
+    color: var(--muted);
+  }
+  .return-table :is(select, input:not([type="checkbox"])) {
+    width: 100%;
+    min-width: 0;
+  }
+  .return-table input[type="checkbox"] {
+    justify-self: start;
+    width: 20px;
+    height: 20px;
+  }
+}

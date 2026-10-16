@@ -5,7 +5,7 @@ import { chromium } from "@playwright/test";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { connectDatabase } from "../src/config/database.js";
-import { User } from "../src/models/index.js";
+import { User, Equipment, Category } from "../src/models/index.js";
 import { app } from "../src/app.js";
 import assert from "node:assert/strict";
 const replica = await MongoMemoryReplSet.create({
@@ -40,6 +40,13 @@ try {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await page.waitForURL("**/dashboard.html");
   await page.getByRole("heading", { name: "Storage overview" }).waitFor();
+  assert.equal(
+    await page
+      .locator(".quick-actions")
+      .getByRole("button", { name: "Issue equipment", exact: true })
+      .count(),
+    1,
+  );
   await page.goto("http://localhost:3000/categories.html");
   await page.waitForURL("**/equipment.html");
   assert.equal(
@@ -56,6 +63,46 @@ try {
   await page.getByRole("button", { name: "New equipment" }).click();
   assert.equal(await page.locator('input[type="file"]').count(), 0);
   await page.getByLabel("Equipment name").fill("Patrol Tent");
+  await page.getByLabel("Description", { exact: true }).fill("Keep this draft");
+  await page.getByLabel("Total stock", { exact: true }).fill("2");
+  await page.getByRole("button", { name: "Add category", exact: true }).click();
+  await page
+    .locator("dialog")
+    .last()
+    .getByLabel("Name", { exact: true })
+    .fill("Shelters");
+  await page
+    .locator("dialog")
+    .last()
+    .getByRole("button", { name: "Save", exact: true })
+    .click();
+  await page
+    .locator("#toasts")
+    .getByText("Category created and ready to use.", { exact: true })
+    .waitFor();
+  await page.waitForFunction(
+    () => document.querySelectorAll("dialog").length === 1,
+  );
+  assert.equal(
+    await page.getByLabel("Equipment name").inputValue(),
+    "Patrol Tent",
+  );
+  assert.equal(
+    await page.getByLabel("Description", { exact: true }).inputValue(),
+    "Keep this draft",
+  );
+  assert.equal(
+    await page.getByLabel("Total stock", { exact: true }).inputValue(),
+    "2",
+  );
+  assert.equal(
+    await page
+      .getByLabel("Category", { exact: true })
+      .locator("option:checked")
+      .textContent(),
+    "Shelters",
+  );
+
   assert.equal(
     await page
       .getByLabel("Category", { exact: true })
@@ -85,6 +132,14 @@ try {
   await page.getByLabel("Total stock", { exact: true }).fill("1");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.getByRole("link", { name: "Camp Stove", exact: true }).waitFor();
+  await Equipment.create({
+    name: "Empty shelf",
+    category: (await Category.findOne({ name: "Camping" }))._id,
+  });
+  await page.goto("http://localhost:3000/equipment.html");
+  const emptyRow = page.getByRole("row").filter({ hasText: "Empty shelf" });
+  await emptyRow.getByText("0 available out of 0", { exact: true }).waitFor();
+  await emptyRow.getByText("Currently unavailable", { exact: true }).waitFor();
   await page.goto("http://localhost:3000/users.html");
   await page.getByRole("button", { name: "New user" }).click();
   assert.equal(
@@ -148,6 +203,22 @@ try {
   });
   await page.getByRole("button", { name: "Confirm issuance" }).click();
   await page.getByRole("cell", { name: "Browser verified camp" }).waitFor();
+  await page.getByRole("button", { name: "Return items", exact: true }).click();
+  await page
+    .getByRole("checkbox", { name: /^Return / })
+    .first()
+    .check();
+  await page
+    .locator("dialog")
+    .getByRole("button", { name: "Record returns", exact: true })
+    .click();
+  await page
+    .locator("#toasts")
+    .getByText("1 item returned; 0 marked lost; 2 still outstanding.", {
+      exact: true,
+    })
+    .waitFor();
+  assert.equal(new URL(page.url()).search, "");
   await page.getByRole("link", { name: /BR-/ }).first().click();
   await page.getByRole("button", { name: "Record returns" }).click();
   await page.getByRole("button", { name: "Select all", exact: true }).click();
@@ -247,7 +318,21 @@ try {
     path: "/tmp/scout-storage-cart-mobile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page
+    .getByLabel("Borrower", { exact: true })
+    .selectOption({ label: "Patrol Scout" });
+  await page.getByLabel("Purpose", { exact: true }).fill("Scout return UX");
+  await page
+    .locator(".borrow-card")
+    .filter({
+      has: page.getByRole("heading", { name: "Patrol Tent", exact: true }),
+    })
+    .getByRole("button", { name: "Add to cart" })
+    .click();
+  await page.getByRole("button", { name: "Confirm issuance" }).click();
+  await page
+    .getByRole("cell", { name: "Scout return UX", exact: true })
+    .waitFor();
   await page.getByRole("button", { name: "Sign out" }).click();
   await page.waitForURL("**/login.html");
   await page.getByLabel("Email address").fill("scout@browser.test");
@@ -264,11 +349,104 @@ try {
       .count(),
     0,
   );
-  await page.goto("http://localhost:3000/requests.html");
-  await page.getByRole("button", { name: "New request" }).click();
+  await page
+    .locator(".quick-actions")
+    .getByRole("link", { name: "My borrowings", exact: true })
+    .click();
+  await page
+    .getByRole("cell", { name: "Scout return UX", exact: true })
+    .waitFor();
+  const borrowedDate = await page.evaluate(async () => {
+    const response = await (await fetch("/api/v1/borrowings")).json();
+    return response.data.find((x) => x.purpose === "Scout return UX")
+      .expectedReturnDate;
+  });
+  await page.getByRole("button", { name: "التبديل إلى العربية" }).click();
+  const arabicDate = new Intl.DateTimeFormat("ar-EG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    calendar: "gregory",
+  }).format(new Date(borrowedDate));
+  await page
+    .getByRole("cell", { name: arabicDate, exact: true })
+    .first()
+    .waitFor();
+  await page.getByRole("button", { name: "إرجاع القطع", exact: true }).click();
+  await page.getByRole("checkbox", { name: /^إرجاع / }).check();
+  await page.getByLabel("ملاحظات الإرجاع", { exact: true }).fill("تم الفحص");
+  await page
+    .getByLabel("الحالة عند الإرجاع", { exact: true })
+    .selectOption("FAIR");
+  assert.ok(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    "Arabic mobile return page must not overflow",
+  );
+  await page.screenshot({
+    path: "/tmp/scout-storage-ux-arabic-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .locator("dialog")
+    .getByRole("button", { name: "تسجيل الإرجاع", exact: true })
+    .click();
+  await page
+    .locator("#toasts")
+    .getByText("تم إرجاع 1 قطعة؛ وتسجيل 0 كمفقودة؛ وما زالت 0 قطعة مستعارة.", {
+      exact: true,
+    })
+    .waitFor();
+  assert.equal(
+    await page
+      .getByRole("button", { name: "إرجاع القطع", exact: true })
+      .count(),
+    0,
+  );
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  const englishDate = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    calendar: "gregory",
+  }).format(new Date(borrowedDate));
+  await page
+    .getByRole("cell", { name: englishDate, exact: true })
+    .first()
+    .waitFor();
+  await page.goto("http://localhost:3000/dashboard.html");
+  await page
+    .getByRole("heading", { name: "Quick actions", exact: true })
+    .waitFor();
+
+  await page
+    .locator(".quick-actions")
+    .getByRole("button", { name: "Request equipment", exact: true })
+    .click();
+  const unavailableChoice = page
+    .locator(".request-choice")
+    .filter({ hasText: "Empty shelf" });
+  await unavailableChoice
+    .getByText(
+      "Currently unavailable. You can request for a future date; approval depends on stock.",
+      { exact: true },
+    )
+    .waitFor();
+  await unavailableChoice.getByRole("spinbutton").fill("1");
+  await unavailableChoice
+    .getByText(
+      "Requested quantity exceeds current availability. Approval depends on stock.",
+      { exact: true },
+    )
+    .waitFor();
+  await unavailableChoice.getByRole("spinbutton").fill("0");
   await page.getByLabel("Purpose", { exact: true }).fill("Scout owned request");
   await page.getByLabel(/Patrol Tent.*currently available/).fill("1");
   await page.getByRole("button", { name: "Submit request" }).click();
+  await page
+    .locator("#toasts")
+    .getByText("Request submitted for approval.", { exact: true })
+    .waitFor();
+  await page.goto("http://localhost:3000/requests.html");
   await page.getByRole("cell", { name: "Scout owned request" }).waitFor();
   await page.getByRole("link", { name: /RQ-/ }).first().click();
   assert.equal(
