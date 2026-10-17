@@ -51,10 +51,19 @@ for (const button of [languageButton, themeButton]) {
   button.className = "button secondary";
 }
 controls.append(languageButton, themeButton);
-(
-  document.querySelector(".topbar") || document.querySelector(".login-main")
-).prepend(controls);
-const originalTitle = document.title;
+let originalTitle = document.title;
+export function updateTitle(title) {
+  originalTitle = title;
+  document.title = title
+    .split(" · ")
+    .map((part) => translateText(part, language))
+    .join(" · ");
+}
+export function mountPreferences(container) {
+  container.append(controls);
+  apply();
+  return () => controls.remove();
+}
 function apply() {
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";

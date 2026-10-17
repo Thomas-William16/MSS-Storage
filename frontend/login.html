@@ -3,60 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sign in · Scout Storage</title>
+    <meta
+      name="description"
+      content="Scout Storage equipment and inventory management"
+    />
+    <title>Scout Storage</title>
     <link rel="stylesheet" href="/css/style.css" />
-    <script type="module" src="/js/login.js"></script>
+    <script type="module" src="/dist/app.js"></script>
   </head>
-  <body class="login-page">
-    <section class="login-art">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">⚜</span
-        ><span
-          ><strong>Scout Storage</strong
-          ><small>Ready for adventure</small></span
-        >
-      </div>
-      <div>
-        <div class="login-motif" aria-hidden="true">⚜</div>
-        <h1>Good gear.<br />Great adventures.</h1>
-        <p>
-          A shared home for your group’s equipment. Keep it organized, cared
-          for, and ready when it matters.
-        </p>
-      </div>
-      <footer>Prepared today. Ready for tomorrow.</footer>
-    </section>
-    <main class="login-main">
-      <form id="login-form" class="login-form">
-        <p class="eyebrow">WELCOME BACK</p>
-        <h1>Sign in to your storage</h1>
-        <p class="muted">Use the account provided by your administrator.</p>
-        <label class="field" for="email"
-          ><span>Email address</span
-          ><input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="username"
-            required
-            maxlength="254"
-            placeholder="you@scoutgroup.org" /></label
-        ><label class="field" for="password"
-          ><span>Password</span
-          ><input
-            id="password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            required
-            maxlength="200"
-        /></label>
-        <p id="login-error" class="form-error" role="alert"></p>
-        <button type="submit" class="button primary">Sign in</button>
-        <p class="login-security">
-          Protected access · Your session expires after 8 hours
-        </p>
-      </form>
-    </main>
+  <body>
+    <div id="root"></div>
+    <div id="toasts" aria-live="polite"></div>
   </body>
 </html>

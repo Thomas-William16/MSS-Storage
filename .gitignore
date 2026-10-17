@@ -11,3 +11,5 @@ test-results/
 
 __pycache__/
 *.pyc
+
+frontend/dist/

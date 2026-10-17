@@ -96,7 +96,8 @@ describe("Offline input, authorization and HTTP defenses", () => {
     expect((await request(app).get("/health")).status).toBe(503);
     const login = await request(app).get("/login.html");
     expect(login.status).toBe(200);
-    expect(login.text).toContain("login-form");
+    expect(login.text).toContain('id="root"');
+    expect(login.text).toContain('src="/dist/app.js"');
     expect(login.text).toContain('type="module"');
   });
 });

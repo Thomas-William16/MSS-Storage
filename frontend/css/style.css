@@ -23,6 +23,11 @@
 * {
   box-sizing: border-box;
 }
+/* The React mount must preserve the login page's two-column grid. */
+#root {
+  display: contents;
+}
+
 body {
   margin: 0;
 }
@@ -1022,7 +1027,7 @@ code {
 .login-main {
   position: relative;
 }
-.login-main > .preference-controls {
+.login-main > .preference-host {
   position: absolute;
   inset-block-start: 24px;
   inset-inline-end: 24px;

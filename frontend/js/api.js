@@ -17,7 +17,7 @@ export async function api(path, options = {}) {
   }));
   if (!response.ok) {
     if (response.status === 401 && !path.startsWith("/auth/"))
-      location.assign("/login.html");
+      window.dispatchEvent(new Event("scout:signed-out"));
     throw new Error(payload.error?.message || "Request failed");
   }
   return payload;
@@ -39,7 +39,8 @@ export async function login(email, password) {
 export async function logout() {
   await api("/auth/logout", { method: "POST" });
   csrfToken = undefined;
-  location.assign("/login.html");
+  currentUser = undefined;
+  window.dispatchEvent(new Event("scout:signed-out"));
 }
 export async function download(path, name) {
   const response = await fetch(`${API_BASE_URL}/api/v1${path}`, {

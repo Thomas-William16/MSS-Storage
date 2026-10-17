@@ -1,6 +1,10 @@
 # Scout Storage Management System
 
-A real MongoDB-backed inventory application for Scout groups. Vanilla HTML/CSS/ES-module JavaScript frontend, Express 5 REST API, Mongoose models, and transactional management of individually coded equipment items.
+A real MongoDB-backed inventory application for Scout groups. React application shell and client-side navigation, Express 5 REST API, Mongoose models, and transactional management of individually coded equipment items.
+
+The shared layout, account controls, mobile navigation, and sign-in form are React components. Existing inventory, reporting, and workflow views run inside an isolated React route adapter; their forms and tables still use the existing DOM helpers. Section links, detail links, query strings, and browser Back/Forward update the current document without a page reload. Existing `.html` URLs remain valid for bookmarks and QR links.
+
+`npm ci` builds the frontend automatically, including production installs with `--omit=dev`. Run `npm run build` after changing frontend JavaScript, or run `npm run dev:frontend` in a separate terminal to rebuild on changes. The Express server serves the local bundle from `frontend/dist`; React does not require a CDN or a relaxed content security policy.
 
 ## Features
 
@@ -16,7 +20,7 @@ A real MongoDB-backed inventory application for Scout groups. Vanilla HTML/CSS/E
 ## Architecture and files
 
 ```
-frontend/              Static pages, css/style.css, modular js/*.js, vercel.json
+frontend/              HTML entry points, React shell, workflow modules, CSS, build output
 backend/server.js      DB initialization, index initialization, server and shutdown
 backend/src/config/    Runtime environment and replica-set connection validation
 backend/src/models/    Mongoose models and indexes
@@ -34,7 +38,7 @@ Business changes and audit events commit in the same MongoDB transaction. Transa
 
 ## Requirements and local startup
 
-Node.js 22.12+ LTS or Node.js 24 LTS (tested on Node 24), npm, and **MongoDB replica set** (MongoDB 7+ or Atlas). Standalone MongoDB is intentionally rejected. No frontend build required.
+Node.js 22.12+ LTS or Node.js 24 LTS (tested on Node 24), npm, and **MongoDB replica set** (MongoDB 7+ or Atlas). Standalone MongoDB is intentionally rejected. Installing dependencies also builds the React frontend.
 
 ```sh
 npm ci
@@ -112,7 +116,7 @@ Vercel Hobby is intended for personal/noncommercial use and has usage limits. At
 1. Create an Atlas cluster (replica-set capability), database and a dedicated application database user with least required permissions. Configure Atlas network access for your backend host's egress addresses; avoid a permanent unrestricted IP allowlist. Store the URI in your backend host's secret settings.
 2. Deploy the repository on Render using `render.yaml`, or Railway with build `npm ci --omit=dev` and start `npm start`. Configure all required environment variables; use the real trusted proxy hop count. `/health` is the health check. Startup establishes DB connectivity and initializes indexes before accepting traffic.
 3. Bootstrap your first admin using `npm run admin` from a secure interactive machine with the production backend environment and trusted database connectivity. Do not place passwords in command arguments, deployment files or source.
-4. Deploy Vercel with project Root Directory **frontend**, no build command, static output `.`. Set `frontend/js/config.js` to the deployed API HTTPS origin before deploying. `frontend/vercel.json` applies security headers. Tighten its `connect-src` from `https:` to your exact backend origin for the final deployment.
+4. For a separate static frontend deployment, enable access to files outside the Vercel project Root Directory **frontend**, use install command `npm --prefix .. ci --omit=dev`, build command `npm --prefix .. run build`, and static output `.`. Set `frontend/js/config.js` to the deployed API HTTPS origin before building. `frontend/vercel.json` applies security headers. Tighten its `connect-src` from `https:` to your exact backend origin for the final deployment.
 5. Set backend `FRONTEND_URL` and `PUBLIC_APP_URL` to the frontend HTTPS origin; choose same-site custom domains and verify login/CSRF/logout, QR lookup, one complete borrow/return flow and responsive layout on the deployed origins.
 6. Configure monitoring for DB availability, HTTP errors and storage capacity. Serve TLS on both hosts. Schedule backups and test restores before storing real user information.
 

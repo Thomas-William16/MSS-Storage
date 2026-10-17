@@ -1,4 +1,5 @@
 import { api, all, manager, currentUser } from "./api.js";
+import { navigate } from "./router.js";
 import {
   el,
   button,
@@ -720,7 +721,7 @@ export async function requestDetail(root, id) {
         () =>
           issueDialog((message) => {
             sessionStorage.setItem("scout-notice", message);
-            location.assign("/borrowings.html");
+            navigate("/borrowings.html");
           }, record),
         "primary",
       ),
