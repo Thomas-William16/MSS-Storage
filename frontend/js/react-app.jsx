@@ -210,6 +210,20 @@ function Workspace({ user, page, search }) {
         Skip to content
       </a>
       <aside className="sidebar">
+        <button
+          type="button"
+          className="sidebar-back"
+          aria-label="Close navigation"
+          onClick={() => {
+            setMenuOpen(false);
+            document.getElementById("menu-toggle").focus();
+          }}
+        >
+          <span className="sidebar-back-arrow" aria-hidden="true">
+            ←
+          </span>
+          <span>Back</span>
+        </button>
         <a href="/dashboard.html">
           <Brand />
         </a>

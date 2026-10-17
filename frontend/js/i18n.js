@@ -19,6 +19,8 @@ const translations = {
   Workspace: "مساحة العمل",
   "Skip to content": "تخطي إلى المحتوى",
   "Toggle navigation": "فتح القائمة",
+  "Close navigation": "إغلاق القائمة",
+  Back: "رجوع",
   "Loading your workspace…": "جارٍ تحميل مساحة العمل…",
   "Care for our gear.": "اعتنوا بمعداتنا.",
   "Make every adventure possible.": "لنجعل كل مغامرة ممكنة.",

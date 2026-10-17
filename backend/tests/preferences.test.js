@@ -148,6 +148,12 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
       );
       const box = await page.locator(".sidebar").boundingBox();
       expect(Math.round(box.x + box.width)).toBe(390);
+      await page.getByRole("button", { name: "إغلاق القائمة" }).click();
+      expect(
+        await page
+          .getByRole("button", { name: "فتح القائمة" })
+          .getAttribute("aria-expanded"),
+      ).toBe("false");
       await page.setViewportSize({ width: 1280, height: 900 });
       await page.getByRole("button", { name: "Switch to English" }).click();
       await page.getByRole("button", { name: "Dark mode" }).click();

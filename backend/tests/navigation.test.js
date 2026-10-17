@@ -85,6 +85,20 @@ it("navigates sections and history without reloading, preserves preferences, and
     expect(await page.locator("html").getAttribute("data-theme")).toBe("dark");
     await page.setViewportSize({ width: 390, height: 844 });
     await page.getByRole("button", { name: "Toggle navigation" }).click();
+    const currentUrl = page.url();
+    await page.getByRole("button", { name: "Close navigation" }).click();
+    expect(page.url()).toBe(currentUrl);
+    expect(
+      await page
+        .getByRole("button", { name: "Toggle navigation" })
+        .getAttribute("aria-expanded"),
+    ).toBe("false");
+    expect(
+      await page
+        .getByRole("button", { name: "Toggle navigation" })
+        .evaluate((node) => node === document.activeElement),
+    ).toBe(true);
+    await page.getByRole("button", { name: "Toggle navigation" }).click();
     await nav.getByRole("link", { name: "Borrowings", exact: true }).click();
     await page.locator("main h1").waitFor();
     expect(

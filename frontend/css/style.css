@@ -104,6 +104,9 @@ small {
   flex-direction: column;
   z-index: 20;
 }
+.sidebar-back {
+  display: none;
+}
 .brand {
   display: flex;
   align-items: center;
@@ -770,6 +773,23 @@ code {
   }
 }
 @media (max-width: 760px) {
+  .sidebar-back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    border: 1px solid #9e859f;
+    border-radius: 8px;
+    background: transparent;
+    color: #f1e7df;
+    font: inherit;
+    cursor: pointer;
+  }
+  [dir="rtl"] .sidebar-back-arrow {
+    transform: scaleX(-1);
+  }
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.2s;
