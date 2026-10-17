@@ -15,6 +15,11 @@ import { reports } from "./routes/reports.js";
 import { logger } from "./utils/logger.js";
 export const app = express();
 app.disable("x-powered-by");
+// Authenticated responses must never enter browser or shared HTTP caches.
+app.use("/api", (req, res, next) => {
+  res.set("Cache-Control", "private, no-store");
+  next();
+});
 const hops = Number(process.env.TRUST_PROXY || 0);
 if (!Number.isInteger(hops) || hops < 0) throw new Error("Invalid TRUST_PROXY");
 if (hops) app.set("trust proxy", hops);
@@ -47,6 +52,7 @@ app.use(
 app.use(express.json({ limit: "64kb" }));
 app.use(cookieParser());
 app.get("/health", async (req, res) => {
+  res.set("Cache-Control", "no-store");
   let ready = mongoose.connection.readyState === 1;
   if (ready)
     try {
@@ -79,7 +85,22 @@ const frontend = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../frontend",
 );
-app.use(express.static(frontend, { index: "index.html" }));
+app.use(
+  express.static(frontend, {
+    index: "index.html",
+    setHeaders(res, file) {
+      const versioned = /\/dist\/chunks\/[^/]+-[A-Z0-9]{8}\.js$/.test(
+        file.replaceAll("\\", "/"),
+      );
+      res.setHeader(
+        "Cache-Control",
+        versioned
+          ? "public, max-age=31536000, immutable"
+          : "public, max-age=0, must-revalidate",
+      );
+    },
+  }),
+);
 app.use((req, res) =>
   res.status(404).json({ error: { message: "Not found" } }),
 );

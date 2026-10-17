@@ -6,27 +6,34 @@ try {
   theme = localStorage.getItem("scout-theme") === "dark" ? "dark" : "light";
 } catch {}
 const originals = new WeakMap();
+function translateNode(node) {
+  if (node.parentElement.closest("script, style, [data-preferences]")) return;
+  const previous = originals.get(node);
+  const source =
+    previous && node.textContent === previous.rendered
+      ? previous.source
+      : node.textContent;
+  const key = source.trim();
+  const rendered =
+    language === "ar"
+      ? source.replace(key, translateText(key, language))
+      : source;
+  originals.set(node, { source, rendered });
+  if (node.textContent !== rendered) node.textContent = rendered;
+}
 function translate(root) {
+  if (root.nodeType === Node.TEXT_NODE) {
+    translateNode(root);
+    return;
+  }
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   for (let node; (node = walker.nextNode());) {
-    if (node.parentElement.closest("script, style, [data-preferences]"))
-      continue;
-    const previous = originals.get(node);
-    const source =
-      previous && node.textContent === previous.rendered
-        ? previous.source
-        : node.textContent;
-    const key = source.trim();
-    const rendered =
-      language === "ar"
-        ? source.replace(key, translateText(key, language))
-        : source;
-    originals.set(node, { source, rendered });
-    if (node.textContent !== rendered) node.textContent = rendered;
+    translateNode(node);
   }
-  for (const node of root.querySelectorAll(
-    "[placeholder], [aria-label], [title], [data-label]",
-  )) {
+  const selector = "[placeholder], [aria-label], [title], [data-label]";
+  const nodes = [...root.querySelectorAll(selector)];
+  if (root.matches?.(selector)) nodes.unshift(root);
+  for (const node of nodes) {
     if (node.closest("[data-preferences]")) continue;
     for (const attr of ["placeholder", "aria-label", "title", "data-label"]) {
       if (!node.hasAttribute(attr)) continue;
@@ -64,7 +71,7 @@ export function mountPreferences(container) {
   apply();
   return () => controls.remove();
 }
-function apply() {
+function apply(translateAll = true) {
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   document.documentElement.dataset.theme = theme;
@@ -75,7 +82,7 @@ function apply() {
   );
   themeButton.textContent = language === "ar" ? "الوضع الداكن" : "Dark mode";
   themeButton.setAttribute("aria-pressed", String(theme === "dark"));
-  translate(document.body);
+  if (translateAll) translate(document.body);
   document.title = originalTitle
     .split(" · ")
     .map((part) => translateText(part, language))
@@ -93,12 +100,39 @@ languageButton.addEventListener("click", () => {
 });
 themeButton.addEventListener("click", () => {
   theme = theme === "light" ? "dark" : "light";
-  apply();
+  apply(false);
 });
-const observer = new MutationObserver(() => {
+const observer = new MutationObserver((records) => {
+  // Only visit changed text and newly inserted subtrees. Avoid rescanning all
+  // tables and dialogs whenever a toast, loading label, or cart total changes.
+  const roots = new Set();
+  for (const record of records) {
+    if (record.type === "characterData") roots.add(record.target);
+    else
+      for (const node of record.addedNodes) {
+        if (
+          node.nodeType === Node.ELEMENT_NODE ||
+          node.nodeType === Node.TEXT_NODE
+        )
+          roots.add(node);
+      }
+  }
   observer.disconnect();
-  translate(document.body);
-  observe();
+  try {
+    for (const root of roots) {
+      if (!root.isConnected) continue;
+      let covered = false;
+      for (let parent = root.parentNode; parent; parent = parent.parentNode) {
+        if (roots.has(parent)) {
+          covered = true;
+          break;
+        }
+      }
+      if (!covered) translate(root);
+    }
+  } finally {
+    observe();
+  }
 });
 function observe() {
   observer.observe(document.body, {

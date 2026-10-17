@@ -64,10 +64,10 @@ function field(label, input) {
   );
 }
 export async function issueDialog(refresh, request) {
-  const users = await all("/users");
-  const equipment = request
-    ? request.items.map((x) => x.equipment)
-    : await all("/equipment");
+  const [users, equipment] = await Promise.all([
+    all("/users"),
+    request ? request.items.map((x) => x.equipment) : all("/equipment"),
+  ]);
   const user = el(
     "select",
     { required: true },

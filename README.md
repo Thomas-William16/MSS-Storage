@@ -6,6 +6,10 @@ The shared layout, account controls, mobile navigation, and sign-in form are Rea
 
 `npm ci` builds the frontend automatically, including production installs with `--omit=dev`. Run `npm run build` after changing frontend JavaScript, or run `npm run dev:frontend` in a separate terminal to rebuild on changes. The Express server serves the local bundle from `frontend/dist`; React does not require a CDN or a relaxed content security policy.
 
+Workflow modules load on demand and preload on section-link hover or focus. Build output reports the total initial JavaScript size, including shared chunks. Deploy the entire `frontend/dist` directory so dynamic imports can resolve. Translation updates process changed text and inserted subtrees; changing language still translates the full page. List filters cancel superseded requests, and independent borrowing-form lookups run in parallel. Inventory availability continues to come from fresh API requests.
+
+The Express server gives content-hashed JavaScript chunks a one-year immutable cache lifetime. HTML, the entry bundle, CSS, and other unversioned files revalidate using HTTP validators so deployments become visible. API responses use `private, no-store`. Category lookups have a separate 60-second in-memory cache that deduplicates concurrent loads and clears on writes, session checks, and authentication failures. It stores no data in localStorage; other users' category changes can take up to 60 seconds to appear. Inventory counts and operational records are not cached by the frontend.
+
 ## Features
 
 - Three roles: ADMIN, STORAGE_KEEPER, SCOUT; backend permissions and private-record ownership checks.
@@ -103,11 +107,13 @@ Physical items and borrowing history are never destructively deleted. Equipment 
 
 ## No-card deployment: Vercel Hobby and Atlas Free
 
-Deploy from the repository root using the root `vercel.json`, with Framework set to Other and Node.js 24. The `api/index.js` adapter serves the website and API together through one Vercel Function and reuses a small database pool on warm invocations. `public/` is intentionally empty; source code and documentation are not a static website output. Production dependencies and the frontend/backend files needed by the function are bundled, while local databases, environment files and walkthrough videos are excluded.
+Deploy from the repository root using the root `vercel.json`, with Framework set to Other and Node.js 24. `npm run build:vercel` builds React and copies only HTML, CSS, and compiled JavaScript into `public/`. Vercel serves these directly as static files; only `/api/*` and `/health` are rewritten to the API function. Loading a page or asset no longer starts a function or initializes a database connection. The `api/index.js` adapter reuses a small database pool on warm invocations. Source code, environment files, local databases, and walkthrough videos are not published as static files.
 
 Set the encrypted production `MONGODB_URI` in Vercel to your Atlas replica-set connection string and `TRUST_PROXY=1`, `COOKIE_SAME_SITE=lax`, `NODE_ENV=production`. The public URL and allowed browser origin default to Vercel's production hostname, so leave frontend `API_BASE_URL` empty. Explicit FRONTEND_URL/PUBLIC_APP_URL values still override the platform default. Use the production address to test sign-in and QR labels.
 
 Vercel Hobby is intended for personal/noncommercial use and has usage limits. Atlas Free remains subject to its storage and network limits. The current in-memory request/login limiters apply per function instance rather than across every instance. Initialize the first administrator securely with `npm run admin` from an interactive machine permitted by Atlas; do not place administrator passwords in deployment commands.
+
+Performance improvements use browser caching, Vercel static delivery, and small browser-memory caches. No Redis, paid cache, paid monitoring, or scheduled keep-alive service is required. Free-plan quotas still apply; this configuration does not guarantee unlimited usage. If using the Render Free alternative, idle services can spin down and the first API call may wait for startup; browser caching cannot remove that delay. See [Vercel Hobby](https://vercel.com/docs/plans/hobby) and [Render Free](https://render.com/docs/free).
 
 `MONGOMS_DOWNLOAD_DIR=/workspace/.mongodb-binaries node backend/scripts/test-serverless.js` verifies the handler locally with a disposable replica set, including concurrent cold initialization, production origin fallback, frontend/assets, authenticated API access and CSRF logout. A live Vercel deployment still requires account access, an Atlas network policy allowing its connections and checks against the actual deployed URL.
 
@@ -120,7 +126,7 @@ Vercel Hobby is intended for personal/noncommercial use and has usage limits. At
 5. Set backend `FRONTEND_URL` and `PUBLIC_APP_URL` to the frontend HTTPS origin; choose same-site custom domains and verify login/CSRF/logout, QR lookup, one complete borrow/return flow and responsive layout on the deployed origins.
 6. Configure monitoring for DB availability, HTTP errors and storage capacity. Serve TLS on both hosts. Schedule backups and test restores before storing real user information.
 
-The separate frontend-only configuration in `frontend/vercel.json` serves static assets and requires an external backend. The root Vercel configuration instead runs the complete app through the serverless adapter described above. No cloud resources are created or published automatically by this repository.
+The separate frontend-only configuration in `frontend/vercel.json` serves static assets and requires an external backend. The root Vercel configuration serves static browser files alongside the serverless API under the same origin. No cloud resources are created or published automatically by this repository.
 
 ## Security and operational guidance
 
@@ -134,7 +140,7 @@ The separate frontend-only configuration in `frontend/vercel.json` serves static
 
 ## Backup and restore
 
-Enable Atlas scheduled backups and retention, limit restore access, and perform a restore drill to a **separate cluster**. For self-managed replica sets use authenticated `mongodump`/`mongorestore` with credentials supplied securely (not shell history). Back up all application collections together to preserve references, counters, indexes and history. Never restore test data over production. Verify counts, indexes, borrowing lines and outstanding-item statuses after restoring; revoke Session records after a disaster recovery if appropriate.
+For a free-only setup, make manual encrypted backups with authenticated `mongodump` and test `mongorestore` against a separate local replica set. Supply credentials securely, not through shell history. Atlas Free's optional managed backup subscription is paid; do not enable it as part of the free-only configuration. See [Atlas Free cluster backups](https://www.mongodb.com/docs/atlas/backup/cloud-backup/free-cluster-backup/). Back up all application collections together to preserve references, counters, indexes and history. Never restore test data over production. Verify counts, indexes, borrowing lines and outstanding-item statuses after restoring; revoke Session records after a disaster recovery if appropriate.
 
 ## Troubleshooting
 

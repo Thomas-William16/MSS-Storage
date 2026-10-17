@@ -14,6 +14,8 @@ const replica = await MongoMemoryReplSet.create({
 try {
   process.env.MONGODB_URI = replica.getUri("serverless_verification");
   process.env.NODE_ENV = "production";
+  // Do not refill deleted test origins from a developer's local .env file.
+  process.env.DOTENV_CONFIG_PATH = ".env.serverless-test-does-not-exist";
   process.env.VERCEL = "1";
   process.env.VERCEL_PROJECT_PRODUCTION_URL = "scout.example.test";
   delete process.env.FRONTEND_URL;
@@ -30,7 +32,7 @@ try {
     Array.from({ length: 8 }, () => request(gateway).get("/health")),
   );
   for (const response of cold) assert.equal(response.status, 200);
-  for (const path of ["/login.html", "/css/style.css", "/js/app.js"]) {
+  for (const path of ["/login.html", "/css/style.css", "/dist/app.js"]) {
     assert.equal((await request(gateway).get(path)).status, 200);
   }
   assert.equal((await request(gateway).get("/api/v1/equipment")).status, 401);

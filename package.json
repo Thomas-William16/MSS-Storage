@@ -20,6 +20,7 @@
     "format:check": "prettier --check backend frontend scripts docs README.md package.json vitest.config.js render.yaml",
     "test:local": "node backend/scripts/local-test.js",
     "build": "node scripts/build.js",
+    "build:vercel": "node scripts/build-vercel.js",
     "dev:frontend": "node scripts/build.js --watch",
     "postinstall": "npm run build",
     "pretest": "npm run build",

@@ -13,3 +13,5 @@ __pycache__/
 *.pyc
 
 frontend/dist/
+public/*
+!public/.gitkeep

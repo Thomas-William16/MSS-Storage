@@ -286,8 +286,10 @@ export async function equipmentDetail(root, id) {
     ],
   });
   reload = async () => {
-    await reloadItems();
-    const { data: fresh } = await api(`/equipment/${id}`);
+    const [, { data: fresh }] = await Promise.all([
+      reloadItems(),
+      api(`/equipment/${id}`),
+    ]);
     showCounts(fresh.counts);
   };
 }

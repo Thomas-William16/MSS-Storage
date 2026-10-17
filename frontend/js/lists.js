@@ -1,5 +1,5 @@
 import { api } from "./api.js";
-import { el, button, table, toast } from "./dom.js";
+import { el, button, table } from "./dom.js";
 export function pagedList(
   container,
   { path, columns, filters = [], search = true },
@@ -48,7 +48,11 @@ export function pagedList(
     toolbar.append(select);
   }
   container.append(toolbar, body, pagination);
+  let pending;
   async function load() {
+    pending?.abort();
+    const controller = new AbortController();
+    pending = controller;
     body.replaceChildren(
       el("p", { class: "loading", role: "status" }, "Loading records…"),
     );
@@ -60,7 +64,9 @@ export function pagedList(
       });
       const result = await api(
         `${path}${path.includes("?") ? "&" : "?"}${query}`,
+        { signal: controller.signal },
       );
+      if (controller.signal.aborted) return;
       body.replaceChildren(table(columns, result.data));
       pagination.replaceChildren(
         el(
@@ -84,9 +90,12 @@ export function pagedList(
           }),
         );
     } catch (error) {
+      if (controller.signal.aborted) return;
       body.replaceChildren(
         el("p", { class: "form-error", role: "alert" }, error.message),
       );
+    } finally {
+      if (pending === controller) pending = undefined;
     }
   }
   load.setFilterOptions = (name, options) => {

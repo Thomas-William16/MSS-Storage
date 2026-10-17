@@ -4,34 +4,7 @@ import { session, login, logout, manager, admin, currentUser } from "./api.js";
 import { mountPreferences, updateTitle } from "./preferences.js";
 import { interceptNavigation, navigate } from "./router.js";
 import { el, toast } from "./dom.js";
-import {
-  equipmentView,
-  equipmentDetail,
-  itemDetail,
-  usersView,
-} from "./catalog.js";
-import { borrowingsView, requestsView, maintenanceView } from "./workflows.js";
-import {
-  dashboardView,
-  reportsView,
-  auditView,
-  settingsView,
-} from "./reports.js";
-
-const routes = {
-  "index.html": ["Overview", dashboardView],
-  "dashboard.html": ["Overview", dashboardView],
-  "equipment.html": ["Equipment", equipmentView],
-  "equipment-details.html": ["Equipment details", equipmentDetail],
-  "equipment-item.html": ["Equipment item", itemDetail],
-  "borrowings.html": ["Borrowings", borrowingsView],
-  "requests.html": ["Requests", requestsView],
-  "maintenance.html": ["Maintenance", maintenanceView],
-  "users.html": ["Users", usersView, admin],
-  "reports.html": ["Reports", reportsView, manager],
-  "audit-logs.html": ["Audit trail", auditView, admin],
-  "settings.html": ["Settings", settingsView],
-};
+import { routes, preloadRoute } from "./routes.js";
 
 function Preferences() {
   const host = useRef(null);
@@ -155,7 +128,9 @@ function WorkflowView({ page, search }) {
         if (route[2] && !route[2]()) throw new Error("Permission denied");
         // Render in a detached container so loading remains visible until ready.
         const content = document.createElement("div");
-        await route[1](content, new URLSearchParams(search).get("id"));
+        const renderView = await route[1]();
+        if (!active) return;
+        await renderView(content, new URLSearchParams(search).get("id"));
         if (!active) return;
         container.replaceChildren(content);
         const notice = sessionStorage.getItem("scout-notice");
@@ -244,6 +219,8 @@ function Workspace({ user, page, search }) {
             <a
               key={href}
               href={href}
+              onPointerEnter={() => preloadRoute(href)}
+              onFocus={() => preloadRoute(href)}
               className={`nav-link${activePage === href ? " active" : ""}`}
               aria-current={activePage === href ? "page" : undefined}
             >
