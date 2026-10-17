@@ -790,6 +790,11 @@ code {
   [dir="rtl"] .sidebar-back-arrow {
     transform: scaleX(-1);
   }
+  [data-theme="dark"] :is(.sidebar-back, .menu-toggle) {
+    background: #71508b;
+    border-color: #c5a0e0;
+    color: #fff;
+  }
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.2s;
