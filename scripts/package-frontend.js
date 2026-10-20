@@ -11,4 +11,5 @@ export async function packageFrontend() {
     await cp(`frontend/${directory}`, `public/${directory}`, {
       recursive: true,
     });
+  await cp("frontend/favicon.svg", "public/favicon.svg");
 }

@@ -11,7 +11,9 @@ it("packages only browser files and serves them without backend/database calls",
     entries
       .filter((name) => name !== ".gitkeep")
       .every(
-        (name) => name.endsWith(".html") || ["css", "dist"].includes(name),
+        (name) =>
+          name.endsWith(".html") ||
+          ["css", "dist", "favicon.svg"].includes(name),
       ),
   ).toBe(true);
   const config = JSON.parse(await readFile("vercel.json", "utf8"));
@@ -44,6 +46,7 @@ it("packages only browser files and serves them without backend/database calls",
     "/dashboard.html",
     "/equipment.html",
     "/css/style.css",
+    "/favicon.svg",
     "/dist/app.js",
     `/dist/chunks/${chunks[0]}`,
   ])
