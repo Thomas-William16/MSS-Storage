@@ -189,3 +189,7 @@ Success notices describe completed actions, including the number returned, marke
 ## Engineering conventions
 
 See [engineering conventions](docs/ENGINEERING.md) for module responsibilities, dependency boundaries, refactoring guidance, and required checks. Run `npm run check:architecture` to detect circular runtime imports and dependencies that cross these boundaries.
+
+## PWA preview
+
+The installable, online-only app trial is documented in [PWA trial and recovery](docs/PWA.md), including phone installation, preview database isolation, and the pre-PWA checkpoint. It adds no paid services or offline write queue.

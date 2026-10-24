@@ -17,6 +17,7 @@ import {
 import { interceptNavigation, navigate } from "./router.js";
 import { UIProvider, useUI, Loading, ErrorMessage } from "./ui.jsx";
 import { routes, preloadRoute } from "./routes.js";
+import { InstallProvider } from "./ui/InstallApp.jsx";
 
 function Preferences() {
   const [language, theme] = useSyncExternalStore(
@@ -386,6 +387,8 @@ function App() {
 
 createRoot(document.getElementById("root")).render(
   <UIProvider>
-    <App />
+    <InstallProvider>
+      <App />
+    </InstallProvider>
   </UIProvider>,
 );

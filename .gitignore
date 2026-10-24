@@ -15,3 +15,5 @@ __pycache__/
 frontend/dist/
 public/*
 !public/.gitkeep
+
+.pwa-preview/

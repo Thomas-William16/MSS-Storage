@@ -22,7 +22,13 @@ it("packages only browser files and serves them without backend/database calls",
       .every(
         (name) =>
           name.endsWith(".html") ||
-          ["css", "dist", "favicon.svg"].includes(name),
+          [
+            "css",
+            "dist",
+            "icons",
+            "favicon.svg",
+            "manifest.webmanifest",
+          ].includes(name),
       ),
   ).toBe(true);
   const config = JSON.parse(await readFile("vercel.json", "utf8"));
@@ -69,6 +75,11 @@ it("packages only browser files and serves them without backend/database calls",
     "/equipment-item.html?id=abc123",
     "/css/style.css",
     "/favicon.svg",
+    "/manifest.webmanifest",
+    "/icons/icon-192.png",
+    "/icons/icon-512.png",
+    "/icons/icon-maskable-512.png",
+    "/icons/apple-touch-icon.png",
     "/dist/app.js",
     `/dist/chunks/${chunks[0]}`,
   ])
@@ -82,6 +93,7 @@ it("packages only browser files and serves them without backend/database calls",
     "/unknown.html",
     "/dist/missing.js",
     "/css/missing.css",
+    "/icons/missing.png",
   ])
     expect((await request(gateway).get(path)).status).toBe(404);
   expect((await request(gateway).get("/api/v1/missing")).status).toBe(503);
