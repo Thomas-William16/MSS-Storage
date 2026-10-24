@@ -44,7 +44,7 @@ it("defers workflow code and translates only changed content", async () => {
       scripts.some((url) => /\/(catalog|workflow|report)-pages-/.test(url)),
     ).toBe(false);
 
-    await page.getByRole("button", { name: "التبديل إلى العربية" }).click();
+    await page.getByRole("combobox", { name: "Language" }).selectOption("ar");
     await page.evaluate(() => {
       const section = document.createElement("section");
       section.id = "large-fixture";
@@ -84,7 +84,7 @@ it("defers workflow code and translates only changed content", async () => {
     console.log(
       `One inserted label visited ${visited} text nodes with 1,000 existing labels.`,
     );
-    await page.getByRole("button", { name: "Switch to English" }).click();
+    await page.getByRole("combobox", { name: "Language" }).selectOption("en");
     await page.waitForFunction(
       () => document.querySelector("#large-fixture p").textContent === "Save",
     );

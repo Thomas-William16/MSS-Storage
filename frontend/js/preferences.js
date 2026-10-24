@@ -2,7 +2,10 @@ import { translateText } from "./i18n.js";
 let language = "en",
   theme = "light";
 try {
-  language = localStorage.getItem("scout-language") === "ar" ? "ar" : "en";
+  const savedLanguage = localStorage.getItem("scout-language");
+  language = ["en", "ar", "ar-Latn"].includes(savedLanguage)
+    ? savedLanguage
+    : "en";
   theme = localStorage.getItem("scout-theme") === "dark" ? "dark" : "light";
 } catch {}
 const originals = new WeakMap();
@@ -15,7 +18,7 @@ function translateNode(node) {
       : node.textContent;
   const key = source.trim();
   const rendered =
-    language === "ar"
+    language !== "en"
       ? source.replace(key, translateText(key, language))
       : source;
   originals.set(node, { source, rendered });
@@ -41,10 +44,7 @@ function translate(root) {
       if (!node.hasAttribute(key))
         node.setAttribute(key, node.getAttribute(attr));
       const source = node.getAttribute(key);
-      node.setAttribute(
-        attr,
-        language === "ar" ? translateText(source, language) : source,
-      );
+      node.setAttribute(attr, translateText(source, language));
     }
   }
 }
@@ -54,8 +54,9 @@ export function subscribePreferences(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
-export function toggleLanguage() {
-  language = language === "en" ? "ar" : "en";
+export function setLanguage(value) {
+  if (!["en", "ar", "ar-Latn"].includes(value) || value === language) return;
+  language = value;
   apply();
 }
 export function toggleTheme() {
