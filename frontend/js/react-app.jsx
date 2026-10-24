@@ -150,7 +150,7 @@ function SignIn({ onSignIn }) {
 const routeComponents = Object.fromEntries(
   Object.entries(routes).map(([page, route]) => [
     page,
-    lazy(() => route[1]().then((Component) => ({ default: Component }))),
+    lazy(() => route.load().then((Component) => ({ default: Component }))),
   ]),
 );
 class RouteBoundary extends React.Component {
@@ -169,7 +169,7 @@ class RouteBoundary extends React.Component {
 function WorkflowView({ page, search }) {
   const route = routes[page];
   if (!route) return <ErrorMessage error="Page not found" />;
-  if (route[2] && !route[2]())
+  if (route.canAccess && !route.canAccess())
     return <ErrorMessage error="Permission denied" />;
   const Component = routeComponents[page];
   return (
@@ -360,7 +360,7 @@ function App() {
   useEffect(() => {
     document.body.classList.toggle("login-page", !loading && !user);
     updateTitle(
-      `${page === "login.html" ? "Sign in" : routes[page]?.[0] || "Scout Storage"} · Scout Storage`,
+      `${page === "login.html" ? "Sign in" : routes[page]?.title || "Scout Storage"} · Scout Storage`,
     );
     if (!loading) {
       if (!user && page !== "login.html")

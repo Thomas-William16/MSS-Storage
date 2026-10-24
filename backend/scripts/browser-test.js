@@ -397,12 +397,10 @@ try {
       exact: true,
     })
     .waitFor();
-  assert.equal(
-    await page
-      .getByRole("button", { name: "إرجاع القطع", exact: true })
-      .count(),
-    0,
-  );
+  // The success toast and the follow-up register request can finish separately.
+  await page
+    .getByRole("button", { name: "إرجاع القطع", exact: true })
+    .waitFor({ state: "detached" });
   await page.getByRole("button", { name: "Switch to English" }).click();
   const englishDate = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",

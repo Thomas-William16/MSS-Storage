@@ -1,7 +1,7 @@
 import { EquipmentRequest, EquipmentItem } from "../models/index.js";
 import { transaction, found, audit } from "./common.js";
 import { activeEquipment } from "./inventory.js";
-import { own, operational } from "../middleware/security.js";
+import { own, operational } from "../policies/access.js";
 import { fail } from "../utils/errors.js";
 export async function createRequest(user, input) {
   if (input.neededUntil <= input.neededFrom || input.neededUntil <= new Date())

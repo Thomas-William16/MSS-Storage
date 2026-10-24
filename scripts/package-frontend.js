@@ -1,12 +1,15 @@
-import { cp, mkdir, readdir } from "node:fs/promises";
+import { cp, mkdir, unlink } from "node:fs/promises";
+import { pagePaths } from "../shared/page-paths.js";
 
 // Publish only browser artifacts, never source, deployment settings, or secrets.
 export async function packageFrontend() {
   await mkdir("public", { recursive: true });
-  for (const entry of await readdir("frontend", { withFileTypes: true })) {
-    if (entry.isFile() && entry.name.endsWith(".html"))
-      await cp(`frontend/${entry.name}`, `public/${entry.name}`);
-  }
+  // Remove stale generated aliases from earlier builds, including local rebuilds.
+  for (const page of pagePaths.filter((page) => page !== "index.html"))
+    await unlink(`public/${page}`).catch((error) => {
+      if (error.code !== "ENOENT") throw error;
+    });
+  await cp("frontend/index.html", "public/index.html");
   for (const directory of ["css", "dist"])
     await cp(`frontend/${directory}`, `public/${directory}`, {
       recursive: true,

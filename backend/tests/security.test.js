@@ -2,7 +2,7 @@ import { afterEach, it, expect, vi } from "vitest";
 import express from "express";
 import request from "supertest";
 import { app } from "../src/app.js";
-import { publicUser } from "../src/middleware/output.js";
+import { publicUser } from "../src/serializers/users.js";
 import { errorHandler } from "../src/middleware/errors.js";
 import { AppError } from "../src/utils/errors.js";
 import { logger } from "../src/utils/logger.js";

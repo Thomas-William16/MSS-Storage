@@ -2,7 +2,7 @@
 
 A real MongoDB-backed inventory application for Scout groups. React application shell and client-side navigation, Express 5 REST API, Mongoose models, and transactional management of individually coded equipment items.
 
-All screens, account and appearance controls, tables, and workflow dialogs are React components. The legacy DOM view adapter and DOM-building modules have been removed. Section links, detail links, query strings, and browser Back/Forward update the current document without a page reload. Existing `.html` URLs remain valid for bookmarks and QR links.
+All screens, account and appearance controls, tables, and workflow dialogs are React components. The legacy DOM view adapter and DOM-building modules have been removed. `frontend/index.html` is the single HTML entry point. Known page URLs are rewritten to it by Vercel and the local Express server, so existing `.html` bookmarks and QR links remain valid without duplicate files. Section links, detail links, query strings, and browser Back/Forward update the current document without a page reload. Unknown pages and missing assets return 404; API requests are never rewritten to HTML.
 
 `npm ci` builds the frontend automatically, including production installs with `--omit=dev`. Run `npm run build` after changing frontend JavaScript, or run `npm run dev:frontend` in a separate terminal to rebuild on changes. The Express server serves the local bundle from `frontend/dist`; React does not require a CDN or a relaxed content security policy.
 
@@ -26,7 +26,7 @@ The Express server gives content-hashed JavaScript chunks a one-year immutable c
 ## Architecture and files
 
 ```
-frontend/              HTML entry points, React shell, workflow modules, CSS, build output
+frontend/              Single HTML entry point, React screens, CSS, build output
 backend/server.js      DB initialization, index initialization, server and shutdown
 backend/src/config/    Runtime environment and replica-set connection validation
 backend/src/models/    Mongoose models and indexes
@@ -109,7 +109,7 @@ Physical items and borrowing history are never destructively deleted. Equipment 
 
 ## No-card deployment: Vercel Hobby and Atlas Free
 
-Deploy from the repository root using the root `vercel.json`, with Framework set to Other and Node.js 24. `npm run build:vercel` builds React and copies only HTML, CSS, and compiled JavaScript into `public/`. Vercel serves these directly as static files; only `/api/*` and `/health` are rewritten to the API function. Loading a page or asset no longer starts a function or initializes a database connection. The `api/index.js` adapter reuses a small database pool on warm invocations. Source code, environment files, local databases, and walkthrough videos are not published as static files.
+Deploy from the repository root using the root `vercel.json`, with Framework set to Other and Node.js 24. `npm run build:vercel` builds React and copies only `index.html`, CSS, the favicon, and compiled JavaScript into `public/`, removing old generated HTML aliases from previous builds. Vercel serves these directly as static files and rewrites known page URLs to `index.html`; only `/api/*` and `/health` are rewritten to the API function. Loading a page or asset no longer starts a function or initializes a database connection. The `api/index.js` adapter reuses a small database pool on warm invocations. Source code, environment files, local databases, and walkthrough videos are not published as static files.
 
 Set the encrypted production `MONGODB_URI` in Vercel to your Atlas replica-set connection string and `TRUST_PROXY=1`, `COOKIE_SAME_SITE=lax`, `NODE_ENV=production`. The public URL and allowed browser origin default to Vercel's production hostname, so leave frontend `API_BASE_URL` empty. Explicit FRONTEND_URL/PUBLIC_APP_URL values still override the platform default. Use the production address to test sign-in and QR labels.
 
@@ -185,3 +185,7 @@ The dashboard shows role-specific shortcuts: Scouts can request equipment or ope
 Admins can create a category beside the category dropdown while adding or editing equipment. The equipment draft is retained, the new category is selected, and the list filter updates immediately. Availability shows available items out of total stock. Requests flag unavailable stock and quantities above current availability; requests for future activities remain possible and do not reserve stock.
 
 Success notices describe completed actions, including the number returned, marked lost and still outstanding. Arabic/English and dark-mode preferences are saved in the browser. Arabic uses RTL layouts and localized Gregorian dates; mobile returns use labeled cards so notes and condition controls stay usable.
+
+## Engineering conventions
+
+See [engineering conventions](docs/ENGINEERING.md) for module responsibilities, dependency boundaries, refactoring guidance, and required checks. Run `npm run check:architecture` to detect circular runtime imports and dependencies that cross these boundaries.

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { AuditLog } from "../models/index.js";
 import { fail } from "../utils/errors.js";
-import { publicUser } from "../middleware/output.js";
+import { publicUser } from "../serializers/users.js";
 export async function transaction(work) {
   const session = await mongoose.startSession();
   try {

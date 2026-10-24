@@ -4,8 +4,7 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { rateLimit, MemoryStore } from "express-rate-limit";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { frontendRouter } from "./middleware/frontend.js";
 import { config } from "./config/env.js";
 import { authenticate, csrf } from "./middleware/security.js";
 import { auth } from "./routes/auth.js";
@@ -82,38 +81,7 @@ app.use("/api/v1", authenticate, csrf, catalog, workflows, reports);
 app.use("/api", (req, res) =>
   res.status(404).json({ error: { message: "Endpoint not found" } }),
 );
-const frontend = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../frontend",
-);
-app.use((req, res, next) => {
-  const publicFile =
-    req.path === "/" ||
-    /^\/[a-z-]+\.html$/.test(req.path) ||
-    ["/css/style.css", "/favicon.svg", "/dist/app.js"].includes(req.path) ||
-    /^\/dist\/chunks\/[a-zA-Z0-9-]+\.js$/.test(req.path);
-  if (!publicFile)
-    return res.status(404).json({ error: { message: "Not found" } });
-  next();
-});
-app.use(
-  express.static(frontend, {
-    index: "index.html",
-    dotfiles: "deny",
-    redirect: false,
-    setHeaders(res, file) {
-      const versioned = /\/dist\/chunks\/[^/]+-[A-Z0-9]{8}\.js$/.test(
-        file.replaceAll("\\", "/"),
-      );
-      res.setHeader(
-        "Cache-Control",
-        versioned
-          ? "public, max-age=31536000, immutable"
-          : "public, max-age=0, must-revalidate",
-      );
-    },
-  }),
-);
+app.use(frontendRouter());
 app.use((req, res) =>
   res.status(404).json({ error: { message: "Not found" } }),
 );

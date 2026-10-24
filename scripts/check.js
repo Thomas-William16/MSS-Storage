@@ -18,4 +18,6 @@ async function walk(dir) {
 }
 await walk("backend");
 await walk("frontend");
+await walk("shared");
+await import("./check-architecture.js");
 console.log("JavaScript syntax and HTML page checks passed.");

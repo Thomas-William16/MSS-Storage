@@ -1,11 +1,12 @@
 import { it, expect } from "vitest";
 import express from "express";
+import { frontendRouter } from "../src/middleware/frontend.js";
 import { chromium } from "@playwright/test";
 import { existsSync } from "node:fs";
 
 it("preserves filters, paging and scroll, cancels old requests, and retains drafts with field errors", async () => {
   const app = express();
-  app.use(express.static("frontend"));
+  app.use(frontendRouter());
   const server = app.listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   const edge = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";

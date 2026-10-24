@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { AuditLog } from "../models/index.js";
-import { permit, operational } from "../middleware/security.js";
+import { permit } from "../middleware/security.js";
+import { operational } from "../policies/access.js";
 import { pagination, z, parse } from "../middleware/validation.js";
 import { list } from "../services/common.js";
 import { dashboard, report, csvReport } from "../services/reports.js";

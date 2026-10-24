@@ -10,7 +10,8 @@ import {
   uniqueIds,
   pagination,
 } from "../src/middleware/validation.js";
-import { permit, permissionMatrix, own } from "../src/middleware/security.js";
+import { permit } from "../src/middleware/security.js";
+import { permissionMatrix, own } from "../src/policies/access.js";
 import { csvCell } from "../src/services/reports.js";
 import { roles as allRoles, EquipmentItem, User } from "../src/models/index.js";
 describe("Offline input, authorization and HTTP defenses", () => {

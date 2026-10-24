@@ -21,7 +21,8 @@ import {
   pathId,
   parse,
 } from "../middleware/validation.js";
-import { permit, operational } from "../middleware/security.js";
+import { permit } from "../middleware/security.js";
+import { operational } from "../policies/access.js";
 import {
   transaction,
   found,
@@ -40,7 +41,7 @@ import {
 import { fail } from "../utils/errors.js";
 import { config } from "../config/env.js";
 import bcrypt from "bcryptjs";
-import { publicUser } from "../middleware/output.js";
+import { publicUser } from "../serializers/users.js";
 export const catalog = Router();
 const respond = (res, data, status = 200) => res.status(status).json({ data });
 const userSchema = z.strictObject({

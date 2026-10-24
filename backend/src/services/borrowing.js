@@ -8,7 +8,7 @@ import {
 } from "../models/index.js";
 import { transaction, found, audit } from "./common.js";
 import { activeEquipment } from "./inventory.js";
-import { own } from "../middleware/security.js";
+import { own } from "../policies/access.js";
 import { fail } from "../utils/errors.js";
 export async function issue(user, input) {
   return transaction(async (session) => {

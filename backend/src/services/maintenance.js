@@ -1,6 +1,6 @@
 import { Maintenance, EquipmentItem } from "../models/index.js";
 import { transaction, found, audit } from "./common.js";
-import { operational } from "../middleware/security.js";
+import { operational } from "../policies/access.js";
 import { fail } from "../utils/errors.js";
 import { activeEquipment } from "./inventory.js";
 export async function reportDamage(user, input) {

@@ -14,7 +14,7 @@ import { config } from "../config/env.js";
 import { fail } from "../utils/errors.js";
 import { transaction, audit } from "../services/common.js";
 import { sharedLoginLimit } from "../middleware/login-limit.js";
-import { publicUser } from "../middleware/output.js";
+import { publicUser } from "../serializers/users.js";
 export const auth = Router();
 const dummyHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 12);
 export const loginStore = new MemoryStore();

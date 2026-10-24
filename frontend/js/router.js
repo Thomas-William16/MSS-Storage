@@ -1,19 +1,5 @@
-export const pages = new Set([
-  "index.html",
-  "dashboard.html",
-  "equipment.html",
-  "equipment-details.html",
-  "equipment-item.html",
-  "borrowings.html",
-  "requests.html",
-  "maintenance.html",
-  "users.html",
-  "reports.html",
-  "audit-logs.html",
-  "settings.html",
-  "login.html",
-  "categories.html",
-]);
+import { pagePaths } from "../../shared/page-paths.js";
+export const pages = new Set(pagePaths);
 
 export function navigate(href, { replace = false } = {}) {
   const url = new URL(href, location.href);

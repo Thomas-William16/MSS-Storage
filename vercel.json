@@ -2,7 +2,7 @@
   "framework": null,
   "functions": {
     "api/index.js": {
-      "includeFiles": "{frontend/**,backend/**}",
+      "includeFiles": "{frontend/**,backend/**,shared/**}",
       "maxDuration": 60
     }
   },
@@ -14,6 +14,58 @@
     {
       "source": "/health",
       "destination": "/api"
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/equipment.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/equipment-details.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/equipment-item.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/borrowings.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/requests.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/maintenance.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/users.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reports.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/audit-logs.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/categories.html",
+      "destination": "/index.html"
     }
   ],
   "buildCommand": "npm run build:vercel",

@@ -21,7 +21,7 @@ import {
   LoginAttempt,
   roles,
 } from "../src/models/index.js";
-import { permissionMatrix } from "../src/middleware/security.js";
+import { permissionMatrix } from "../src/policies/access.js";
 import { csvCell } from "../src/services/reports.js";
 let replica, users, clients, csrf, category, equipment;
 const origin = "http://localhost:3000",

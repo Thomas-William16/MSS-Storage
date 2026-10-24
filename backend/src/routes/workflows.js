@@ -17,7 +17,8 @@ import {
   uniqueIds,
   parse,
 } from "../middleware/validation.js";
-import { permit, own, operational } from "../middleware/security.js";
+import { permit } from "../middleware/security.js";
+import { own, operational } from "../policies/access.js";
 import { found, list } from "../services/common.js";
 import { issue, returnItems, cancelBorrowing } from "../services/borrowing.js";
 import { createRequest, changeRequest } from "../services/requests.js";

@@ -1,24 +1,10 @@
+import { permissionMatrix } from "../policies/access.js";
 import crypto from "node:crypto";
 import { Session, User } from "../models/index.js";
 import { fail } from "../utils/errors.js";
 import { config } from "../config/env.js";
 export const hash = (value) =>
   crypto.createHash("sha256").update(value).digest("hex");
-export const permissionMatrix = {
-  inventory: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
-  manageInventory: ["ADMIN", "STORAGE_KEEPER"],
-  borrow: ["ADMIN", "STORAGE_KEEPER"],
-  requests: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
-  reviewRequests: ["ADMIN", "STORAGE_KEEPER"],
-  maintenance: ["ADMIN", "STORAGE_KEEPER"],
-  reportDamage: ["ADMIN", "STORAGE_KEEPER", "SCOUT"],
-  reports: ["ADMIN", "STORAGE_KEEPER"],
-  users: ["ADMIN"],
-  taxonomy: ["ADMIN"],
-  audit: ["ADMIN"],
-};
-export const operational = (user) =>
-  ["ADMIN", "STORAGE_KEEPER"].includes(user.role);
 export async function authenticate(req, res, next) {
   const token = req.cookies?.session;
   if (!token || typeof token !== "string" || token.length > 200)
@@ -59,13 +45,6 @@ export function csrf(req, res, next) {
     }
   }
   next();
-}
-export function own(record, user, field = "user") {
-  if (
-    !operational(user) &&
-    String(record[field]?._id || record[field]) !== String(user._id)
-  )
-    fail(403, "Permission denied");
 }
 export const cookieOptions = () => ({
   httpOnly: true,
