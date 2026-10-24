@@ -112,6 +112,9 @@ it("offers mobile install guidance, handles a native prompt once, and registers 
     await page
       .getByRole("heading", { name: "Install on your phone" })
       .waitFor();
+    expect(await page.locator(".preview-notice").count()).toBe(
+      process.env.VERCEL_ENV === "preview" ? 1 : 0,
+    );
     expect(
       await page
         .getByText("Open this website in Safari", { exact: false })

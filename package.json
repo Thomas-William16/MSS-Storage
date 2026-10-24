@@ -12,6 +12,7 @@
     "test": "vitest run",
     "check": "node scripts/check.js",
     "check:architecture": "node scripts/check-architecture.js",
+    "check:release": "node scripts/check-release.js",
     "admin": "node --env-file-if-exists=.env backend/scripts/admin.js",
     "dev:local": "node backend/scripts/local.js",
     "test:browser": "node backend/scripts/browser-test.js",

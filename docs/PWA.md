@@ -1,4 +1,22 @@
-# PWA trial and recovery
+# PWA release and recovery
+
+## Production behavior
+
+The PWA is part of the same React application as the website. On the production address it uses existing production accounts, sessions, permissions, and inventory. No user/data migration, separate app server, new database, or paid service is required. The preview account notice is compiled out of production builds. Preview credentials are not included in public assets and cannot sign in to production.
+
+Installation remains optional and online-only. Borrowing, returns, requests, and administrative changes follow the same server rules in a browser or installed window. No offline write queue is enabled.
+
+## Release procedure
+
+1. Validate the final commit with `npm run check`, `npm test`, `npm run test:browser`, `npm run format:check`, and `npm run check:release`. The release check builds local production assets and verifies install metadata and exclusion of private preview details. It does not deploy or contact a database.
+2. Review the pull request into `scout-storage-app` and confirm the intended Vercel project is `mss-storage` in the existing account. Production variables and the normal database URI must remain unchanged. Preview bootstrap variables stay scoped to the preview branch.
+3. Once go-live is approved, merge the reviewed release into the production branch. Its existing Git integration builds with production settings and publishes to `https://mss-storage.vercel.app`. Never promote a preview to transfer its preview environment or database.
+4. Check production sign-in using an existing account, role navigation, sign-out, manifest/icons, and cache headers. Do not reset or create production users as part of this release.
+5. Open the production URL in Safari on iPhone, tap Share, then Add to Home Screen. Enable Open as Web App if offered. On Android, use the browser's Install app/Add to Home screen option or the in-page button when available.
+
+An installation from the private preview belongs to a different origin. It does not become the production app automatically. Remove the trial icon if desired, and install again from the production URL. Production users use their normal accounts, not preview credentials. A Safari home-screen installation may require signing in again because it can have separate browser storage.
+
+Record the released commit and deployment ID after publishing. Retain the checkpoint below until the installed production app has been verified on a phone. If validation fails, use the source revert procedure under Recovery.
 
 ## Checkpoint
 
