@@ -4,11 +4,25 @@ export const id = z.string().regex(/^[a-f\d]{24}$/i, "Invalid ID");
 export const str = (max = 2000) => z.string().trim().max(max);
 export const password = z
   .string()
-  .min(12)
+  .min(8)
   .max(72)
   .refine(
     (x) => Buffer.byteLength(x) <= 72,
     "Password exceeds bcrypt byte limit",
+  )
+  .refine(
+    (value) => !/^(.)\1+$/su.test(value),
+    "Choose a longer, less predictable passphrase",
+  )
+  .refine(
+    (value) =>
+      !new Set([
+        "password123456789",
+        "123456789012345",
+        "qwertyuiop123456",
+        "letmein123456789",
+      ]).has(value.toLowerCase()),
+    "This password is too common",
   );
 export const date = z.iso
   .datetime({ offset: true })

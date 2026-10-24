@@ -39,6 +39,7 @@ import {
 import { fail } from "../utils/errors.js";
 import { config } from "../config/env.js";
 import bcrypt from "bcryptjs";
+import { publicUser } from "../middleware/output.js";
 export const catalog = Router();
 const respond = (res, data, status = 200) => res.status(status).json({ data });
 const userSchema = z.strictObject({
@@ -81,7 +82,7 @@ catalog.get("/users", permit("borrow"), async (req, res) => {
   );
 });
 catalog.get("/users/:id", pathId, permit("users"), async (req, res) =>
-  respond(res, await found(User, req.params.id)),
+  respond(res, publicUser(await found(User, req.params.id))),
 );
 catalog.post("/users", permit("users"), body(userSchema), async (req, res) => {
   const { password: plain, ...data } = req.input;
@@ -98,8 +99,7 @@ catalog.post("/users", permit("users"), body(userSchema), async (req, res) => {
     );
     return user;
   });
-  const safe = user.toObject();
-  delete safe.passwordHash;
+  const safe = publicUser(user);
   respond(res, safe, 201);
 });
 catalog.patch(
@@ -137,8 +137,7 @@ catalog.patch(
       );
       return user;
     });
-    const safe = user.toObject();
-    delete safe.passwordHash;
+    const safe = publicUser(user);
     respond(res, safe);
   },
 );
@@ -166,7 +165,7 @@ catalog.patch(
           req.input,
           session,
         );
-        return user;
+        return publicUser(user);
       }),
     );
   },

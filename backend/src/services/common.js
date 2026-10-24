@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { AuditLog } from "../models/index.js";
 import { fail } from "../utils/errors.js";
+import { publicUser } from "../middleware/output.js";
 export async function transaction(work) {
   const session = await mongoose.startSession();
   try {
@@ -45,7 +46,7 @@ export async function list(model, filter, paging, populate = []) {
     model.countDocuments(filter),
   ]);
   return {
-    data,
+    data: model.modelName === "User" ? data.map(publicUser) : data,
     meta: {
       page: paging.page,
       limit: paging.limit,

@@ -18,6 +18,7 @@ import {
   Maintenance,
   AuditLog,
   Counter,
+  LoginAttempt,
   roles,
 } from "../src/models/index.js";
 import { permissionMatrix } from "../src/middleware/security.js";
@@ -107,6 +108,24 @@ beforeEach(async () => {
   });
 });
 describe("Authentication and access", () => {
+  it("enforces shared account limits even when the per-instance limiter resets", async () => {
+    const window = Math.floor(Date.now() / (15 * 60 * 1000));
+    const { hash } = await import("../src/middleware/security.js");
+    const key = hash(`account:${users.ADMIN.email}:${window}`);
+    await LoginAttempt.updateOne({ _id: key }, { $set: { attempts: 20 } });
+    await loginStore.resetAll();
+    const blocked = await request(app)
+      .post("/api/v1/auth/login")
+      .set("Origin", origin)
+      .send({ email: users.ADMIN.email, password: secret });
+    expect(blocked.status).toBe(429);
+    expect(Number(blocked.headers["retry-after"])).toBeGreaterThan(0);
+    expect((await LoginAttempt.findById(key)).attempts).toBe(21);
+    expect(LoginAttempt.schema.indexes()).toContainEqual([
+      { expiresAt: 1 },
+      { expireAfterSeconds: 0, background: true },
+    ]);
+  });
   it("uses HttpOnly cookies, hides hashes, revokes logout, rejects expired sessions", async () => {
     const me = await clients.ADMIN.get("/api/v1/auth/me");
     expect(me.status).toBe(200);

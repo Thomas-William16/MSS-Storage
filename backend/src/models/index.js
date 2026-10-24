@@ -12,6 +12,15 @@ const make = (name, fields, indexes = []) => {
   return mongoose.model(name, schema);
 };
 export const roles = ["ADMIN", "STORAGE_KEEPER", "SCOUT"];
+export const LoginAttempt = make(
+  "LoginAttempt",
+  {
+    _id: { type: String, required: true },
+    attempts: { type: Number, default: 0, min: 0 },
+    expiresAt: { type: Date, required: true },
+  },
+  [[{ expiresAt: 1 }, { expireAfterSeconds: 0 }]],
+);
 export const conditions = ["NEW", "GOOD", "FAIR", "DAMAGED"];
 export const statuses = [
   "AVAILABLE",

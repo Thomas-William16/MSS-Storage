@@ -411,7 +411,7 @@ try {
       await click(page.getByRole("button", { name: "New user" }));
       await fill("Full name", "Demo member");
       await fill("Email", "member@demo.example");
-      await fill("Password (at least 12 characters)", memberPassword);
+      await fill("Password (at least 8 characters)", memberPassword);
       await page.getByLabel("Role", { exact: true }).selectOption("SCOUT");
       await save();
       await page

@@ -23,7 +23,7 @@ try {
     email = await rl.question("Administrator email: ");
   if (!process.stdin.isTTY)
     throw new Error("Use an interactive terminal for secure password entry");
-  process.stdout.write("Password (at least 12 characters; hidden): ");
+  process.stdout.write("Password (at least 8 characters; hidden): ");
   muted = true;
   const plain = await rl.question("");
   muted = false;

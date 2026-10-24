@@ -500,11 +500,11 @@ export async function usersView(root) {
           name: "password",
           label: record
             ? "New password (optional)"
-            : "Password (at least 12 characters)",
+            : "Password (at least 8 characters)",
           type: "password",
           required: !record,
           autocomplete: "new-password",
-          minLength: 12,
+          minLength: 8,
           maxLength: 72,
         },
         {

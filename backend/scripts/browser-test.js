@@ -159,7 +159,7 @@ try {
   await page.getByLabel("Full name").fill("Patrol Scout");
   await page.getByLabel("Email", { exact: true }).fill("scout@browser.test");
   await page
-    .getByLabel("Password (at least 12 characters)")
+    .getByLabel("Password (at least 8 characters)")
     .fill("Scout-browser-only-password");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.getByRole("cell", { name: "Patrol Scout", exact: true }).waitFor();

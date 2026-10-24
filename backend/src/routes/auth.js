@@ -13,6 +13,8 @@ import {
 import { config } from "../config/env.js";
 import { fail } from "../utils/errors.js";
 import { transaction, audit } from "../services/common.js";
+import { sharedLoginLimit } from "../middleware/login-limit.js";
+import { publicUser } from "../middleware/output.js";
 export const auth = Router();
 const dummyHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 12);
 export const loginStore = new MemoryStore();
@@ -34,9 +36,14 @@ auth.post(
         .email()
         .max(254)
         .transform((x) => x.toLowerCase()),
-      password: z.string().min(1).max(200),
+      password: z
+        .string()
+        .min(1)
+        .max(72)
+        .refine((value) => Buffer.byteLength(value) <= 72),
     }),
   ),
+  sharedLoginLimit,
   async (req, res) => {
     const user = await User.findOne({ email: req.input.email }).select(
       "+passwordHash",
@@ -49,7 +56,10 @@ auth.post(
     const token = crypto.randomBytes(32).toString("hex"),
       csrfToken = crypto.randomBytes(32).toString("hex");
     await transaction(async (session) => {
-      if (req.cookies.session)
+      if (
+        typeof req.cookies.session === "string" &&
+        /^[a-f\d]{64}$/i.test(req.cookies.session)
+      )
         await Session.deleteOne({
           tokenHash: hash(req.cookies.session),
         }).session(session);
@@ -67,13 +77,14 @@ auth.post(
       await audit(user, "LOGIN", "User", user._id, {}, session);
     });
     res.cookie("session", token, cookieOptions());
-    const safe = user.toObject();
-    delete safe.passwordHash;
+    const safe = publicUser(user);
     res.json({ data: { user: safe, csrfToken } });
   },
 );
 auth.get("/me", authenticate, (req, res) =>
-  res.json({ data: { user: req.user, csrfToken: req.session.csrf } }),
+  res.json({
+    data: { user: publicUser(req.user), csrfToken: req.session.csrf },
+  }),
 );
 auth.post("/logout", authenticate, csrf, async (req, res) => {
   await transaction(async (session) => {

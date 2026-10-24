@@ -12,7 +12,7 @@ import { auth } from "./routes/auth.js";
 import { catalog } from "./routes/catalog.js";
 import { workflows } from "./routes/workflows.js";
 import { reports } from "./routes/reports.js";
-import { logger } from "./utils/logger.js";
+import { errorHandler } from "./middleware/errors.js";
 export const app = express();
 app.disable("x-powered-by");
 // Authenticated responses must never enter browser or shared HTTP caches.
@@ -25,6 +25,7 @@ if (!Number.isInteger(hops) || hops < 0) throw new Error("Invalid TRUST_PROXY");
 if (hops) app.set("trust proxy", hops);
 app.use(
   helmet({
+    frameguard: { action: "deny" },
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
@@ -85,9 +86,21 @@ const frontend = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../frontend",
 );
+app.use((req, res, next) => {
+  const publicFile =
+    req.path === "/" ||
+    /^\/[a-z-]+\.html$/.test(req.path) ||
+    ["/css/style.css", "/favicon.svg", "/dist/app.js"].includes(req.path) ||
+    /^\/dist\/chunks\/[a-zA-Z0-9-]+\.js$/.test(req.path);
+  if (!publicFile)
+    return res.status(404).json({ error: { message: "Not found" } });
+  next();
+});
 app.use(
   express.static(frontend, {
     index: "index.html",
+    dotfiles: "deny",
+    redirect: false,
     setHeaders(res, file) {
       const versioned = /\/dist\/chunks\/[^/]+-[A-Z0-9]{8}\.js$/.test(
         file.replaceAll("\\", "/"),
@@ -104,26 +117,4 @@ app.use(
 app.use((req, res) =>
   res.status(404).json({ error: { message: "Not found" } }),
 );
-app.use((error, req, res, next) => {
-  let status = error.status || 500,
-    message = error.message;
-  if (error.code === 11000) {
-    status = 409;
-    message = "A unique value already exists";
-  } else if (
-    error.name === "ValidationError" ||
-    error.name === "CastError" ||
-    error.type === "entity.parse.failed"
-  ) {
-    status = 400;
-    message = "Invalid request";
-  }
-  if (status >= 500) {
-    logger.error(
-      { name: error.name, code: error.code, path: req.path },
-      "Request failed",
-    );
-    message = "An internal error occurred";
-  }
-  res.status(status).json({ error: { message } });
-});
+app.use(errorHandler);

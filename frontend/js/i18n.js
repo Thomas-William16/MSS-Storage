@@ -385,7 +385,7 @@ Object.assign(translations, {
   "Manage accounts, permissions, and account access.":
     "إدارة الحسابات والصلاحيات والوصول.",
   "New password (optional)": "كلمة مرور جديدة (اختياري)",
-  "Password (at least 12 characters)": "كلمة المرور (١٢ حرفاً على الأقل)",
+  "Password (at least 8 characters)": "كلمة المرور (٨ أحرف على الأقل)",
   "New records will appear here.": "ستظهر السجلات الجديدة هنا.",
   "Nothing here yet": "لا توجد بيانات بعد",
   "Open an item from the equipment catalog to report damage directly.":

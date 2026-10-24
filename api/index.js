@@ -19,10 +19,10 @@ async function initializeFirstAdmin() {
   if (!email || !password) return;
   if (await User.exists({ role: "ADMIN" })) return;
 
-  parse(
-    z.strictObject({ email: z.email(), password: passwordSchema }),
-    { email, password },
-  );
+  parse(z.strictObject({ email: z.email(), password: passwordSchema }), {
+    email,
+    password,
+  });
 
   const passwordHash = await bcrypt.hash(password, 12);
 
@@ -36,22 +36,26 @@ async function initializeFirstAdmin() {
     if (await User.exists({ role: "ADMIN" }).session(session)) return;
 
     const [user] = await User.create(
-      [{
-        name: "Administrator",
-        email,
-        passwordHash,
-        role: "ADMIN",
-      }],
+      [
+        {
+          name: "Administrator",
+          email,
+          passwordHash,
+          role: "ADMIN",
+        },
+      ],
       { session },
     );
 
     await AuditLog.create(
-      [{
-        user: user._id,
-        action: "ADMIN_BOOTSTRAPPED",
-        entity: "User",
-        entityId: user._id,
-      }],
+      [
+        {
+          user: user._id,
+          action: "ADMIN_BOOTSTRAPPED",
+          entity: "User",
+          entityId: user._id,
+        },
+      ],
       { session },
     );
   });
@@ -69,6 +73,7 @@ export default async function handler(req, res) {
 
     await databaseReady;
   } catch (error) {
+    res.setHeader("Cache-Control", "private, no-store");
     logger.error(
       {
         name: error.name,
