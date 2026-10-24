@@ -1205,6 +1205,43 @@ code {
   .preference-controls .button {
     padding: 8px;
   }
+  /* Keep header controls in the same positions in both interface languages. */
+  .topbar {
+    direction: ltr;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-inline: 12px;
+  }
+  .topbar .preference-controls {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .topbar .account {
+    margin: 0;
+    gap: 6px;
+  }
+  .topbar .button {
+    padding: 8px 7px;
+    font-size: 12px;
+  }
+  .topbar .menu-toggle {
+    flex-shrink: 0;
+    padding: 8px 10px;
+    font-size: 18px;
+  }
+  .topbar .avatar {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+  [dir="rtl"] .topbar :is(button, .account-name) {
+    direction: rtl;
+  }
+}
+@media (max-width: 359px) {
+  .topbar .button:not(.menu-toggle) {
+    font-size: 11px;
+  }
 }
 [data-theme="dark"] .login-page {
   background: var(--bg);
