@@ -101,7 +101,7 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
       await page
         .getByRole("button", { name: "Record returns", exact: true })
         .waitFor();
-      await page.getByRole("button", { name: "التبديل إلى العربية" }).click();
+      await page.getByRole("combobox", { name: "Language" }).selectOption("ar");
       await page
         .getByRole("button", { name: "تسجيل الإرجاع", exact: true })
         .waitFor();
@@ -155,8 +155,42 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
           .getByRole("button", { name: "فتح القائمة" })
           .getAttribute("aria-expanded"),
       ).toBe("false");
+      await page
+        .getByRole("combobox", { name: "Language" })
+        .selectOption("ar-Latn");
+      await page
+        .getByRole("button", { name: "Saggel el erga3", exact: true })
+        .waitFor();
+      expect(await page.locator("html").getAttribute("dir")).toBe("ltr");
+      expect(await page.locator("html").getAttribute("lang")).toBe("ar-Latn");
+      expect(await page.locator(".account-name").textContent()).toContain(
+        "Test User",
+      );
+      await page.reload();
+      await page
+        .getByRole("button", { name: "Saggel el erga3", exact: true })
+        .waitFor();
+      expect(
+        await page.getByRole("combobox", { name: "Language" }).inputValue(),
+      ).toBe("ar-Latn");
+      for (const width of [320, 390]) {
+        await page.setViewportSize({ width, height: 844 });
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+        const controls = await page
+          .locator(".topbar .preference-controls")
+          .boundingBox();
+        const menu = await page.locator(".menu-toggle").boundingBox();
+        expect(controls.x + controls.width).toBeLessThanOrEqual(menu.x);
+      }
       await page.setViewportSize({ width: 1280, height: 900 });
-      await page.getByRole("button", { name: "Switch to English" }).click();
+      await page.getByRole("combobox", { name: "Language" }).selectOption("en");
+      await page
+        .getByRole("button", { name: "Record returns", exact: true })
+        .waitFor();
       await page.getByRole("button", { name: "Dark mode" }).click();
       await page.setViewportSize({ width: 1280, height: 900 });
     }
@@ -167,10 +201,23 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
       }),
     );
     await page.goto(`${base}/login.html`);
-    await page.getByRole("button", { name: "التبديل إلى العربية" }).click();
+    await page.getByRole("combobox", { name: "Language" }).selectOption("ar");
     await page
       .getByRole("button", { name: "تسجيل الدخول", exact: true })
       .waitFor();
+    await page
+      .getByRole("combobox", { name: "Language" })
+      .selectOption("ar-Latn");
+    await page
+      .getByRole("button", { name: "Tasgeel el dokhoul", exact: true })
+      .waitFor();
+    await page
+      .getByRole("textbox", { name: "El email" })
+      .fill("scout@example.com");
+    await page.getByRole("combobox", { name: "Language" }).selectOption("en");
+    expect(
+      await page.getByRole("textbox", { name: "Email address" }).inputValue(),
+    ).toBe("scout@example.com");
     expect(errors).toEqual([]);
   } finally {
     await browser.close();

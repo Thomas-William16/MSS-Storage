@@ -11,13 +11,14 @@ import {
   updateTitle,
   preferenceSnapshot,
   subscribePreferences,
-  toggleLanguage,
+  setLanguage,
   toggleTheme,
 } from "./preferences.js";
 import { interceptNavigation, navigate } from "./router.js";
 import { UIProvider, useUI, Loading, ErrorMessage } from "./ui.jsx";
 import { routes, preloadRoute } from "./routes.js";
 import { InstallApp, InstallProvider } from "./ui/InstallApp.jsx";
+import { translateText } from "./i18n.js";
 
 function Preferences() {
   const [language, theme] = useSyncExternalStore(
@@ -27,23 +28,31 @@ function Preferences() {
   return (
     <div className="preference-host">
       <div className="preference-controls" data-preferences="true">
-        <button
-          type="button"
-          className="button secondary"
-          aria-label={
-            language === "ar" ? "Switch to English" : "التبديل إلى العربية"
-          }
-          onClick={toggleLanguage}
-        >
-          {language === "ar" ? "English" : "العربية"}
-        </button>
+        <label className="button secondary language-picker" dir="ltr">
+          <span aria-hidden="true">Language ▾</span>
+          <select
+            aria-label="Language"
+            value={language}
+            onChange={(event) => setLanguage(event.target.value)}
+          >
+            <option value="en" lang="en">
+              English
+            </option>
+            <option value="ar" lang="ar">
+              العربية
+            </option>
+            <option value="ar-Latn" lang="ar-Latn">
+              Franco-Arab
+            </option>
+          </select>
+        </label>
         <button
           type="button"
           className="button secondary"
           aria-pressed={theme === "dark"}
           onClick={toggleTheme}
         >
-          {language === "ar" ? "الوضع الداكن" : "Dark mode"}
+          {translateText("Dark mode", language)}
         </button>
       </div>
     </div>

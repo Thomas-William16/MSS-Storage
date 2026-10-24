@@ -1,3 +1,4 @@
+import { translateFranco } from "./franco.js";
 // Shared Arabic catalog and date formatting. Stored application data stays unchanged.
 const translations = {
   "Show password": "إظهار كلمة المرور",
@@ -255,6 +256,7 @@ export function dateText(value) {
   return english;
 }
 export function translateText(source, language = "ar") {
+  if (language === "ar-Latn") return translateFranco(source);
   if (language !== "ar") return source;
   if (translations[source]) return translations[source];
   if (source.startsWith("＋ ") && translations[source.slice(2)])
@@ -557,6 +559,7 @@ Object.assign(translations, {
 
 Object.assign(translations, {
   LOGIN: "تسجيل الدخول",
+  "Dark mode": "الوضع الداكن",
   LOGOUT: "تسجيل الخروج",
   "USER CREATED": "إنشاء مستخدم",
   "USER UPDATED": "تحديث مستخدم",
