@@ -1,5 +1,8 @@
 // Shared Arabic catalog and date formatting. Stored application data stays unchanged.
 const translations = {
+  "Show password": "إظهار كلمة المرور",
+  "This is a test preview. Use the separate preview account supplied with your preview link. Your normal website account does not sign in here.":
+    "هذه نسخة تجريبية. استخدم الحساب التجريبي المرفق برابط المعاينة. حساب الموقع الأساسي لا يعمل هنا.",
   "Install on your phone": "التثبيت على هاتفك",
   "Install app": "تثبيت التطبيق",
   "Scout Storage is running as an app.": "مخزن الكشافة يعمل كتطبيق.",

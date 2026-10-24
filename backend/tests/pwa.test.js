@@ -91,16 +91,49 @@ it("offers mobile install guidance, handles a native prompt once, and registers 
     });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.route("**/api/v1/**", (route) =>
-      route.fulfill({
+    let authenticated = false;
+    await page.route("**/api/v1/**", (route) => {
+      if (!authenticated)
+        return route.fulfill({
+          status: 401,
+          json: { error: { message: "Authentication required" } },
+        });
+      return route.fulfill({
         json: {
           data: {
             user: { _id: "preview", name: "Preview Admin", role: "ADMIN" },
             csrfToken: "test",
           },
         },
-      }),
-    );
+      });
+    });
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    await page.goto(`${origin}/login.html`);
+    await page
+      .getByRole("heading", { name: "Install on your phone" })
+      .waitFor();
+    expect(
+      await page
+        .getByText("Open this website in Safari", { exact: false })
+        .isVisible(),
+    ).toBe(true);
+    await page
+      .getByLabel("Password", { exact: true })
+      .fill("Preview-test-only");
+    await page.getByLabel("Show password", { exact: true }).check();
+    expect(
+      await page.getByLabel("Password", { exact: true }).getAttribute("type"),
+    ).toBe("text");
+    await page.getByLabel("Show password", { exact: true }).uncheck();
+    expect(
+      await page.getByLabel("Password", { exact: true }).getAttribute("type"),
+    ).toBe("password");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    authenticated = true;
     await page.goto(`http://127.0.0.1:${server.address().port}/settings.html`);
     await page
       .getByRole("heading", { name: "Install on your phone" })

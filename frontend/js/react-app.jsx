@@ -17,7 +17,7 @@ import {
 import { interceptNavigation, navigate } from "./router.js";
 import { UIProvider, useUI, Loading, ErrorMessage } from "./ui.jsx";
 import { routes, preloadRoute } from "./routes.js";
-import { InstallProvider } from "./ui/InstallApp.jsx";
+import { InstallApp, InstallProvider } from "./ui/InstallApp.jsx";
 
 function Preferences() {
   const [language, theme] = useSyncExternalStore(
@@ -67,6 +67,7 @@ function Brand() {
 function SignIn({ onSignIn }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   async function submit(event) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -104,45 +105,63 @@ function SignIn({ onSignIn }) {
       </section>
       <main className="login-main">
         <Preferences />
-        <form id="login-form" className="login-form" onSubmit={submit}>
-          <p className="eyebrow">WELCOME BACK</p>
-          <h1>Sign in to your storage</h1>
-          <p className="muted">
-            Use the account provided by your administrator.
-          </p>
-          <label className="field" htmlFor="email">
-            <span>Email address</span>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="username"
-              required
-              maxLength={254}
-              placeholder="you@scoutgroup.org"
-            />
-          </label>
-          <label className="field" htmlFor="password">
-            <span>Password</span>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              maxLength={200}
-            />
-          </label>
-          <p id="login-error" className="form-error" role="alert">
-            {error}
-          </p>
-          <button type="submit" className="button primary" disabled={busy}>
-            {busy ? "Signing in…" : "Sign in"}
-          </button>
-          <p className="login-security">
-            Protected access · Your session expires after 8 hours
-          </p>
-        </form>
+        <div className="login-content">
+          <form id="login-form" className="login-form" onSubmit={submit}>
+            <p className="eyebrow">WELCOME BACK</p>
+            <h1>Sign in to your storage</h1>
+            <p className="muted">
+              Use the account provided by your administrator.
+            </p>
+            {__PREVIEW__ && (
+              <p className="preview-notice" role="note">
+                This is a test preview. Use the separate preview account
+                supplied with your preview link. Your normal website account
+                does not sign in here.
+              </p>
+            )}
+            <label className="field" htmlFor="email">
+              <span>Email address</span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="username"
+                required
+                maxLength={254}
+                placeholder="you@scoutgroup.org"
+              />
+            </label>
+            <label className="field" htmlFor="password">
+              <span>Password</span>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                maxLength={200}
+              />
+            </label>
+            <label className="password-visibility">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={(event) => setShowPassword(event.target.checked)}
+              />
+              <span>Show password</span>
+            </label>
+            <p id="login-error" className="form-error" role="alert">
+              {error}
+            </p>
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Signing in…" : "Sign in"}
+            </button>
+            <p className="login-security">
+              Protected access · Your session expires after 8 hours
+            </p>
+          </form>
+          <InstallApp />
+        </div>
       </main>
     </>
   );

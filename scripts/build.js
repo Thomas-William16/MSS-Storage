@@ -11,7 +11,10 @@ const options = {
   splitting: true,
   chunkNames: "chunks/[name]-[hash]",
   metafile: true,
-  define: { "process.env.NODE_ENV": '"production"' },
+  define: {
+    "process.env.NODE_ENV": '"production"',
+    __PREVIEW__: JSON.stringify(process.env.VERCEL_ENV === "preview"),
+  },
   legalComments: "eof",
 };
 if (process.argv.includes("--watch")) {

@@ -8,7 +8,7 @@ Before the trial, the live Vercel deployment was `dpl_5wCC9LkePgYVtjpGTW5rD3HY24
 
 ## What is installed
 
-The manifest, PNG Scout icons, and standalone display mode let supporting browsers install this website. Settings includes Android and iPhone instructions, and a native Install app button when the browser offers it. Installation remains optional. No service worker is registered, no offline API data is stored, and no background synchronization is introduced. Internet access is required for application operations.
+The manifest, PNG Scout icons, and standalone display mode let supporting browsers install this website. Both the sign-in page and Settings include Android and iPhone instructions, and a native Install app button when the browser offers it. You do not need to sign in to find installation instructions. Installation remains optional. No service worker is registered, no offline API data is stored, and no background synchronization is introduced. Internet access is required for application operations.
 
 The browser's HTTP cache rules remain in place. The frontend loads the current unversioned entry file and CSS through revalidation, and versioned chunks retain their immutable caching. A future offline implementation needs its own update, cache invalidation, and recovery review.
 
@@ -21,6 +21,8 @@ Vercel previews (`VERCEL_ENV=preview`) explicitly select the `scout_storage_prev
 Preview CSRF allows only the exact HTTPS deployment and branch hostnames supplied by Vercel (`VERCEL_URL` and `VERCEL_BRANCH_URL`). Public links prefer the stable branch URL so an installed trial can follow subsequent preview updates. No CORS wildcard is added. Production keeps its existing URL and database settings.
 
 The preview administrator is separate from production users. Bootstrap credentials are scoped to the preview branch and stored encrypted in Vercel; they are not committed. Local trial credentials and access notes belong in ignored `.pwa-preview/` only. Do not reuse production passwords or enter real personal/inventory data in the trial.
+
+Preview builds show a notice on the sign-in page explaining the separate account. This notice is compiled from `VERCEL_ENV` by esbuild; it exposes no passwords. Sign-in includes an optional Show password checkbox for checking typed characters.
 
 Vercel deployment protection remains enabled. Sign into Vercel on your phone using the account that owns this project before testing; an installed window may require signing into Vercel again. A temporary share link is an access credential, not an unrestricted public release, and must not be committed or shared broadly.
 
