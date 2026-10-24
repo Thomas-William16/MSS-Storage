@@ -30,6 +30,9 @@ it("serves install metadata and valid icons without adding a service worker", as
   }
   expect((await request(app).get("/sw.js")).status).toBe(404);
   expect(await read("frontend/index.html", "utf8")).toContain('rel="manifest"');
+  expect(await read("frontend/index.html", "utf8")).toContain(
+    'crossorigin="use-credentials"',
+  );
 });
 
 it("isolates Vercel previews from the live database and uses their own HTTPS origin", () => {

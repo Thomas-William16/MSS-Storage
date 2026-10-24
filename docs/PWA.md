@@ -14,6 +14,8 @@ The browser's HTTP cache rules remain in place. The frontend loads the current u
 
 ## Preview isolation
 
+The manifest link uses `crossorigin="use-credentials"` so protected previews can load install metadata with their access cookie. Check browser installability using a regular profile; private browsing cannot install PWAs.
+
 Vercel previews (`VERCEL_ENV=preview`) explicitly select the `scout_storage_preview` MongoDB database through Mongoose's `dbName` connection option. They never use the database name inherited from the production connection URI. The live database is unchanged. All previews of this project share this separate preview database; it is intended for small test datasets, not copies of production records.
 
 Preview CSRF allows only the exact HTTPS deployment and branch hostnames supplied by Vercel (`VERCEL_URL` and `VERCEL_BRANCH_URL`). Public links prefer the stable branch URL so an installed trial can follow subsequent preview updates. No CORS wildcard is added. Production keeps its existing URL and database settings.
