@@ -49,6 +49,7 @@ it("isolates Vercel previews from the live database and uses their own HTTPS ori
             NODE_ENV: "production",
             VERCEL_ENV: environment,
             VERCEL_URL: "preview.example.test",
+            VERCEL_BRANCH_URL: "preview-branch.example.test",
             VERCEL_PROJECT_PRODUCTION_URL: "live.example.test",
             RENDER_EXTERNAL_URL: "",
             FRONTEND_URL: "https://live.example.test",
@@ -59,8 +60,11 @@ it("isolates Vercel previews from the live database and uses their own HTTPS ori
     );
   expect(inspect("preview")).toEqual({
     database: "scout_storage_preview",
-    origins: ["https://preview.example.test"],
-    publicUrl: "https://preview.example.test",
+    origins: [
+      "https://preview.example.test",
+      "https://preview-branch.example.test",
+    ],
+    publicUrl: "https://preview-branch.example.test",
   });
   expect(inspect("production")).toEqual({
     origins: ["https://live.example.test"],

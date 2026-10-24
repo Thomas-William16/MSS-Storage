@@ -16,7 +16,7 @@ The browser's HTTP cache rules remain in place. The frontend loads the current u
 
 Vercel previews (`VERCEL_ENV=preview`) explicitly select the `scout_storage_preview` MongoDB database through Mongoose's `dbName` connection option. They never use the database name inherited from the production connection URI. The live database is unchanged. All previews of this project share this separate preview database; it is intended for small test datasets, not copies of production records.
 
-Preview CSRF and public URL configuration use the exact HTTPS `VERCEL_URL`, not the production hostname. Open the exact deployment URL supplied for testing; an alternate branch alias may be rejected for writes. No CORS wildcard is added. Production keeps its existing URL and database settings.
+Preview CSRF allows only the exact HTTPS deployment and branch hostnames supplied by Vercel (`VERCEL_URL` and `VERCEL_BRANCH_URL`). Public links prefer the stable branch URL so an installed trial can follow subsequent preview updates. No CORS wildcard is added. Production keeps its existing URL and database settings.
 
 The preview administrator is separate from production users. Bootstrap credentials are scoped to the preview branch and stored encrypted in Vercel; they are not committed. Local trial credentials and access notes belong in ignored `.pwa-preview/` only. Do not reuse production passwords or enter real personal/inventory data in the trial.
 
