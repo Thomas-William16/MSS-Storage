@@ -10,9 +10,10 @@ export async function packageFrontend() {
       if (error.code !== "ENOENT") throw error;
     });
   await cp("frontend/index.html", "public/index.html");
-  for (const directory of ["css", "dist"])
+  for (const directory of ["css", "dist", "icons"])
     await cp(`frontend/${directory}`, `public/${directory}`, {
       recursive: true,
     });
   await cp("frontend/favicon.svg", "public/favicon.svg");
+  await cp("frontend/manifest.webmanifest", "public/manifest.webmanifest");
 }

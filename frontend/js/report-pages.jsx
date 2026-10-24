@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { all, download, manager, admin, currentUser } from "./api.js";
 import { IssueDialog, RequestDialog } from "./workflow-pages.jsx";
+import { InstallApp } from "./ui/InstallApp.jsx";
 import {
   Header,
   Panel,
@@ -400,6 +401,7 @@ export function SettingsPage() {
         title="Account & system"
         subtitle="Your account information and deployment configuration."
       />
+      <InstallApp />
       <Panel title="My account">
         <dl>
           <dt>Name</dt>

@@ -16,7 +16,15 @@ export function frontendRouter(root = source) {
         headers: { "Cache-Control": "public, max-age=0, must-revalidate" },
       });
     const asset =
-      ["/css/style.css", "/favicon.svg", "/dist/app.js"].includes(req.path) ||
+      [
+        "/css/style.css",
+        "/favicon.svg",
+        "/dist/app.js",
+        "/manifest.webmanifest",
+      ].includes(req.path) ||
+      /^\/icons\/(icon-192|icon-512|icon-maskable-512|apple-touch-icon)\.png$/.test(
+        req.path,
+      ) ||
       /^\/dist\/chunks\/[a-zA-Z0-9-]+\.js$/.test(req.path);
     if (!asset) return next();
     serveAssets(req, res, next);

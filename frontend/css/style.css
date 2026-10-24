@@ -746,6 +746,34 @@ code {
   width: 100%;
   max-width: 350px;
 }
+.login-content {
+  width: 100%;
+  max-width: 400px;
+  display: grid;
+  gap: 24px;
+}
+.login-content .login-form {
+  max-width: none;
+}
+.login-content .panel {
+  margin-bottom: 0;
+}
+.password-visibility {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.password-visibility input {
+  width: auto;
+}
+.preview-notice {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  font-size: 13px;
+}
 .login-form h1 {
   font-size: 30px;
 }

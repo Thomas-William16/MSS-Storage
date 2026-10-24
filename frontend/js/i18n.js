@@ -1,5 +1,21 @@
 // Shared Arabic catalog and date formatting. Stored application data stays unchanged.
 const translations = {
+  "Show password": "إظهار كلمة المرور",
+  "This is a test preview. Use the separate preview account supplied with your preview link. Your normal website account does not sign in here.":
+    "هذه نسخة تجريبية. استخدم الحساب التجريبي المرفق برابط المعاينة. حساب الموقع الأساسي لا يعمل هنا.",
+  "Install on your phone": "التثبيت على هاتفك",
+  "Install app": "تثبيت التطبيق",
+  "Scout Storage is running as an app.": "مخزن الكشافة يعمل كتطبيق.",
+  "Add Scout Storage to your home screen for quick access.":
+    "أضف مخزن الكشافة إلى الشاشة الرئيسية للوصول السريع.",
+  "Android:": "أندرويد:",
+  "iPhone:": "آيفون:",
+  "Open this website in Chrome, then choose Install app or Add to Home screen from the browser menu.":
+    "افتح الموقع في كروم، ثم اختر تثبيت التطبيق أو الإضافة إلى الشاشة الرئيسية من قائمة المتصفح.",
+  "Open this website in Safari, tap Share, then Add to Home Screen. Enable Open as Web App if offered.":
+    "افتح الموقع في سفاري، واضغط على مشاركة، ثم إضافة إلى الشاشة الرئيسية. فعّل الفتح كتطبيق ويب إذا ظهر الخيار.",
+  "An internet connection is required. You can also keep using the website in your browser.":
+    "يلزم الاتصال بالإنترنت. يمكنك أيضاً الاستمرار في استخدام الموقع من المتصفح.",
   Overview: "نظرة عامة",
   Equipment: "المعدات",
   Borrowings: "الاستعارات",

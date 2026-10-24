@@ -189,3 +189,9 @@ Success notices describe completed actions, including the number returned, marke
 ## Engineering conventions
 
 See [engineering conventions](docs/ENGINEERING.md) for module responsibilities, dependency boundaries, refactoring guidance, and required checks. Run `npm run check:architecture` to detect circular runtime imports and dependencies that cross these boundaries.
+
+## Installable mobile app
+
+Scout Storage can be installed from Safari on iPhone or a supporting Android browser. Installation instructions are available before sign-in and in Settings. The installed app uses the same accounts and inventory as the website at that address and requires internet access. No app store or paid service is required.
+
+See [PWA release and recovery](docs/PWA.md) for installation, production release, preview isolation, and rollback. Run `npm run check:release` to build and check production frontend packaging without deploying.
