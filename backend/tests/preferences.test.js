@@ -186,6 +186,50 @@ it("persists language/theme for all roles, mirrors mobile navigation, and reuses
         const menu = await page.locator(".menu-toggle").boundingBox();
         expect(controls.x + controls.width).toBeLessThanOrEqual(menu.x);
       }
+      // Short mobile screens must keep every menu entry reachable without
+      // wrapping labels, and keep the close button outside the scrolling list.
+      await page.setViewportSize({ width: 320, height: 568 });
+      for (const locale of ["en", "ar", "ar-Latn"]) {
+        await page
+          .getByRole("combobox", { name: "Language" })
+          .selectOption(locale);
+        await page.locator("#menu-toggle").click();
+        const navigation = page.locator("#navigation");
+        expect(
+          await navigation.evaluate((node) => {
+            return [
+              ...node.querySelectorAll(".nav-link > span:not([aria-hidden])"),
+            ].every((label) => {
+              const range = document.createRange();
+              range.selectNodeContents(label);
+              return (
+                label.scrollWidth <= label.clientWidth &&
+                range.getClientRects().length === 1
+              );
+            });
+          }),
+        ).toBe(true);
+        expect(
+          await navigation.evaluate(
+            (node) => node.scrollHeight > node.clientHeight,
+          ),
+        ).toBe(true);
+        await navigation.evaluate((node) => {
+          node.scrollTop = node.scrollHeight;
+        });
+        expect(
+          await navigation.evaluate((node) => node.scrollTop),
+        ).toBeGreaterThan(0);
+        const finalLink = await navigation.locator("a").last().boundingBox();
+        const scrollArea = await navigation.boundingBox();
+        expect(finalLink.y + finalLink.height).toBeLessThanOrEqual(
+          scrollArea.y + scrollArea.height + 1,
+        );
+        await page.locator(".sidebar-back").click();
+        expect(
+          await page.locator("#menu-toggle").getAttribute("aria-expanded"),
+        ).toBe("false");
+      }
       await page.setViewportSize({ width: 1280, height: 900 });
       await page.getByRole("combobox", { name: "Language" }).selectOption("en");
       await page

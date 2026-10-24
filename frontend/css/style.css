@@ -181,10 +181,15 @@ nav {
   font-size: 13px;
   color: #d7c3cd;
 }
-.nav-link span {
+.nav-link > span[aria-hidden="true"] {
+  flex: 0 0 19px;
   width: 19px;
   font-size: 18px;
   text-align: center;
+}
+.nav-link > span:not([aria-hidden]) {
+  min-width: 0;
+  white-space: nowrap;
 }
 .nav-link:hover {
   background: #ffffff0c;
@@ -857,6 +862,17 @@ code {
     transform: translateX(-100%);
     transition: transform 0.2s;
     width: 238px;
+    max-height: 100dvh;
+  }
+  .sidebar > :not(nav) {
+    flex-shrink: 0;
+  }
+  .sidebar nav {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    align-content: start;
   }
   .menu-open .sidebar {
     transform: translateX(0);
@@ -1109,6 +1125,10 @@ code {
 }
 .language-picker {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   flex-shrink: 0;
   white-space: nowrap;
 }
