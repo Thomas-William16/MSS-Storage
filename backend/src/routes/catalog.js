@@ -34,6 +34,7 @@ import {
   createItems,
   createItemsInSession,
   inventoryStats,
+  inventoryPage,
   updateItem,
 } from "../services/inventory.js";
 import { fail } from "../utils/errors.js";
@@ -257,20 +258,7 @@ catalog.get("/equipment", permit("inventory"), async (req, res) => {
     filter = { archivedAt: null };
   if (paging.search) filter.name = searchRegex(paging.search);
   if (paging.category) filter.category = paging.category;
-  const rows = await inventoryStats(filter);
-  rows.sort((a, b) => a.name.localeCompare(b.name));
-  res.json({
-    data: rows.slice(
-      (paging.page - 1) * paging.limit,
-      paging.page * paging.limit,
-    ),
-    meta: {
-      page: paging.page,
-      limit: paging.limit,
-      total: rows.length,
-      pages: Math.ceil(rows.length / paging.limit),
-    },
-  });
+  res.json(await inventoryPage(filter, paging));
 });
 catalog.get("/equipment/:id", pathId, permit("inventory"), async (req, res) => {
   const rows = await inventoryStats({ _id: req.params.id });

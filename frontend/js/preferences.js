@@ -48,16 +48,20 @@ function translate(root) {
     }
   }
 }
-const controls = document.createElement("div");
-controls.className = "preference-controls";
-controls.dataset.preferences = "true";
-const languageButton = document.createElement("button");
-const themeButton = document.createElement("button");
-for (const button of [languageButton, themeButton]) {
-  button.type = "button";
-  button.className = "button secondary";
+const listeners = new Set();
+export const preferenceSnapshot = () => `${language}:${theme}`;
+export function subscribePreferences(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 }
-controls.append(languageButton, themeButton);
+export function toggleLanguage() {
+  language = language === "en" ? "ar" : "en";
+  apply();
+}
+export function toggleTheme() {
+  theme = theme === "light" ? "dark" : "light";
+  apply(false);
+}
 let originalTitle = document.title;
 export function updateTitle(title) {
   originalTitle = title;
@@ -66,22 +70,10 @@ export function updateTitle(title) {
     .map((part) => translateText(part, language))
     .join(" · ");
 }
-export function mountPreferences(container) {
-  container.append(controls);
-  apply();
-  return () => controls.remove();
-}
 function apply(translateAll = true) {
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   document.documentElement.dataset.theme = theme;
-  languageButton.textContent = language === "ar" ? "English" : "العربية";
-  languageButton.setAttribute(
-    "aria-label",
-    language === "ar" ? "Switch to English" : "التبديل إلى العربية",
-  );
-  themeButton.textContent = language === "ar" ? "الوضع الداكن" : "Dark mode";
-  themeButton.setAttribute("aria-pressed", String(theme === "dark"));
   if (translateAll) translate(document.body);
   document.title = originalTitle
     .split(" · ")
@@ -93,15 +85,8 @@ function apply(translateAll = true) {
   } catch {
     /* Private browsing may disable localStorage. */
   }
+  for (const listener of listeners) listener();
 }
-languageButton.addEventListener("click", () => {
-  language = language === "en" ? "ar" : "en";
-  apply();
-});
-themeButton.addEventListener("click", () => {
-  theme = theme === "light" ? "dark" : "light";
-  apply(false);
-});
 const observer = new MutationObserver((records) => {
   // Only visit changed text and newly inserted subtrees. Avoid rescanning all
   // tables and dialogs whenever a toast, loading label, or cart total changes.

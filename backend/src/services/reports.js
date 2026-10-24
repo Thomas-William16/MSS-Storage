@@ -8,39 +8,45 @@ import {
   Maintenance,
   AuditLog,
 } from "../models/index.js";
-import { inventoryStats } from "./inventory.js";
+import { inventoryStats, inventoryPage } from "./inventory.js";
 import { list } from "./common.js";
 export async function dashboard(user, operations) {
-  const rows = await inventoryStats({ archivedAt: null });
-  const total = await EquipmentItem.aggregate([
-    { $group: { _id: "$status", count: { $sum: 1 } } },
+  const scope = operations ? {} : { user: user._id };
+  const [
+    rows,
+    total,
+    overdue,
+    recentBorrowings,
+    pendingRequests,
+    recentActivity,
+  ] = await Promise.all([
+    inventoryStats({ archivedAt: null }),
+    EquipmentItem.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]),
+    Borrowing.countDocuments({
+      ...scope,
+      status: { $in: ["ACTIVE", "PARTIAL"] },
+      expectedReturnDate: { $lt: new Date() },
+    }),
+    Borrowing.find(scope)
+      .populate("user", "name role")
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean(),
+    EquipmentRequest.countDocuments({
+      ...(operations ? {} : { requestedBy: user._id }),
+      status: "PENDING",
+    }),
+    operations
+      ? AuditLog.find({})
+          .populate("user", "name")
+          .sort({ timestamp: -1 })
+          .limit(8)
+          .lean()
+      : Promise.resolve([]),
   ]);
   const counts = Object.fromEntries(total.map((x) => [x._id, x.count]));
-  const scope = operations ? {} : { user: user._id };
-  const [overdue, recentBorrowings, pendingRequests, recentActivity] =
-    await Promise.all([
-      Borrowing.countDocuments({
-        ...scope,
-        status: { $in: ["ACTIVE", "PARTIAL"] },
-        expectedReturnDate: { $lt: new Date() },
-      }),
-      Borrowing.find(scope)
-        .populate("user", "name role")
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .lean(),
-      EquipmentRequest.countDocuments({
-        ...(operations ? {} : { requestedBy: user._id }),
-        status: "PENDING",
-      }),
-      operations
-        ? AuditLog.find({})
-            .populate("user", "name")
-            .sort({ timestamp: -1 })
-            .limit(8)
-            .lean()
-        : Promise.resolve([]),
-    ]);
   return {
     equipmentTypes: rows.length,
     physicalItems: Object.values(counts).reduce((a, b) => a + b, 0),
@@ -63,28 +69,18 @@ export async function report(type, paging) {
         }
       : {};
   let equipmentIds;
+  if (type === "inventory")
+    return inventoryPage(
+      {
+        ...dates,
+        ...(paging.category ? { category: paging.category } : {}),
+      },
+      paging,
+    );
   if (paging.category)
     equipmentIds = (
       await Equipment.find({ category: paging.category }).select("_id")
     ).map((x) => x._id);
-  if (type === "inventory") {
-    const rows = await inventoryStats({
-      ...dates,
-      ...(paging.category ? { category: paging.category } : {}),
-    });
-    return {
-      data: rows.slice(
-        (paging.page - 1) * paging.limit,
-        paging.page * paging.limit,
-      ),
-      meta: {
-        page: paging.page,
-        limit: paging.limit,
-        total: rows.length,
-        pages: Math.ceil(rows.length / paging.limit),
-      },
-    };
-  }
   if (["lost", "damaged"].includes(type))
     return list(
       EquipmentItem,
@@ -116,7 +112,7 @@ export async function report(type, paging) {
       { $match: dates },
       {
         $lookup: {
-          from: "equipmentitems",
+          from: EquipmentItem.collection.name,
           localField: "equipmentItem",
           foreignField: "_id",
           as: "item",
@@ -129,7 +125,7 @@ export async function report(type, paging) {
       { $group: { _id: "$item.equipmentId", borrowCount: { $sum: 1 } } },
       {
         $lookup: {
-          from: "equipments",
+          from: Equipment.collection.name,
           localField: "_id",
           foreignField: "_id",
           as: "equipment",
@@ -138,17 +134,24 @@ export async function report(type, paging) {
       { $unwind: "$equipment" },
       { $sort: { borrowCount: -1, _id: 1 } },
     ];
-    const rows = await BorrowingItem.aggregate(pipeline);
+    pipeline.push({
+      $facet: {
+        data: [
+          { $skip: (paging.page - 1) * paging.limit },
+          { $limit: paging.limit },
+        ],
+        metadata: [{ $count: "total" }],
+      },
+    });
+    const [result] = await BorrowingItem.aggregate(pipeline);
+    const total = result.metadata[0]?.total || 0;
     return {
-      data: rows.slice(
-        (paging.page - 1) * paging.limit,
-        paging.page * paging.limit,
-      ),
+      data: result.data,
       meta: {
         page: paging.page,
         limit: paging.limit,
-        total: rows.length,
-        pages: Math.ceil(rows.length / paging.limit),
+        total,
+        pages: Math.ceil(total / paging.limit),
       },
     };
   }

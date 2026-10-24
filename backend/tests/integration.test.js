@@ -108,6 +108,54 @@ beforeEach(async () => {
   });
 });
 describe("Authentication and access", () => {
+  it("paginates inventory counts and rankings in the database with stable boundaries", async () => {
+    const types = await Equipment.insertMany(
+      Array.from({ length: 6 }, (_, index) => ({
+        name: `Sort ${index + 1}`,
+        category: category._id,
+      })),
+    );
+    const physical = await EquipmentItem.insertMany(
+      types.map((type, index) => ({
+        equipmentId: type._id,
+        itemCode: `SORT-${index}`,
+        condition: "GOOD",
+        status: index % 2 ? "LOST" : "AVAILABLE",
+      })),
+    );
+    const response = await clients.ADMIN.get(
+      `/api/v1/reports/inventory?page=2&limit=2&category=${category._id}`,
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.data.map((row) => row.name)).toEqual([
+      "Sort 3",
+      "Sort 4",
+    ]);
+    expect(response.body.data.map((row) => row.counts.total)).toEqual([1, 1]);
+    expect(response.body.data.map((row) => row.counts.available)).toEqual([
+      1, 0,
+    ]);
+    expect(response.body.meta).toMatchObject({ total: 7, pages: 4, page: 2 });
+    const empty = await clients.ADMIN.get(
+      "/api/v1/reports/inventory?page=20&limit=2",
+    );
+    expect(empty.body.data).toEqual([]);
+    expect(empty.body.meta.total).toBe(7);
+    for (let index = 0; index < 3; index++)
+      await BorrowingItem.insertMany(
+        Array.from({ length: 3 - index }, () => ({
+          borrowing: new mongoose.Types.ObjectId(),
+          equipmentItem: physical[index]._id,
+          conditionBefore: "GOOD",
+        })),
+      );
+    const ranked = await clients.ADMIN.get(
+      "/api/v1/reports/most-borrowed?page=2&limit=1",
+    );
+    expect(ranked.body.data[0].equipment.name).toBe("Sort 2");
+    expect(ranked.body.data[0].borrowCount).toBe(2);
+    expect(ranked.body.meta).toMatchObject({ total: 3, pages: 3, page: 2 });
+  });
   it("enforces shared account limits even when the per-instance limiter resets", async () => {
     const window = Math.floor(Date.now() / (15 * 60 * 1000));
     const { hash } = await import("../src/middleware/security.js");

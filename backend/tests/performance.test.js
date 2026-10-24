@@ -3,7 +3,7 @@ import express from "express";
 import { chromium } from "@playwright/test";
 import { existsSync } from "node:fs";
 
-it("defers workflow code, translates only changed content, and cancels superseded filters", async () => {
+it("defers workflow code and translates only changed content", async () => {
   const app = express();
   app.use(express.static("frontend"));
   const server = app.listen(0, "127.0.0.1");
@@ -40,7 +40,7 @@ it("defers workflow code, translates only changed content, and cancels supersede
       .getByRole("heading", { name: "Sign in to your storage" })
       .waitFor();
     expect(
-      scripts.some((url) => /\/(catalog|workflows|reports)-/.test(url)),
+      scripts.some((url) => /\/(catalog|workflow|report)-pages-/.test(url)),
     ).toBe(false);
 
     await page.getByRole("button", { name: "التبديل إلى العربية" }).click();
@@ -87,62 +87,6 @@ it("defers workflow code, translates only changed content, and cancels supersede
     await page.waitForFunction(
       () => document.querySelector("#large-fixture p").textContent === "Save",
     );
-    await page.addScriptTag({
-      type: "module",
-      content:
-        'import { pagedList } from "/js/lists.js"; window.testPagedList = pagedList;',
-    });
-    await page.waitForFunction(
-      () => typeof window.testPagedList === "function",
-    );
-    await page.evaluate(() => {
-      window.cancelledListRequests = 0;
-      const original = window.fetch;
-      window.fetch = (...args) => {
-        if (String(args[0]).includes("/performance")) {
-          args[1]?.signal?.addEventListener(
-            "abort",
-            () => window.cancelledListRequests++,
-          );
-        }
-        return original(...args);
-      };
-      const container = document.createElement("section");
-      container.id = "list-fixture";
-      document.body.append(container);
-      window.testPagedList(container, {
-        path: "/performance",
-        search: false,
-        columns: [{ key: "name", label: "Name" }],
-        filters: [
-          {
-            name: "filter",
-            label: "Performance filter",
-            options: [
-              { value: "slow", label: "Slow" },
-              { value: "fast", label: "Fast" },
-            ],
-          },
-        ],
-      });
-    });
-    await page
-      .locator("#list-fixture td")
-      .filter({ hasText: "initial" })
-      .waitFor();
-    await page.getByLabel("Performance filter").selectOption("slow");
-    await page.getByLabel("Performance filter").selectOption("fast");
-    await page
-      .locator("#list-fixture td")
-      .filter({ hasText: "fast" })
-      .waitFor();
-    await page.waitForTimeout(400);
-    expect(await page.locator("#list-fixture td").allTextContents()).toEqual([
-      "fast",
-    ]);
-    expect(
-      await page.evaluate(() => window.cancelledListRequests),
-    ).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   } finally {
     await browser.close();

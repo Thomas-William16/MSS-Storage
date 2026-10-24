@@ -21,6 +21,10 @@ const translations = {
   "Toggle navigation": "فتح القائمة",
   "Close navigation": "إغلاق القائمة",
   Back: "رجوع",
+  "Saving…": "جارٍ الحفظ…",
+  "Try again": "حاول مرة أخرى",
+  "The end date must be after the start date":
+    "يجب أن يكون تاريخ النهاية بعد تاريخ البداية",
   "Loading your workspace…": "جارٍ تحميل مساحة العمل…",
   "Care for our gear.": "اعتنوا بمعداتنا.",
   "Make every adventure possible.": "لنجعل كل مغامرة ممكنة.",

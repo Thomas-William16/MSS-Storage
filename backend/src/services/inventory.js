@@ -71,8 +71,15 @@ export async function createItemsInSession(user, equipmentId, input, session) {
   );
   return created;
 }
-export async function inventoryStats(filter = {}) {
-  const rows = await Equipment.find(filter).populate("category").lean();
+export async function inventoryStats(filter = {}, paging) {
+  const query = Equipment.find(filter).populate("category");
+  if (paging)
+    query
+      .collation({ locale: "en", strength: 2 })
+      .sort({ name: 1, _id: 1 })
+      .skip((paging.page - 1) * paging.limit)
+      .limit(paging.limit);
+  const rows = await query.lean();
   const ids = rows.map((x) => x._id);
   const counts = await EquipmentItem.aggregate([
     { $match: { equipmentId: { $in: ids } } },
@@ -108,6 +115,21 @@ export async function inventoryStats(filter = {}) {
       damaged: 0,
     },
   }));
+}
+export async function inventoryPage(filter, paging) {
+  const [data, total] = await Promise.all([
+    inventoryStats(filter, paging),
+    Equipment.countDocuments(filter),
+  ]);
+  return {
+    data,
+    meta: {
+      page: paging.page,
+      limit: paging.limit,
+      total,
+      pages: Math.ceil(total / paging.limit),
+    },
+  };
 }
 export async function updateItem(user, id, input) {
   return transaction(async (session) => {

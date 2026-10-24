@@ -1,15 +1,52 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useSyncExternalStore,
+  useState,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { session, login, logout, manager, admin, currentUser } from "./api.js";
-import { mountPreferences, updateTitle } from "./preferences.js";
+import {
+  updateTitle,
+  preferenceSnapshot,
+  subscribePreferences,
+  toggleLanguage,
+  toggleTheme,
+} from "./preferences.js";
 import { interceptNavigation, navigate } from "./router.js";
-import { el, toast } from "./dom.js";
+import { UIProvider, useUI, Loading, ErrorMessage } from "./ui.jsx";
 import { routes, preloadRoute } from "./routes.js";
 
 function Preferences() {
-  const host = useRef(null);
-  useLayoutEffect(() => mountPreferences(host.current), []);
-  return <div className="preference-host" ref={host} />;
+  const [language, theme] = useSyncExternalStore(
+    subscribePreferences,
+    preferenceSnapshot,
+  ).split(":");
+  return (
+    <div className="preference-host">
+      <div className="preference-controls" data-preferences="true">
+        <button
+          type="button"
+          className="button secondary"
+          aria-label={
+            language === "ar" ? "Switch to English" : "التبديل إلى العربية"
+          }
+          onClick={toggleLanguage}
+        >
+          {language === "ar" ? "English" : "العربية"}
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={theme === "dark"}
+          onClick={toggleTheme}
+        >
+          {language === "ar" ? "الوضع الداكن" : "Dark mode"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function Brand() {
@@ -110,65 +147,51 @@ function SignIn({ onSignIn }) {
   );
 }
 
-// Isolate existing workflow DOM inside a React-owned route lifecycle. A new
-// container per URL prevents late responses from overwriting a newer route.
-function WorkflowView({ page, search }) {
-  const host = useRef(null);
-  useEffect(() => {
-    const container = document.createElement("div");
-    host.current.replaceChildren(container);
-    let active = true;
-    const route = routes[page];
-    container.append(
-      el("p", { class: "loading", role: "status" }, "Loading your workspace…"),
+const routeComponents = Object.fromEntries(
+  Object.entries(routes).map(([page, route]) => [
+    page,
+    lazy(() => route[1]().then((Component) => ({ default: Component }))),
+  ]),
+);
+class RouteBoundary extends React.Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  render() {
+    return this.state.error ? (
+      <ErrorMessage error={this.state.error} retry={() => location.reload()} />
+    ) : (
+      this.props.children
     );
-    async function render() {
-      try {
-        if (!route) throw new Error("Page not found");
-        if (route[2] && !route[2]()) throw new Error("Permission denied");
-        // Render in a detached container so loading remains visible until ready.
-        const content = document.createElement("div");
-        const renderView = await route[1]();
-        if (!active) return;
-        await renderView(content, new URLSearchParams(search).get("id"));
-        if (!active) return;
-        container.replaceChildren(content);
-        const notice = sessionStorage.getItem("scout-notice");
-        if (notice) {
-          sessionStorage.removeItem("scout-notice");
-          toast(notice);
-        }
-        host.current.closest("main").focus({ preventScroll: true });
-      } catch (error) {
-        if (active)
-          container.replaceChildren(
-            el(
-              "div",
-              { class: "panel form-error", role: "alert" },
-              error.message,
-            ),
-          );
-      }
-    }
-    render();
-    return () => {
-      active = false;
-      container.remove();
-      for (const dialog of document.querySelectorAll("dialog")) {
-        dialog.close();
-        dialog.remove();
-      }
-    };
-  }, [page, search]);
-  return <div ref={host} />;
+  }
+}
+function WorkflowView({ page, search }) {
+  const route = routes[page];
+  if (!route) return <ErrorMessage error="Page not found" />;
+  if (route[2] && !route[2]())
+    return <ErrorMessage error="Permission denied" />;
+  const Component = routeComponents[page];
+  return (
+    <RouteBoundary key={page + search}>
+      <Suspense fallback={<Loading />}>
+        <Component
+          key={page + search}
+          id={new URLSearchParams(search).get("id")}
+        />
+      </Suspense>
+    </RouteBoundary>
+  );
 }
 
 function Workspace({ user, page, search }) {
+  const { toast } = useUI();
   const [menuOpen, setMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   useEffect(() => {
     setMenuOpen(false);
     window.scrollTo(0, 0);
+    document.getElementById("content")?.focus({ preventScroll: true });
   }, [page, search]);
   useEffect(() => {
     document.body.classList.toggle("menu-open", menuOpen);
@@ -311,6 +334,16 @@ function App() {
     window.addEventListener("popstate", update);
     window.addEventListener("scout:signed-out", expired);
     document.addEventListener("click", interceptNavigation);
+    const originalScrollRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    let scrollFrame;
+    const saveScroll = () => {
+      cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(() =>
+        history.replaceState({ ...history.state, scroll: window.scrollY }, ""),
+      );
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
     session()
       .then(setUser)
       .catch(() => setUser(null))
@@ -319,6 +352,9 @@ function App() {
       window.removeEventListener("popstate", update);
       window.removeEventListener("scout:signed-out", expired);
       document.removeEventListener("click", interceptNavigation);
+      window.removeEventListener("scroll", saveScroll);
+      cancelAnimationFrame(scrollFrame);
+      history.scrollRestoration = originalScrollRestoration;
     };
   }, []);
   useEffect(() => {
@@ -348,4 +384,8 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(
+  <UIProvider>
+    <App />
+  </UIProvider>,
+);

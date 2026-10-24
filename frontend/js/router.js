@@ -20,7 +20,12 @@ export function navigate(href, { replace = false } = {}) {
   if (url.origin !== location.origin) return location.assign(url.href);
   if (url.pathname === "/categories.html") url.pathname = "/equipment.html";
   if (url.href === location.href) return;
-  history[replace ? "replaceState" : "pushState"]({}, "", url);
+  history.replaceState({ ...history.state, scroll: window.scrollY }, "");
+  history[replace ? "replaceState" : "pushState"](
+    { scroll: 0, from: location.pathname + location.search },
+    "",
+    url,
+  );
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 

@@ -27,7 +27,10 @@ export async function api(path, options = {}) {
       if (response.status === 401) clearReferences();
       if (response.status === 401 && !path.startsWith("/auth/"))
         window.dispatchEvent(new Event("scout:signed-out"));
-      throw new Error(payload.error?.message || "Request failed");
+      throw Object.assign(
+        new Error(payload.error?.message || "Request failed"),
+        { fields: payload.error?.fields, status: response.status },
+      );
     }
     return payload;
   } finally {

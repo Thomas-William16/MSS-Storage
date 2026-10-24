@@ -50,5 +50,12 @@ export function errorHandler(error, req, res, next) {
   };
   if (status >= 500) logger.error(details, "Request failed");
   else logger.warn(details, "Request rejected");
-  res.status(status).json({ error: { message } });
+  res.status(status).json({
+    error: {
+      message,
+      ...(error instanceof AppError && status === 400 && error.fields
+        ? { fields: error.fields }
+        : {}),
+    },
+  });
 }

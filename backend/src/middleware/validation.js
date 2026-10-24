@@ -35,6 +35,11 @@ export const parse = (schema, value) => {
       result.error.issues
         .map((x) => `${x.path.join(".") || "body"}: ${x.message}`)
         .join("; "),
+      Object.fromEntries(
+        result.error.issues
+          .filter((issue) => issue.path.length)
+          .map((issue) => [issue.path.join("."), issue.message]),
+      ),
     );
   return result.data;
 };
