@@ -511,6 +511,9 @@ td .button {
 .field small {
   font-weight: 400;
 }
+.report-filters > .field {
+  margin: 0;
+}
 .inline-field {
   display: grid;
   gap: 5px;
